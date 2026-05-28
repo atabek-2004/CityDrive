@@ -29,6 +29,7 @@ import 'package:ikidz/src/feature/profile/presentation/widgets/choose_city_botto
 
 @RoutePage()
 class SignUpFirstPage extends StatefulWidget implements AutoRouteWrapper {
+  
   const SignUpFirstPage({super.key});
 
   @override

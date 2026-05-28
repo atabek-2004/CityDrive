@@ -35,11 +35,11 @@ class NewsDTO {
 }
 
 @RoutePage()
-class MainPage extends StatefulWidget implements AutoRouteWrapper {
-  const MainPage({super.key});
+class MainPageFirst extends StatefulWidget implements AutoRouteWrapper {
+  const MainPageFirst({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<MainPageFirst> createState() => _MainPageFirstState();
 
   @override
   Widget wrappedRoute(BuildContext context) {
@@ -66,7 +66,7 @@ class MainPage extends StatefulWidget implements AutoRouteWrapper {
   }
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageFirstState extends State<MainPageFirst> {
   final RefreshController _refreshController = RefreshController();
   int currentIndex = 0;
 
@@ -78,16 +78,16 @@ class _MainPageState extends State<MainPage> {
 
   final news = [
     NewsDTO(
-      title: 'Ремент улицы Абая',
+      title: 'Ремонт улицы Абая',
       description:
-          'Ремент улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
       imageUrl: Assets.images.png.news.path,
       createdAt: '2 дня назад',
     ),
     NewsDTO(
-      title: 'Ремент улицы Абая',
+      title: 'Ремонт улицы Абая',
       description:
-          'Ремент улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
       imageUrl: Assets.images.png.news.path,
       createdAt: '2 дня назад',
     ),

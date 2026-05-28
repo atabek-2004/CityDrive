@@ -9,11 +9,11 @@ import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
 import 'package:ikidz/src/core/utils/layout/url_util.dart' show UrlUtil;
 import 'package:ikidz/src/feature/app/bloc/app_bloc.dart';
 import 'package:ikidz/src/feature/app/logic/notification_service.dart';
+import 'package:ikidz/src/feature/app/presentation/pages/role_selection_page.dart';
 import 'package:ikidz/src/feature/app/presentation/pages/base.dart';
 import 'package:ikidz/src/feature/app/presentation/pages/force_update_page.dart';
-import 'package:ikidz/src/feature/auth/bloc/login_cubit.dart';
 import 'package:ikidz/src/feature/auth/presentation/pages/auth_page.dart';
-import 'package:ikidz/src/feature/profile/bloc/profile_bloc.dart';
+
 
 @RoutePage(name: 'LauncherRoute')
 class Launcher extends StatefulWidget {
@@ -86,7 +86,7 @@ class _LauncherState extends State<Launcher> with WidgetsBindingObserver {
           //   ),
           //   child: const AuthPage(),
           // ),
-          notAuthorized: () => const AuthPage(),
+          notAuthorized: () => const RoleSelectionPage(),
           banned: () => const AuthPage(), // BlocProvider(
           //   create: (context) => LoginCubit(
           //     repository: context.repository.authRepository,

@@ -43,16 +43,16 @@ class _NewCenetersPageState extends State<NewCenetersPage> {
 
   final news = [
     NewsDTO(
-      title: 'Ремент улицы Абая',
+      title: 'Ремонт улицы Абая',
       description:
-          'Ремент улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
       imageUrl: Assets.images.png.news.path,
       createdAt: '2 дня назад',
     ),
     NewsDTO(
-      title: 'Ремент улицы Кабанбай батыра',
+      title: 'Ремонт улицы Кабанбай батыра',
       description:
-          'Ремент улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
       imageUrl: Assets.images.png.newsSecond.path,
       createdAt: '2 дня назад',
     ),

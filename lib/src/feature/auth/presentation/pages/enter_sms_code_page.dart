@@ -32,9 +32,11 @@ class EnterSmsCodePage extends StatefulWidget implements AutoRouteWrapper {
     required this.smsDelay,
     this.userPayload,
     required this.phone,
+    this.isSignUpSecond = false,
   });
 
   final EnterSmsCodeType flowType;
+  final bool isSignUpSecond;
   final String phone;
   final int smsDelay;
   final UserPayload? userPayload; // for resend register sms code
@@ -278,13 +280,23 @@ class _EnterSmsCodePageState extends State<EnterSmsCodePage> {
                               ScaffoldMessenger.of(
                                 context,
                               ).showSnackBar(SnackBar(content: Text(message)));
-                              
                             },
                             loaded: () {
                               context.loaderOverlay.hide();
 
-                              context.router
-                                  .replaceAll([const LauncherRoute()]);
+                              if (widget.isSignUpSecond) {
+                                context.router.replaceAll(
+                                  [
+                                    const CompanyDataRoute(),
+                                  ],
+                                );
+                              } else {
+                                context.router.replaceAll(
+                                  [
+                                    const LoginRoute(),
+                                  ],
+                                );
+                              }
                             },
                           );
                         },

@@ -90,6 +90,22 @@ class AddChildSearchRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ApplicationSubmittedPage]
+class ApplicationSubmittedRoute extends PageRouteInfo<void> {
+  const ApplicationSubmittedRoute({List<PageRouteInfo>? children})
+    : super(ApplicationSubmittedRoute.name, initialChildren: children);
+
+  static const String name = 'ApplicationSubmittedRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ApplicationSubmittedPage();
+    },
+  );
+}
+
+/// generated route for
 /// [AuthPage]
 class AuthRoute extends PageRouteInfo<void> {
   const AuthRoute({List<PageRouteInfo>? children})
@@ -101,6 +117,38 @@ class AuthRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const AuthPage();
+    },
+  );
+}
+
+/// generated route for
+/// [AuthSecondPage]
+class AuthSecondRoute extends PageRouteInfo<void> {
+  const AuthSecondRoute({List<PageRouteInfo>? children})
+    : super(AuthSecondRoute.name, initialChildren: children);
+
+  static const String name = 'AuthSecondRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AuthSecondPage();
+    },
+  );
+}
+
+/// generated route for
+/// [BaseSecondPage]
+class BaseSecondRoute extends PageRouteInfo<void> {
+  const BaseSecondRoute({List<PageRouteInfo>? children})
+    : super(BaseSecondRoute.name, initialChildren: children);
+
+  static const String name = 'BaseSecondRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const BaseSecondPage();
     },
   );
 }
@@ -288,6 +336,38 @@ class CommentsRouteArgs {
 }
 
 /// generated route for
+/// [CompanyDataPage]
+class CompanyDataRoute extends PageRouteInfo<void> {
+  const CompanyDataRoute({List<PageRouteInfo>? children})
+    : super(CompanyDataRoute.name, initialChildren: children);
+
+  static const String name = 'CompanyDataRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CompanyDataPage();
+    },
+  );
+}
+
+/// generated route for
+/// [CompanyDocumentsPage]
+class CompanyDocumentsRoute extends PageRouteInfo<void> {
+  const CompanyDocumentsRoute({List<PageRouteInfo>? children})
+    : super(CompanyDocumentsRoute.name, initialChildren: children);
+
+  static const String name = 'CompanyDocumentsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CompanyDocumentsPage();
+    },
+  );
+}
+
+/// generated route for
 /// [ConfirmEntryPage]
 class ConfirmEntryRoute extends PageRouteInfo<void> {
   const ConfirmEntryRoute({List<PageRouteInfo>? children})
@@ -383,6 +463,7 @@ class EnterSmsCodeRoute extends PageRouteInfo<EnterSmsCodeRouteArgs> {
     required int smsDelay,
     UserPayload? userPayload,
     required String phone,
+    bool isSignUpSecond = false,
     List<PageRouteInfo>? children,
   }) : super(
          EnterSmsCodeRoute.name,
@@ -392,6 +473,7 @@ class EnterSmsCodeRoute extends PageRouteInfo<EnterSmsCodeRouteArgs> {
            smsDelay: smsDelay,
            userPayload: userPayload,
            phone: phone,
+           isSignUpSecond: isSignUpSecond,
          ),
          initialChildren: children,
        );
@@ -409,6 +491,7 @@ class EnterSmsCodeRoute extends PageRouteInfo<EnterSmsCodeRouteArgs> {
           smsDelay: args.smsDelay,
           userPayload: args.userPayload,
           phone: args.phone,
+          isSignUpSecond: args.isSignUpSecond,
         ),
       );
     },
@@ -422,6 +505,7 @@ class EnterSmsCodeRouteArgs {
     required this.smsDelay,
     this.userPayload,
     required this.phone,
+    this.isSignUpSecond = false,
   });
 
   final Key? key;
@@ -434,9 +518,11 @@ class EnterSmsCodeRouteArgs {
 
   final String phone;
 
+  final bool isSignUpSecond;
+
   @override
   String toString() {
-    return 'EnterSmsCodeRouteArgs{key: $key, flowType: $flowType, smsDelay: $smsDelay, userPayload: $userPayload, phone: $phone}';
+    return 'EnterSmsCodeRouteArgs{key: $key, flowType: $flowType, smsDelay: $smsDelay, userPayload: $userPayload, phone: $phone, isSignUpSecond: $isSignUpSecond}';
   }
 }
 
@@ -658,17 +744,17 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [MainPage]
-class MainRoute extends PageRouteInfo<void> {
-  const MainRoute({List<PageRouteInfo>? children})
-    : super(MainRoute.name, initialChildren: children);
+/// [MainPageFirst]
+class MainRouteFirst extends PageRouteInfo<void> {
+  const MainRouteFirst({List<PageRouteInfo>? children})
+    : super(MainRouteFirst.name, initialChildren: children);
 
-  static const String name = 'MainRoute';
+  static const String name = 'MainRouteFirst';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return WrappedRoute(child: const MainPage());
+      return WrappedRoute(child: const MainPageFirst());
     },
   );
 }
@@ -717,6 +803,22 @@ class MyChildrenProfileRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return WrappedRoute(child: const MyChildrenProfilePage());
+    },
+  );
+}
+
+/// generated route for
+/// [MyResponsesPage]
+class MyResponsesRoute extends PageRouteInfo<void> {
+  const MyResponsesRoute({List<PageRouteInfo>? children})
+    : super(MyResponsesRoute.name, initialChildren: children);
+
+  static const String name = 'MyResponsesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyResponsesPage();
     },
   );
 }
@@ -814,6 +916,22 @@ class NotificationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [NotificationsPage]
+class NotificationsRoute extends PageRouteInfo<void> {
+  const NotificationsRoute({List<PageRouteInfo>? children})
+    : super(NotificationsRoute.name, initialChildren: children);
+
+  static const String name = 'NotificationsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const NotificationsPage();
+    },
+  );
+}
+
+/// generated route for
 /// [OnboardingSeondPage]
 class OnboardingSeondRoute extends PageRouteInfo<void> {
   const OnboardingSeondRoute({List<PageRouteInfo>? children})
@@ -878,6 +996,45 @@ class PaymentWasSuccessfulRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ProblemDetailPage]
+class ProblemDetailRoute extends PageRouteInfo<ProblemDetailRouteArgs> {
+  ProblemDetailRoute({
+    Key? key,
+    bool isSubmit = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ProblemDetailRoute.name,
+         args: ProblemDetailRouteArgs(key: key, isSubmit: isSubmit),
+         initialChildren: children,
+       );
+
+  static const String name = 'ProblemDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ProblemDetailRouteArgs>(
+        orElse: () => const ProblemDetailRouteArgs(),
+      );
+      return ProblemDetailPage(key: args.key, isSubmit: args.isSubmit);
+    },
+  );
+}
+
+class ProblemDetailRouteArgs {
+  const ProblemDetailRouteArgs({this.key, this.isSubmit = false});
+
+  final Key? key;
+
+  final bool isSubmit;
+
+  @override
+  String toString() {
+    return 'ProblemDetailRouteArgs{key: $key, isSubmit: $isSubmit}';
+  }
+}
+
+/// generated route for
 /// [ProfilePage]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})
@@ -905,6 +1062,74 @@ class QrRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const QrPage();
+    },
+  );
+}
+
+/// generated route for
+/// [ReportDetailPage]
+class ReportDetailRoute extends PageRouteInfo<ReportDetailRouteArgs> {
+  ReportDetailRoute({
+    Key? key,
+    required String reportId,
+    required String imageUrl,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ReportDetailRoute.name,
+         args: ReportDetailRouteArgs(
+           key: key,
+           reportId: reportId,
+           imageUrl: imageUrl,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'ReportDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<ReportDetailRouteArgs>();
+      return ReportDetailPage(
+        key: args.key,
+        reportId: args.reportId,
+        imageUrl: args.imageUrl,
+      );
+    },
+  );
+}
+
+class ReportDetailRouteArgs {
+  const ReportDetailRouteArgs({
+    this.key,
+    required this.reportId,
+    required this.imageUrl,
+  });
+
+  final Key? key;
+
+  final String reportId;
+
+  final String imageUrl;
+
+  @override
+  String toString() {
+    return 'ReportDetailRouteArgs{key: $key, reportId: $reportId, imageUrl: $imageUrl}';
+  }
+}
+
+/// generated route for
+/// [ReportSuccessPage]
+class ReportSuccessRoute extends PageRouteInfo<void> {
+  const ReportSuccessRoute({List<PageRouteInfo>? children})
+    : super(ReportSuccessRoute.name, initialChildren: children);
+
+  static const String name = 'ReportSuccessRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ReportSuccessPage();
     },
   );
 }
@@ -944,6 +1169,22 @@ class RoadProblemDetailRouteArgs {
   String toString() {
     return 'RoadProblemDetailRouteArgs{key: $key, problem: $problem}';
   }
+}
+
+/// generated route for
+/// [RoleSelectionPage]
+class RoleSelectionRoute extends PageRouteInfo<void> {
+  const RoleSelectionRoute({List<PageRouteInfo>? children})
+    : super(RoleSelectionRoute.name, initialChildren: children);
+
+  static const String name = 'RoleSelectionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const RoleSelectionPage();
+    },
+  );
 }
 
 /// generated route for
@@ -1011,6 +1252,38 @@ class SignUpFirstRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [SignUpSecondPage]
+class SignUpSecondRoute extends PageRouteInfo<void> {
+  const SignUpSecondRoute({List<PageRouteInfo>? children})
+    : super(SignUpSecondRoute.name, initialChildren: children);
+
+  static const String name = 'SignUpSecondRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return WrappedRoute(child: const SignUpSecondPage());
+    },
+  );
+}
+
+/// generated route for
+/// [SubmitApplicationPage]
+class SubmitApplicationRoute extends PageRouteInfo<void> {
+  const SubmitApplicationRoute({List<PageRouteInfo>? children})
+    : super(SubmitApplicationRoute.name, initialChildren: children);
+
+  static const String name = 'SubmitApplicationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SubmitApplicationPage();
+    },
+  );
+}
+
+/// generated route for
 /// [SubscriptionPage]
 class SubscriptionRoute extends PageRouteInfo<void> {
   const SubscriptionRoute({List<PageRouteInfo>? children})
@@ -1072,6 +1345,22 @@ class UpcomingClassesRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return WrappedRoute(child: const UpcomingClassesPage());
+    },
+  );
+}
+
+/// generated route for
+/// [WorkReportPage]
+class WorkReportRoute extends PageRouteInfo<void> {
+  const WorkReportRoute({List<PageRouteInfo>? children})
+    : super(WorkReportRoute.name, initialChildren: children);
+
+  static const String name = 'WorkReportRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const WorkReportPage();
     },
   );
 }

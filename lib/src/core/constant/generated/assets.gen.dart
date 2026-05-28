@@ -107,6 +107,12 @@ class $AssetsIconsGen {
   /// File path: assets/icons/my_children.svg
   SvgGenImage get myChildren => const SvgGenImage('assets/icons/my_children.svg');
 
+  /// File path: assets/icons/my_sends.svg
+  SvgGenImage get mySends => const SvgGenImage('assets/icons/my_sends.svg');
+
+  /// File path: assets/icons/my_sends_not_active.svg
+  SvgGenImage get mySendsNotActive => const SvgGenImage('assets/icons/my_sends_not_active.svg');
+
   /// File path: assets/icons/person.svg
   SvgGenImage get person => const SvgGenImage('assets/icons/person.svg');
 
@@ -196,6 +202,8 @@ class $AssetsIconsGen {
         map,
         mapInTab,
         myChildren,
+        mySends,
+        mySendsNotActive,
         person,
         profileActive,
         profileInActive,
@@ -327,6 +335,9 @@ class $AssetsImagesPngGen {
   /// File path: assets/images/png/schedule_empty.png
   AssetGenImage get scheduleEmpty => const AssetGenImage('assets/images/png/schedule_empty.png');
 
+  /// File path: assets/images/png/splash.png
+  AssetGenImage get splash => const AssetGenImage('assets/images/png/splash.png');
+
   /// File path: assets/images/png/splash_screen.png
   AssetGenImage get splashScreen => const AssetGenImage('assets/images/png/splash_screen.png');
 
@@ -335,6 +346,12 @@ class $AssetsImagesPngGen {
 
   /// File path: assets/images/png/tiger.png
   AssetGenImage get tiger => const AssetGenImage('assets/images/png/tiger.png');
+
+  /// File path: assets/images/png/time-left 1.png
+  AssetGenImage get timeLeft1 => const AssetGenImage('assets/images/png/time-left 1.png');
+
+  /// File path: assets/images/png/upload (1) 1.png
+  AssetGenImage get upload11 => const AssetGenImage('assets/images/png/upload (1) 1.png');
 
   /// File path: assets/images/png/visa.png
   AssetGenImage get visa => const AssetGenImage('assets/images/png/visa.png');
@@ -377,9 +394,12 @@ class $AssetsImagesPngGen {
         onboardTwo,
         paymentSuccess,
         scheduleEmpty,
+        splash,
         splashScreen,
         subscriptionBackg,
         tiger,
+        timeLeft1,
+        upload11,
         visa,
         whatsappIcon
       ];

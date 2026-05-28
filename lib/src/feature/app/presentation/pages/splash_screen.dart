@@ -26,26 +26,26 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // body: Center(
-      //   child: Padding(
-      //     padding: const EdgeInsets.symmetric(horizontal: 55),
-      //     child: Column(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       children: [
-      //         Image.asset(
-      //           Assets.images.png.splashScreen.path,
-      //           height: 280,
-      //           width: 280,
-      //         ),
-      //         const Gap(3),
-      //         Text(
-      //           'Обучение без границ', 
-      //           style: AppTextStyles.title20w800.copyWith(color: AppColors.muteBlue)
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 55),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                Assets.images.png.splash.path,
+                height: 280,
+                width: 280,
+              ),
+              // const Gap(3),
+              // Text(
+              //   'Обучение без границ', 
+              //   style: AppTextStyles.title20w800.copyWith(color: AppColors.muteBlue)
+              // ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

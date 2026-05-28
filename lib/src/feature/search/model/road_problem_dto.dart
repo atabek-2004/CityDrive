@@ -10,10 +10,10 @@ class RoadProblemDTO {
   final String? status;
   final DateTime? reportedDate;
   final List<String>? images;
-  final String? author;        // НОВОЕ - автор сообщения
-  final int? likes;            // НОВОЕ - количество лайков
-  final int? commentsCount;    // НОВОЕ - количество комментариев
-  final List<Comment>? comments; // НОВОЕ - список комментариев
+  final String? author;        
+  final int? likes;            
+  final int? commentsCount;    
+  final List<Comment>? comments; 
 
   RoadProblemDTO({
     required this.id,

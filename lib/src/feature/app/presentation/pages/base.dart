@@ -24,7 +24,7 @@ class _BaseState extends State<Base> with TickerProviderStateMixin {
     super.initState();
 
     _tabController = TabController(
-      length: 3,
+      length: 4,
       vsync: this,
     );
   }
@@ -42,11 +42,13 @@ class _BaseState extends State<Base> with TickerProviderStateMixin {
       overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
       child: AutoTabsScaffold(
         routes: const [
-          MainRoute(),
+          MainRouteFirst(),
           MapRoute(),
-          ProfileRoute(),
+
+          MyResponsesRoute(),
+          // MyResponsesRoute(),
           // ScheduleRoute(),
-          // ProfileRoute(),
+          ProfileRoute(),
         ],
         // appBarBuilder: (context, tabsRouter) => switch (tabsRouter.activeIndex) {
         //   0 => AppBar(
@@ -189,11 +191,18 @@ class _BaseBottomNavbarState extends State<BaseBottomNavbar> {
             tabIndex: 1,
           ),
           CustomTabWidget(
+            icon: Assets.icons.addPlus.path,
+            activeIcon: Assets.icons.closeIcon1.path,
+            title: 'Мои отметки',
+            currentIndex: widget.tabController.index,
+            tabIndex: 2,
+          ),
+          CustomTabWidget(
             icon: Assets.icons.profileActive.path,
             activeIcon: Assets.icons.profileInActive.path,
             title: context.localized.profile,
             currentIndex: widget.tabController.index,
-            tabIndex: 2,
+            tabIndex: 3,
           ),
 
           // CustomTabWidget(

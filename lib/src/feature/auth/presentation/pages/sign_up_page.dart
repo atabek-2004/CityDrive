@@ -1,562 +1,643 @@
-// // ignore_for_file: deprecated_member_use
+import 'dart:io';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
+import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:ikidz/src/feature/auth/bloc/register_cubit.dart';
+import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
+import 'package:ikidz/src/feature/auth/presentation/auth.dart';
+import 'package:ikidz/src/feature/auth/presentation/widgets/registration_is_not_available_dialog.dart';
+import 'package:intl/intl.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
+import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:ikidz/src/core/presentation/widgets/textfields/custom_textfield.dart';
+import 'package:ikidz/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
+import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:ikidz/src/core/utils/input/validator_util.dart';
+import 'package:ikidz/src/feature/app/router/app_router.dart';
+// import 'package:ikidz/src/feature/auth/bloc/registration1_cubit.dart';
+import 'package:ikidz/src/feature/auth/models/common_dto.dart';
+import 'package:ikidz/src/feature/profile/presentation/widgets/choose_city_bottom_sheet.dart';
 
-// import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-// import 'package:ikidz/src/feature/app/presentation/widgets/custom_dropdown.dart';
-// import 'package:ikidz/src/feature/app/presentation/widgets/app_text.dart';
-// import 'package:ikidz/src/feature/app/router/app_router.dart';
-// import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
-// import 'package:gap/gap.dart';
-// import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-// import 'package:ikidz/src/core/presentation/widgets/textfields/custom_textfield.dart';
-// import 'package:ikidz/src/core/theme/resources.dart';
-// import 'package:loader_overlay/loader_overlay.dart';
-// import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+@RoutePage()
+class SignUpSecondPage extends StatefulWidget implements AutoRouteWrapper {
+  
+  const SignUpSecondPage({super.key});
 
-// @RoutePage()
-// class SignUpPage extends StatefulWidget {
-//   const SignUpPage({super.key});
+  @override
+  _SignUpSecondPageState createState() => _SignUpSecondPageState();
 
-//   @override
-//   State<SignUpPage> createState() => _SignUpPageState();
+  @override
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          RegisterCubit(repository: context.repository.authRepository),
+      child: this,
+    );
+  }
+}
 
-//   // @override
-//   // Widget wrappedRoute(BuildContext context) {
-//   //   return MultiBlocProvider(
-//   //     providers: [
-//   //       BlocProvider(
-//   //         create: (context) =>
-//   //             RegisterCubit(repository: context.repository.authRepository),
-//   //       ),
-//   //     ],
-//   //     child: this,
-//   //   );
-//   // }
-// }
+class _SignUpSecondPageState extends State<SignUpSecondPage> {
+  File? image;
+  CommonDTO? city;
+  bool _showDate = false;
+  DateTime? _selectedDate;
+  var agee = 0;
 
-// class _SignUpPageState extends State<SignUpPage> {
-//   final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController birthDayController = TextEditingController();
+  final TextEditingController passwordRepeatController =
+      TextEditingController();
 
-//   final TextEditingController _nameController = TextEditingController();
-//   final TextEditingController _phoneController = TextEditingController();
-//   final TextEditingController _parentPhoneController = TextEditingController();
-//   final TextEditingController _iinController = TextEditingController();
-//   final TextEditingController _addressController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-//   final TextEditingController _passwordRepeatController =
-//       TextEditingController();
+  final ValueNotifier<String?> _phoneError = ValueNotifier(null);
+  final ValueNotifier<String?> _cityError = ValueNotifier(null);
+  final ValueNotifier<String?> _firstNameError = ValueNotifier(null);
+  final ValueNotifier<String?> _passwordError = ValueNotifier(null);
+  final ValueNotifier<String?> _passwordRepeatError = ValueNotifier(null);
+  final MaskTextInputFormatter maskFormatter =
+      MaskTextInputFormatter(mask: '+7(###) ###-##-##');
+  final ValueNotifier<bool> _obscureText = ValueNotifier(true);
+  final ValueNotifier<bool> _obscureText2 = ValueNotifier(true);
+  final ValueNotifier<bool> _allowTapButton = ValueNotifier(false);
 
-//   final ValueNotifier<String?> _passwordError = ValueNotifier(null);
-//   final ValueNotifier<String?> _passwordRepeatError = ValueNotifier(null);
-//   final ValueNotifier<bool> _obscureText = ValueNotifier(true);
-//   final ValueNotifier<bool> _obscureText2 = ValueNotifier(true);
-//   final ValueNotifier<bool> _allowTapButton = ValueNotifier(false);
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    birthDayController.dispose();
+    cityController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    passwordRepeatController.dispose();
+    _obscureText.dispose();
+    _passwordError.dispose();
+    _phoneError.dispose();
+    _cityError.dispose();
+    _firstNameError.dispose();
 
-//   MaskTextInputFormatter maskFormatter =
-//       MaskTextInputFormatter(mask: '+7(###) ###-##-##');
+    _passwordRepeatError.dispose();
+    _allowTapButton.dispose();
+    super.dispose();
+  }
 
-//   MaskTextInputFormatter iinMaskFormatter =
-//       MaskTextInputFormatter(mask: '############');
+  @override
+  void initState() {
+    super.initState();
+    // nameController = PhoneNumberUtils(phoneController: phoneNumberController);
+    phoneController.addListener(checkAllowTapButton);
+    birthDayController.addListener(checkAllowTapButton);
+    cityController.addListener(checkAllowTapButton);
+    firstNameController.addListener(checkAllowTapButton);
+    passwordController.addListener(checkAllowTapButton);
+    passwordRepeatController.addListener(checkAllowTapButton);
+  }
 
-//   final phoneKey = GlobalKey();
-//   final passwordKey = GlobalKey();
-//   final passwordRepKey = GlobalKey();
+  void checkAllowTapButton() {
+    final isPassValid =
+        passwordController.text == passwordRepeatController.text;
 
-//   String selectedRole = 'Менеджер';
-//   int selectedTeam = 1;
-//   String selectedSubTeam = 'TIM1';
-//   String selectedCity = 'Алматы';
+    final bool isAdult =
+        _selectedDate != null && _calculateAge(_selectedDate!) >= 18;
 
-//   void _scrollToWidget(GlobalKey key) {
-//     final context = key.currentContext;
-//     if (context != null) {
-//       Scrollable.ensureVisible(
-//         context,
-//         duration: const Duration(milliseconds: 500),
-//         curve: Curves.easeInOut,
-//       );
-//     }
-//   }
+    _allowTapButton.value = phoneController.text.length == 17 &&
+        firstNameController.text.isNotEmpty &&
+        city != null &&
+        passwordController.text.isNotEmpty &&
+        passwordRepeatController.text.isNotEmpty &&
+        isPassValid &&
+        _selectedDate != null &&
+        isAdult;
+  }
 
-//   @override
-//   void dispose() {
-//     _passwordController.dispose();
-//     _passwordRepeatController.dispose();
-//     _passwordError.dispose();
-//     _passwordRepeatError.dispose();
-//     _allowTapButton.dispose();
-//     super.dispose();
-//   }
+  // bool isValidEmail(String value) {
+  //   const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+  //   final regExp = RegExp(pattern);
+  //   return regExp.hasMatch(value);
+  // }
 
-//   bool checkAllowTapButton() {
-//     return true;
-//     // return _nameController.text.isNotEmpty &&
-//     //     _dateController.text.isNotEmpty &&
-//     //     userNameController.text.isNotEmpty &&
-//     //     maskFormatter.getUnmaskedText().length == 10 &&
-//     //     passwordController.text.isNotEmpty &&
-//     //     passwordRepeatController.text.isNotEmpty &&
-//     //     passwordRepeatController.text == passwordController.text;
-//   }
+  int _calculateAge(DateTime birthDate) {
+    final now = DateTime.now();
+    int age = now.year - birthDate.year;
 
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
 
-//   @override
-//   void didChangeDependencies() {
-//     FocusScope.of(context).addListener(() {
-//       setState(() {});
-//     });
-//     super.didChangeDependencies();
-//   }
+    return age;
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return LoaderOverlay(
-//       overlayColor: AppColors.barrierColor,
-//       overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
-//       child: GestureDetector(
-//         onTap: () {
-//           FocusScope.of(context).unfocus();
-//         },
-//         child: Scaffold(
-//           backgroundColor: AppColors.bg,
-//           body: SafeArea(
-//             child: Form(
-//               key: _formKey,
-//               autovalidateMode: AutovalidateMode.onUserInteraction,
-//               child: SingleChildScrollView(
-//                 child: Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 16),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       const Gap(16),
-//                       title('Добро пожаловать!'),
-//                       const Gap(12),
-//                       subTitle(
-//                           'Если вы впервые у нас, просим вас создать новый аккаунт'),
-//                       const Gap(24),
+  @override
+  Widget build(BuildContext context) {
+    return LoaderOverlay(
+      overlayColor: AppColors.barrierColor,
+      overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Scaffold(
+          // appBar: AppBar(
+          //   leading: TextButton.icon(
+          //     onPressed: () {
+          //       context.router.maybePop();
+          //     },
+          //     label: SvgPicture.asset(Assets.icons.backArrow.path),
+          //   ),
+          // ),
+          body: SafeArea(
+            child: Form(
+              key: _formKey,
+              // autovalidateMode: AutovalidateMode.onUnfocus,
+              child: ScrollWrapper(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: BlocListener<RegisterCubit, RegisterState>(
+                    listener: (context, state) {
+                      state.maybeWhen(
+                        error: (message) {
+                          context.loaderOverlay.hide();
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
+                        },
+                        loading: () {
+                          context.loaderOverlay.show();
+                        },
+                        loaded: (user) {
+                          context.loaderOverlay.hide();
+                          print(user.phone);
+                          context.router.push(
+                            EnterSmsCodeRoute(
+                              isSignUpSecond: true,
+                              phone: user.phone ?? '',
+                              flowType: EnterSmsCodeType.signUp,
+                              smsDelay: 1,
+                              userPayload: UserPayload(
+                                fullName: user.fullName,
+                                password: user.password,
+                                phone: user.phone,
+                                passwordConfirmation: user.passwordConfirmation,
+                                cityId: user.cityId,
+                                birthDate: user.birthDate,
+                              ),
+                            ),
+                          );
+                        },
+                        orElse: () {
+                          context.loaderOverlay.hide();
+                        },
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // const SignUpStepsWidget(activeIndex: 1),
+                        const Gap(32),
+                        Text(
+                          context.localized.create_an_account,
+                          style: AppTextStyles.title26Semibold,
+                        ),
+                        const Gap(29),
 
-//                       // ФИО
-//                       titleTextField('ФИО'),
-//                       const Gap(6),
-//                       CustomTextField(
-//                         height: 48,
-//                         contentPadding: const EdgeInsets.only(left: 10),
-//                         controller: _nameController,
-//                         fillColor: Colors.white,
-//                         hintText: 'Введите фамилию и имя',
-//                         hintStyle: AppTextStyles.fs16w400.copyWith(
-//                             color: AppColors.grey3, letterSpacing: -0.4),
-//                         textStyle: AppTextStyles.fs16w400
-//                             .copyWith(letterSpacing: -0.4),
-//                         enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         onChanged: (v) {
-//                           checkAllowTapButton();
-//                           setState(() {});
-//                         },
-//                       ),
-//                       const Gap(14),
+                        Text(
+                          'Фамилия и имя',
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        CustomTextField(
+                          controller: firstNameController,
+                          hintText: 'Введите фамилию и имя',
+                          onChanged: (value) {
+                            checkAllowTapButton();
+                          },
+                        ),
+                        const Gap(16),
+                        Text(
+                          context.localized.phone_number,
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        CustomValidatorTextfield(
+                          controller: phoneController,
+                          valueListenable: _phoneError,
+                          inputFormatters: [maskFormatter],
+                          hintText: context.localized.enter_your_phone_number,
+                          keyboardType: TextInputType.phone,
+                          onChanged: (value) {
+                            checkAllowTapButton();
+                          },
+                          validator: (String? value) {
+                            return _phoneError.value = ValidatorUtil.phone(
+                              maskFormatter.getUnmaskedText(),
+                            );
+                          },
+                        ),
+                        const Gap(16),
+                        Text(
+                          context.localized.city,
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        CustomValidatorTextfield(
+                          controller: cityController,
+                          valueListenable: _phoneError,
+                          hintText: context.localized.choose_a_city,
+                          readOnly: true,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            child: SvgPicture.asset(
+                              Assets.icons.vector.path,
+                            ),
+                          ),
+                          onChanged: (value) {
+                            checkAllowTapButton();
+                          },
+                          onTap: () async {
+                            final result = await CityBottomSheet.show(
+                              context,
+                              chosenCity: city,
+                            );
 
-//                       // Номер телефона
-//                       titleTextField('Номер телефона'),
-//                       const Gap(6),
-//                       CustomTextField(
-//                         height: 48,
-//                         contentPadding: const EdgeInsets.only(left: 10),
-//                         controller: _phoneController,
-//                         inputFormatters: [maskFormatter],
-//                         hintText: 'Ваш номер телефона',
-//                         hintStyle: AppTextStyles.fs16w400.copyWith(
-//                             color: AppColors.grey3, letterSpacing: -0.4),
-//                         keyboardType: TextInputType.number,
-//                         fillColor: Colors.white,
-//                         textStyle: AppTextStyles.fs16w400
-//                             .copyWith(letterSpacing: -0.4),
-//                         enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         onChanged: (v) {
-//                           checkAllowTapButton();
-//                           setState(() {});
-//                         },
-//                       ),
-//                       const Gap(14),
+                            if (context.mounted && result != null) {
+                              setState(() {
+                                city = result;
+                                cityController.text = result.name ?? '';
+                              });
+                              checkAllowTapButton();
+                            }
+                          },
+                        ),
+                        const Gap(16),
+                        Text(
+                          'Дата рождения',
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        CustomValidatorTextfield(
+                          controller: birthDayController,
+                          valueListenable: _phoneError,
+                          hintText: 'Выберите дату рождения',
+                          readOnly: true,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            child: SvgPicture.asset(
+                              Assets.icons.vector.path,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              if (_showDate && _selectedDate != null) {
+                                final now = DateTime.now();
+                                final date = _selectedDate!;
+                                final age = now.year -
+                                    date.year -
+                                    ((now.month < date.month ||
+                                            (now.month == date.month &&
+                                                now.day < date.day))
+                                        ? 1
+                                        : 0);
 
-//                       // ИНН
-//                       titleTextField('ИНН'),
-//                       const Gap(6),
-//                       CustomTextField(
-//                         height: 48,
-//                         contentPadding: const EdgeInsets.only(left: 10),
-//                         controller: _iinController,
-//                         inputFormatters: [iinMaskFormatter],
-//                         hintText: 'Ваш ИИН',
-//                         hintStyle: AppTextStyles.fs16w400.copyWith(
-//                             color: AppColors.grey3, letterSpacing: -0.4),
-//                         keyboardType: TextInputType.number,
-//                         fillColor: Colors.white,
-//                         textStyle: AppTextStyles.fs16w400
-//                             .copyWith(letterSpacing: -0.4),
-//                         enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         onChanged: (v) {
-//                           checkAllowTapButton();
-//                           setState(() {});
-//                         },
-//                       ),
-//                       const Gap(14),
+                                if (age < 18) {
+                                  RegisterIsNotAvailableDialog.show(context);
 
-//                       // Выберите роль
-//                       titleTextField('Выберите роль'),
-//                       const Gap(6),
-//                       CustomDropdown<String>(
-//                         items: _role,
-//                         hint: '',
-//                         value: selectedRole,
-//                         selectedWidget: Text(
-//                           selectedRole,
-//                           style: AppTextStyles.fs16w400,
-//                         ),
-//                         menuItems: _role
-//                             .map(
-//                               (String item) => DropdownMenuItem<String>(
-//                                 value: item,
-//                                 child: Row(
-//                                   mainAxisAlignment:
-//                                       MainAxisAlignment.spaceBetween,
-//                                   children: [
-//                                     Text(
-//                                       item,
-//                                       style: AppTextStyles.fs16w400,
-//                                       overflow: TextOverflow.ellipsis,
-//                                     ),
-//                                     if (selectedRole == item)
-//                                       const Icon(Icons.check)
-//                                   ],
-//                                 ),
-//                               ),
-//                             )
-//                             .toList(),
-//                         onChanged: (value) {
-//                           setState(() {
-//                             selectedRole = value ?? '';
-//                           });
-//                         },
-//                       ),
-//                       const Gap(14),
+                                  return;
+                                }
 
-//                       // Выберите команду
-//                       titleTextField('Выберите команду'),
-//                       const Gap(6),
-//                       Row(
-//                         children: [
-//                           _chooseTeamWidget(
-//                             title: 'TIM',
-//                             selected: selectedTeam == 1,
-//                             onTap: () {
-//                               selectedTeam = 1;
-//                               selectedSubTeam = 'TIM1';
-//                               setState(() {});
-//                             },
-//                           ),
-//                           const Gap(16),
-//                           _chooseTeamWidget(
-//                             title: 'WEN',
-//                             selected: selectedTeam == 2,
-//                             onTap: () {
-//                               selectedTeam = 2;
-//                               selectedSubTeam = 'WEN1';
-//                               setState(() {});
-//                             },
-//                           ),
-//                         ],
-//                       ),
-//                       const Gap(14),
+                                // setState(() {
+                                //   _showDate = false;
+                                // });
+                              }
 
-//                       // Выберите подкоманду
-//                       titleTextField('Выберите подкоманду'),
-//                       const Gap(6),
-//                       CustomDropdown<String>(
-//                         items: selectedTeam == 1 ? _timTeam : _wenTeam,
-//                         hint: '',
-//                         value: selectedSubTeam,
-//                         selectedWidget: Text(
-//                           selectedSubTeam,
-//                           style: AppTextStyles.fs16w400,
-//                         ),
-//                         menuItems: (selectedTeam == 1 ? _timTeam : _wenTeam)
-//                             .map(
-//                               (String item) => DropdownMenuItem<String>(
-//                                 value: item,
-//                                 child: Row(
-//                                   mainAxisAlignment:
-//                                       MainAxisAlignment.spaceBetween,
-//                                   children: [
-//                                     Text(
-//                                       item,
-//                                       style: AppTextStyles.fs16w400,
-//                                       overflow: TextOverflow.ellipsis,
-//                                     ),
-//                                     if (selectedSubTeam == item)
-//                                       const Icon(Icons.check)
-//                                   ],
-//                                 ),
-//                               ),
-//                             )
-//                             .toList(),
-//                         onChanged: (value) {
-//                           setState(() {
-//                             selectedSubTeam = value ?? '';
-//                           });
-//                         },
-//                       ),
-//                       const Gap(14),
+                              _showDate = !_showDate;
+                            });
+                          },
+                        ),
+                        GestureDetector(
+                          behavior: HitTestBehavior.deferToChild,
+                          onTap: () {
+                            if (_showDate && _selectedDate != null) {
+                              final now = DateTime.now();
+                              final date = _selectedDate!;
+                              final age = now.year -
+                                  date.year -
+                                  ((now.month < date.month ||
+                                          (now.month == date.month &&
+                                              now.day < date.day))
+                                      ? 1
+                                      : 0);
 
-//                       // Город
-//                       titleTextField('Город'),
-//                       const Gap(6),
-//                       CustomDropdown<String>(
-//                         items: _city,
-//                         hint: '',
-//                         value: selectedCity,
-//                         selectedWidget: Text(
-//                           selectedCity,
-//                           style: AppTextStyles.fs16w400,
-//                         ),
-//                         menuItems: _city
-//                             .map(
-//                               (String item) => DropdownMenuItem<String>(
-//                                 value: item,
-//                                 child: Row(
-//                                   mainAxisAlignment:
-//                                       MainAxisAlignment.spaceBetween,
-//                                   children: [
-//                                     Text(
-//                                       item,
-//                                       style: AppTextStyles.fs16w400,
-//                                       overflow: TextOverflow.ellipsis,
-//                                     ),
-//                                     if (selectedCity == item)
-//                                       const Icon(Icons.check)
-//                                   ],
-//                                 ),
-//                               ),
-//                             )
-//                             .toList(),
-//                         onChanged: (value) {
-//                           setState(() {
-//                             selectedCity = value ?? '';
-//                           });
-//                         },
-//                       ),
-//                       const Gap(14),
+                              if (age < 18) {
+                                RegisterIsNotAvailableDialog.show(context);
 
-//                       // Адрес проживания
-//                       titleTextField('Адрес проживания'),
-//                       const Gap(6),
-//                       CustomTextField(
-//                         height: 48,
-//                         contentPadding: const EdgeInsets.only(left: 10),
-//                         controller: _addressController,
-//                         hintText: 'Ваш адрес',
-//                         hintStyle: AppTextStyles.fs16w400.copyWith(
-//                             color: AppColors.grey3, letterSpacing: -0.4),
-//                         fillColor: Colors.white,
-//                         textStyle: AppTextStyles.fs16w400
-//                             .copyWith(letterSpacing: -0.4),
-//                         enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         onChanged: (v) {
-//                           checkAllowTapButton();
-//                           setState(() {});
-//                         },
-//                       ),
-//                       const Gap(14),
+                                return;
+                              }
 
-//                       // Номер телефон родителя
-//                       titleTextField('Номер телефон родителя'),
-//                       const Gap(6),
-//                       CustomTextField(
-//                         height: 48,
-//                         contentPadding: const EdgeInsets.only(left: 10),
-//                         controller: _parentPhoneController,
-//                         inputFormatters: [maskFormatter],
-//                         hintText: 'Введите номер телефон родителя',
-//                         hintStyle: AppTextStyles.fs16w400.copyWith(
-//                             color: AppColors.grey3, letterSpacing: -0.4),
-//                         keyboardType: TextInputType.number,
-//                         fillColor: Colors.white,
-//                         textStyle: AppTextStyles.fs16w400
-//                             .copyWith(letterSpacing: -0.4),
-//                         enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(12),
-//                             borderSide: BorderSide.none),
-//                         onChanged: (v) {
-//                           checkAllowTapButton();
-//                           setState(() {});
-//                         },
-//                       ),
-//                       const Gap(14),
+                              // setState(() {
+                              //   _showDate = false;
+                              // });
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              if (_showDate)
+                                Column(
+                                  children: [
+                                    const Gap(10),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        color: const Color(0xFFEAECED),
+                                      ),
+                                      child: SizedBox(
+                                        height: 200,
+                                        child: CupertinoDatePicker(
+                                          mode: CupertinoDatePickerMode.date,
+                                          initialDateTime:
+                                              _selectedDate ?? DateTime(2003),
+                                          minimumDate: DateTime(1900),
+                                          maximumDate: DateTime.now(),
+                                          dateOrder: DatePickerDateOrder.dmy,
+                                          onDateTimeChanged: (date) {
+                                            setState(() {
+                                              _selectedDate = date;
+                                              birthDayController.text =
+                                                  DateFormat('dd.MM.yyyy')
+                                                      .format(date);
+                                            });
+                                            checkAllowTapButton();
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
 
-//                       // Пароль
-//                       titleTextField('Пароль'),
-//                       const Gap(6),
-//                       ValueListenableBuilder(
-//                         valueListenable: _obscureText,
-//                         builder: (context, value, child) {
-//                           return CustomTextField(
-//                             height: 48,
-//                             contentPadding: const EdgeInsets.only(left: 10),
-//                             controller: _passwordController,
-//                             obscureText: _obscureText,
-//                             hintText: 'Придумайте пароль',
-//                             hintStyle: AppTextStyles.fs16w400.copyWith(
-//                                 color: AppColors.grey3, letterSpacing: -0.4),
-//                             fillColor: Colors.white,
-//                             textStyle: AppTextStyles.fs16w400
-//                                 .copyWith(letterSpacing: -0.4),
-//                             enabledBorder: OutlineInputBorder(
-//                                 borderRadius: BorderRadius.circular(12),
-//                                 borderSide: BorderSide.none),
-//                             focusedBorder: OutlineInputBorder(
-//                                 borderRadius: BorderRadius.circular(12),
-//                                 borderSide: BorderSide.none),
-//                             onTap: () {
-//                               _scrollToWidget(passwordKey);
-//                             },
-//                             onChanged: (value) {
-//                               checkAllowTapButton();
-//                               setState(() {});
-//                             },
-//                           );
-//                         },
-//                       ),
-//                       const Gap(14),
+                        const Gap(16),
+                        // Text(
+                        //   context.localized.email,
+                        //   style: AppTextStyles.body14Regular,
+                        // ),
+                        // const Gap(6),
+                        // CustomValidatorTextfield(
+                        //   controller: emailController,
+                        //   valueListenable: _emailError,
+                        //   hintText: context.localized.enter_your_email_address,
+                        //   onChanged: (value) {
+                        //     checkAllowTapButton();
+                        //   },
+                        // ),
 
-//                       // Повторить  пароль
-//                       titleTextField('Повторить  пароль'),
-//                       const Gap(6),
-//                       ValueListenableBuilder(
-//                         valueListenable: _obscureText2,
-//                         builder: (context, value, child) {
-//                           return CustomTextField(
-//                             height: 48,
-//                             contentPadding: const EdgeInsets.only(left: 10),
-//                             controller: _passwordRepeatController,
-//                             obscureText: _obscureText2,
-//                             hintText: 'Повторить  пароль',
-//                             hintStyle: AppTextStyles.fs16w400.copyWith(
-//                                 color: AppColors.grey3, letterSpacing: -0.4),
-//                             fillColor: Colors.white,
-//                             textStyle: AppTextStyles.fs16w400
-//                                 .copyWith(letterSpacing: -0.4),
-//                             enabledBorder: OutlineInputBorder(
-//                                 borderRadius: BorderRadius.circular(12),
-//                                 borderSide: BorderSide.none),
-//                             focusedBorder: OutlineInputBorder(
-//                                 borderRadius: BorderRadius.circular(12),
-//                                 borderSide: BorderSide.none),
-//                             onTap: () {
-//                               _scrollToWidget(passwordKey);
-//                             },
-//                             onChanged: (value) {
-//                               checkAllowTapButton();
-//                               setState(() {});
-//                             },
-//                           );
-//                         },
-//                       ),
-//                       const Gap(19),
+                        // const Gap(16),
+                        Text(
+                          context.localized.password,
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        ValueListenableBuilder(
+                          valueListenable: _obscureText,
+                          builder: (context, v, c) {
+                            return CustomValidatorTextfield(
+                              obscureText: _obscureText,
+                              controller: passwordController,
+                              valueListenable: _passwordError,
+                              hintText: context.localized.enter_the_password,
+                              onChanged: (value) {
+                                checkAllowTapButton();
+                              },
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return _passwordError.value =
+                                      context.localized.required_to_fill_in;
+                                }
 
-//                       // Кнопка "Далее"
-//                       CustomButton(
-//                         onPressed: () {
-//                           context.router.push(SmsRoute(
-//                               phone: '+7 (777) 777 77 77', type: 'register'));
-//                         },
-//                         style: CustomButtonStyles.mainButtonStyle(context),
-//                         text: 'Далее',
-//                         child: null,
-//                       ),
-//                       const Gap(16),
+                                if (value.length < 6) {
+                                  return _passwordError.value = context
+                                      .localized
+                                      .the_minimum_password_length_is_6;
+                                }
 
-//                       // У вас есть аккаунт? Войти
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Text('У вас есть аккаунт?',
-//                               style: AppTextStyles.fs16w400.copyWith(
-//                                   color: AppColors.baseDay700,
-//                                   letterSpacing: -0.4)),
-//                           GestureDetector(
-//                             onTap: () =>
-//                                 context.router.push(const LoginRoute()),
-//                             child: Text('  Войти',
-//                                 style: AppTextStyles.fs16w600.copyWith(
-//                                     color: AppColors.primary,
-//                                     letterSpacing: -0.08)),
-//                           ),
-//                         ],
-//                       ),
-//                       const Gap(30)
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+                                return _passwordError.value = null;
+                              },
+                            );
+                          },
+                        ),
+                        const Gap(16),
+                        Text(
+                          context.localized.repeat_the_password,
+                          style: AppTextStyles.texts13w500
+                              .copyWith(color: AppColors.text63636366),
+                        ),
+                        const Gap(6),
+                        ValueListenableBuilder(
+                          valueListenable: _obscureText2,
+                          builder: (context, v, c) {
+                            return CustomValidatorTextfield(
+                              obscureText: _obscureText2,
+                              controller: passwordRepeatController,
+                              valueListenable: _passwordRepeatError,
+                              hintText: context.localized.repeat_the_password,
+                              onChanged: (value) {
+                                checkAllowTapButton();
+                              },
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return _passwordRepeatError.value =
+                                      context.localized.required_to_fill_in;
+                                }
 
-// Widget _chooseTeamWidget(
-//     {required String title, void Function()? onTap, required bool selected}) {
-//   return Expanded(
-//     child: GestureDetector(
-//       onTap: onTap,
-//       child: Container(
-//         height: 45,
-//         padding: const EdgeInsets.only(left: 10),
-//         alignment: AlignmentDirectional.centerStart,
-//         decoration: BoxDecoration(
-//             color: Colors.white,
-//             borderRadius: BorderRadius.circular(12),
-//             border: selected
-//                 ? Border.all(color: AppColors.primary, width: 1)
-//                 : Border.all(color: Colors.white, width: 1)),
-//         child: Text(title,
-//             style: AppTextStyles.fs16w400.copyWith(letterSpacing: -0.08)),
-//       ),
-//     ),
-//   );
-// }
+                                if (value.length < 6) {
+                                  return _passwordRepeatError.value = context
+                                      .localized
+                                      .the_minimum_password_length_is_6;
+                                }
 
-// List<String> _role = ['Старший менеджер', 'Конвейсер', 'Менеджер'];
-// List<String> _timTeam = ['TIM1', 'TIM2', 'TIM3'];
-// List<String> _wenTeam = ['WEN1', 'WEN2', 'WEN3'];
-// List<String> _city = ['Алматы', 'Астана', 'Шымкент', 'Тараз'];
+                                if (value != passwordController.text) {
+                                  return _passwordRepeatError.value =
+                                      context.localized.passwords_dont_match;
+                                }
+                                return _passwordRepeatError.value = null;
+                              },
+                            );
+                          },
+                        ),
+                        const Gap(16),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                  text: 'Продолжая, вы соглашаетесь с ',
+                                  style: AppTextStyles.body16Regular400),
+                              TextSpan(
+                                  text: 'Политикой конфиденциальности',
+                                  style: AppTextStyles.body16Regular800
+                                      .copyWith(
+                                          color: const Color(0xFF1890FF))),
+                            ],
+                          ),
+                        ),
+                        const Gap(26),
+                        const Spacer(),
+                        const Gap(16),
+                        ValueListenableBuilder(
+                          valueListenable: _allowTapButton,
+                          builder: (context, isEnabled, _) {
+                            return CustomButton(
+                              allowTapButton: _allowTapButton,
+                              onPressed: () {
+                                BlocProvider.of<RegisterCubit>(context)
+                                    .register(
+                                  payload: UserPayload(
+                                    fullName: firstNameController.text.trim(),
+                                    password: passwordController.text.trim(),
+                                    cityId: city?.id,
+                                    phone: phoneController.text
+                                        .replaceAll(RegExp(r'[^\d]'), ''),
+                                    passwordConfirmation:
+                                        passwordRepeatController.text.trim(),
+
+                                    birthDate: _selectedDate.toString(),
+                                    // deviceType:
+                                    //     Platform.isAndroid ? 'android' : 'ios',
+                                    // deviceToken: '',
+                                  ),
+                                );
+                              },
+                              style: CustomButtonStyles.mainButtonStyle(context)
+                                  .copyWith(
+                                shape: WidgetStatePropertyAll(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                backgroundColor: WidgetStatePropertyAll(
+                                  isEnabled
+                                      ? AppColors.mainColor
+                                      : AppColors.backgroundButtonF5F5F5,
+                                ),
+                                foregroundColor: WidgetStatePropertyAll(
+                                  isEnabled
+                                      ? AppColors.white
+                                      : AppColors
+                                          .foregroundTextButoonWhenIsnotAllowed,
+                                ),
+                              ),
+                              text: 'Далее',
+                              child: null,
+                            );
+                          },
+                        ),
+
+                        // BlocListener<Register1Cubit, Register1State>(
+                        //   listener: (context, state) {
+                        //     state.maybeWhen(
+                        //       loading: () => context.loaderOverlay.show(),
+                        //       error: (message) {
+                        //         context.loaderOverlay.hide();
+                        //         ScaffoldMessenger.of(context).showSnackBar(
+                        //           SnackBar(
+                        //             content: Text(message),
+                        //           ),
+                        //         );
+                        //       },
+                        //       loaded: (user) {
+                        //         context.loaderOverlay.hide();
+                        //         // context.pushRoute(SignUpSecondRoute(email: emailController.text));
+                        //       },
+                        //       orElse: () => context.loaderOverlay.hide(),
+                        //     );
+                        //   },
+                        //   child: ValueListenableBuilder(
+                        //     valueListenable: _allowTapButton,
+                        //     builder: (context, isEnabled, _) {
+                        //       return CustomButton(
+                        //         allowTapButton: _allowTapButton,
+                        //         onPressed: () {
+                        //           // BlocProvider.of<RegisterCheckCodeCubit>(
+                        //           //         context)
+                        //           //     .checkCode(
+                        //           //   code: pinputController.text,
+                        //           //   phone: widget.phone ?? "",
+                        //           // );
+                        //         },
+                        //         style: CustomButtonStyles.mainButtonStyle(context)
+                        //             .copyWith(
+                        //           shape: WidgetStatePropertyAll(
+                        //             RoundedRectangleBorder(
+                        //               borderRadius: BorderRadius.circular(16),
+                        //             ),
+                        //           ),
+                        //           backgroundColor: WidgetStatePropertyAll(
+                        //             isEnabled
+                        //                 ? AppColors.mainColor
+                        //                 : AppColors.backgroundButtonF5F5F5,
+                        //           ),
+                        //           foregroundColor: WidgetStatePropertyAll(
+                        //             isEnabled
+                        //                 ? AppColors.white
+                        //                 : AppColors
+                        //                     .foregroundTextButoonWhenIsnotAllowed,
+                        //           ),
+                        //         ),
+                        //         text: 'Далее',
+                        //         child: null,
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
+                        const Gap(16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'У вас есть аккаунт?',
+                              style: AppTextStyles.body16Regular400.copyWith(
+                                color: AppColors.text8E8E93,
+                              ),
+                            ),
+                            const Gap(5),
+                            GestureDetector(
+                              onTap: () {
+                                context.router.push(const LoginRoute());
+                              },
+                              child: const Text(
+                                'Войти',
+                                style: AppTextStyles.body16Regular400Blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
