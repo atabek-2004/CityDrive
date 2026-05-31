@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
-import 'package:ikidz/src/feature/app/logic/not_auth_logic.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/feature/app/logic/not_auth_logic.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 part 'app_bloc.freezed.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class EmptyWidget extends StatelessWidget {
   final String title;

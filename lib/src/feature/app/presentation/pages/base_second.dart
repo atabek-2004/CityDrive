@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/profile/bloc/profile_bloc.dart';
-import 'package:ikidz/src/feature/profile/presentation/pages/profile_page.dart';
-import 'package:ikidz/src/feature/search/presentation/pages/my_works_page.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
+import 'package:city_drive/src/feature/profile/presentation/pages/profile_page.dart';
+import 'package:provider/provider.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/presentation/pages/my_works_page.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
 
 @RoutePage()
 class BaseSecondPage extends StatefulWidget {
@@ -31,15 +37,22 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
       length: 3,
       vsync: this,
     );
-    _tabController.addListener(() {
-      setState(() {
-        _currentIndex = _tabController.index;
-      });
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!mounted) return;
+    if (!_tabController.indexIsChanging && _tabController.index == 0) {
+      context.read<RoadProblemsProvider>().load();
+    }
+    setState(() {
+      _currentIndex = _tabController.index;
     });
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -47,13 +60,16 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     // Оборачиваем в BlocProvider для ProfilePage
-    return BlocProvider(
-      create: (context) => ProfileBLoC(
-        profileRepository: context.repository.profileRepository,
-        authRepository: context.repository.authRepository,
-      )..add(const ProfileEvent.getProfile()),
-      child: Scaffold(
-        body: TabBarView(
+    return LoaderOverlay(
+      overlayColor: AppColors.barrierColor,
+      overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
+      child: BlocProvider(
+        create: (context) => ProfileBLoC(
+          profileRepository: context.repository.profileRepository,
+          authRepository: context.repository.authRepository,
+        )..add(const ProfileEvent.getProfile()),
+        child: Scaffold(
+          body: TabBarView(
           controller: _tabController,
           physics: const NeverScrollableScrollPhysics(),
           children: const [
@@ -62,9 +78,10 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
             ProfilePage(),
           ],
         ),
-        bottomNavigationBar: BaseBottomNavbar(
-          tabController: _tabController,
-          currentIndex: _currentIndex,
+          bottomNavigationBar: BaseBottomNavbar(
+            tabController: _tabController,
+            currentIndex: _currentIndex,
+          ),
         ),
       ),
     );
@@ -83,6 +100,7 @@ class BaseBottomNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
     return Container(
       padding: EdgeInsets.only(
         top: 8,
@@ -108,21 +126,21 @@ class BaseBottomNavbar extends StatelessWidget {
           _NavBarItem(
             icon: Icons.home_outlined,
             activeIcon: Icons.home,
-            label: 'Главная',
+            label: l10n.main,
             isActive: currentIndex == 0,
             onTap: () => tabController.animateTo(0),
           ),
           _NavBarItem(
             icon: Icons.assignment_outlined,
             activeIcon: Icons.assignment,
-            label: 'Мое работы',
+            label: l10n.cityDriveMyWorks,
             isActive: currentIndex == 1,
             onTap: () => tabController.animateTo(1),
           ),
           _NavBarItem(
             icon: Icons.person_outline,
             activeIcon: Icons.person,
-            label: 'Профиль',
+            label: l10n.profile,
             isActive: currentIndex == 2,
             onTap: () => tabController.animateTo(2),
           ),
@@ -178,12 +196,69 @@ class _NavBarItem extends StatelessWidget {
   }
 }
 
-// ============== ГЛАВНАЯ СТРАНИЦА ==============
-class MainPage extends StatelessWidget {
+// ============== ГЛАВНАЯ СТРАНИЦА КОНТРОЛЛЕРА ==============
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RoadProblemsProvider>().load();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return Consumer<RoadProblemsProvider>(
+      builder: (context, provider, _) {
+        final pending = provider.pendingForController();
+        final inWork = provider.problems
+            .where((p) => p.status == 'in_progress' || p.status == 'confirmed')
+            .length;
+        final done =
+            provider.problems.where((p) => p.status == 'fixed').length;
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            provider.load();
+          },
+          child: _MainPageBody(
+            pendingCount: pending.length,
+            applicationsCount: pending.length,
+            inWorkCount: inWork,
+            doneCount: done,
+            pendingProblems: pending,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MainPageBody extends StatelessWidget {
+  const _MainPageBody({
+    required this.pendingCount,
+    required this.applicationsCount,
+    required this.inWorkCount,
+    required this.doneCount,
+    required this.pendingProblems,
+  });
+
+  final int pendingCount;
+  final int applicationsCount;
+  final int inWorkCount;
+  final int doneCount;
+  final List<RoadProblemDTO> pendingProblems;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.localized;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
@@ -205,13 +280,13 @@ class MainPage extends StatelessWidget {
                         color: const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.search, color: Colors.grey),
-                          Gap(8),
+                          const Icon(Icons.search, color: Colors.grey),
+                          const Gap(8),
                           Text(
-                            'Ключевые слова',
-                            style: TextStyle(
+                            l10n.cityDriveKeywords,
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
                             ),
@@ -253,15 +328,14 @@ class MainPage extends StatelessWidget {
               ),
             ),
             
-            // Контент
             Expanded(
               child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 children: [
-                  // Заголовок
-                  const Text(
-                    'Объявлении',
-                    style: TextStyle(
+                  Text(
+                    l10n.cityDriveAnnouncements,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),
@@ -273,32 +347,32 @@ class MainPage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _StatCard(
-                          count: '12',
-                          label: 'Новые',
+                          count: '$pendingCount',
+                          label: l10n.cityDriveNew,
                           color: Colors.red,
                         ),
                       ),
                       const Gap(12),
                       Expanded(
                         child: _StatCard(
-                          count: '3',
-                          label: 'Заявки',
+                          count: '$applicationsCount',
+                          label: l10n.cityDriveApplications,
                           color: Colors.purple,
                         ),
                       ),
                       const Gap(12),
                       Expanded(
                         child: _StatCard(
-                          count: '1',
-                          label: 'В работе',
+                          count: '$inWorkCount',
+                          label: l10n.cityDriveInProgress,
                           color: Colors.orange,
                         ),
                       ),
                       const Gap(12),
                       Expanded(
                         child: _StatCard(
-                          count: '5',
-                          label: 'Готово',
+                          count: '$doneCount',
+                          label: l10n.cityDriveDone,
                           color: Colors.green,
                         ),
                       ),
@@ -306,24 +380,37 @@ class MainPage extends StatelessWidget {
                   ),
                   const Gap(24),
                   
-                  // Карточки проблем
-                  _ProblemCard(
-                    title: 'Ямочный ремонт',
-                    address: 'ул. Абая, 150',
-                    cost: '850000тг',
-                    days: '30 дней',
-                    status: 'Критический',
-                    publishedTime: 'Опубликовано вчера',
-                  ),
-                  const Gap(16),
-                  _ProblemCard(
-                    title: 'Ямочный ремонт',
-                    address: 'ул. Абая, 150',
-                    cost: '5000000тг',
-                    days: '30 дней',
-                    status: 'Критический',
-                    publishedTime: 'Опубликовано вчера',
-                  ),
+                  if (pendingProblems.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Text(
+                        l10n.cityDriveNoNewMarksEmpty,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.grey, height: 1.4),
+                      ),
+                    )
+                  else
+                    ...pendingProblems.map(
+                      (p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: GestureDetector(
+                          onTap: () => context.router.push(
+                            RoadProblemDetailRoute(problem: p),
+                          ),
+                          child: _ProblemCard(
+                            problem: p,
+                            title: p.title ?? l10n.cityDrivePotholeRepair,
+                            address: p.address ?? l10n.cityDriveAddressNotSpecified,
+                            severityLabel: severityLabel(l10n, p.severity),
+                            statusLine: l10n.cityDriveUnderReview,
+                            publishedTime: publishedLabel(l10n, p.reportedDate),
+                            authorLine: p.author != null
+                                ? l10n.cityDriveFromAuthor(p.author!)
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -379,20 +466,22 @@ class _StatCard extends StatelessWidget {
 
 class _ProblemCard extends StatelessWidget {
   const _ProblemCard({
+    required this.problem,
     required this.title,
     required this.address,
-    required this.cost,
-    required this.days,
-    required this.status,
+    required this.severityLabel,
+    required this.statusLine,
     required this.publishedTime,
+    this.authorLine,
   });
 
+  final RoadProblemDTO problem;
   final String title;
   final String address;
-  final String cost;
-  final String days;
-  final String status;
+  final String severityLabel;
+  final String statusLine;
   final String publishedTime;
+  final String? authorLine;
 
   @override
   Widget build(BuildContext context) {
@@ -425,7 +514,7 @@ class _ProblemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  status,
+                  severityLabel,
                   style: const TextStyle(
                     color: Color(0xFFFF6B6B),
                     fontSize: 12,
@@ -440,34 +529,32 @@ class _ProblemCard extends StatelessWidget {
             children: [
               const Icon(Icons.location_on_outlined, size: 18, color: Colors.grey),
               const Gap(4),
-              Text(
-                address,
-                style: const TextStyle(color: Colors.grey),
+              Expanded(
+                child: Text(
+                  address,
+                  style: const TextStyle(color: Colors.grey),
+                ),
               ),
             ],
           ),
           const Gap(8),
           Row(
             children: [
-              const Icon(Icons.attach_money, size: 18, color: Colors.grey),
+              const Icon(Icons.info_outline, size: 18, color: Colors.grey),
               const Gap(4),
               Text(
-                cost,
+                statusLine,
                 style: const TextStyle(color: Colors.grey),
               ),
             ],
           ),
-          const Gap(8),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 18, color: Colors.grey),
-              const Gap(4),
-              Text(
-                days,
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
+          if (authorLine != null) ...[
+            const Gap(8),
+            Text(
+              authorLine!,
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+          ],
           const Gap(8),
           Text(
             publishedTime,
@@ -481,7 +568,7 @@ class _ProblemCard extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                context.router.push(ProblemDetailRoute());
+                context.router.push(RoadProblemDetailRoute(problem: problem));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
@@ -490,9 +577,9 @@ class _ProblemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Подробнее',
-                style: TextStyle(
+              child: Text(
+                context.localized.cityDriveMoreDetails,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

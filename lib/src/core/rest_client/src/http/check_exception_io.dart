@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
 
 // coverage:ignore-start
 /// Checks the [http.ClientException] and tries to parse it.

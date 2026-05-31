@@ -1,7 +1,20 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/main/presentation/pages/problem_detail_page.dart';
+import 'package:provider/provider.dart';
+import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
+
+enum _WorksMainFilter { applications, inWork, canceled }
+
+enum _WorksSubFilter { inProgress, completed }
 
 class MyWorksPage extends StatefulWidget {
   const MyWorksPage({super.key});
@@ -11,11 +24,56 @@ class MyWorksPage extends StatefulWidget {
 }
 
 class _MyWorksPageState extends State<MyWorksPage> {
-  String _selectedMainFilter = 'Заявки';
-  String _selectedSubFilter = 'В процессе'; // для фильтра "В работе"
+  _WorksMainFilter _selectedMainFilter = _WorksMainFilter.applications;
+  _WorksSubFilter _selectedSubFilter = _WorksSubFilter.inProgress;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<RoadProblemsProvider>().load();
+      }
+    });
+  }
+
+  List<RoadProblemDTO> _filteredItems(
+    RoadProblemsProvider provider,
+    int controllerId,
+  ) {
+    switch (_selectedMainFilter) {
+      case _WorksMainFilter.applications:
+        return provider.pendingForController();
+      case _WorksMainFilter.canceled:
+        return provider.problems
+            .where((p) => p.status == ReportStatus.rejected)
+            .toList();
+      case _WorksMainFilter.inWork:
+        if (_selectedSubFilter == _WorksSubFilter.completed) {
+          return provider.problems
+              .where(
+                (p) =>
+                    p.assignedControllerId == controllerId &&
+                    p.status == ReportStatus.fixed,
+              )
+              .toList();
+        }
+        return provider.problems
+            .where(
+              (p) =>
+                  p.assignedControllerId == controllerId &&
+                  (p.status == ReportStatus.inProgress ||
+                      p.status == ReportStatus.confirmed),
+            )
+            .toList();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final controllerId = context.repository.authRepository.user?.id ?? 0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
@@ -25,67 +83,59 @@ class _MyWorksPageState extends State<MyWorksPage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Основные фильтры
                   Row(
                     children: [
                       _FilterChip(
-                        label: 'Заявки',
-                        isSelected: _selectedMainFilter == 'Заявки',
-                        onTap: () {
-                          setState(() {
-                            _selectedMainFilter = 'Заявки';
-                          });
-                        },
+                        label: l10n.cityDriveApplications,
+                        isSelected:
+                            _selectedMainFilter == _WorksMainFilter.applications,
+                        onTap: () => setState(
+                          () => _selectedMainFilter = _WorksMainFilter.applications,
+                        ),
                       ),
                       const Gap(8),
                       _FilterChip(
-                        label: 'В работе',
-                        isSelected: _selectedMainFilter == 'В работе',
-                        onTap: () {
-                          setState(() {
-                            _selectedMainFilter = 'В работе';
-                            _selectedSubFilter = 'В процессе';
-                          });
-                        },
+                        label: l10n.cityDriveInProgress,
+                        isSelected:
+                            _selectedMainFilter == _WorksMainFilter.inWork,
+                        onTap: () => setState(() {
+                          _selectedMainFilter = _WorksMainFilter.inWork;
+                          _selectedSubFilter = _WorksSubFilter.inProgress;
+                        }),
                       ),
                       const Gap(8),
                       _FilterChip(
-                        label: 'Отмененные',
-                        isSelected: _selectedMainFilter == 'Отмененные',
-                        onTap: () {
-                          setState(() {
-                            _selectedMainFilter = 'Отмененные';
-                          });
-                        },
+                        label: l10n.cityDriveCanceled,
+                        isSelected:
+                            _selectedMainFilter == _WorksMainFilter.canceled,
+                        onTap: () => setState(
+                          () => _selectedMainFilter = _WorksMainFilter.canceled,
+                        ),
                       ),
                     ],
                   ),
-
-                  // Дополнительные фильтры для "В работе"
-                  if (_selectedMainFilter == 'В работе') ...[
+                  if (_selectedMainFilter == _WorksMainFilter.inWork) ...[
                     const Gap(12),
                     Row(
                       children: [
                         _FilterChip(
-                          label: 'В процессе',
-                          isSelected: _selectedSubFilter == 'В процессе',
+                          label: l10n.cityDriveInProcess,
+                          isSelected:
+                              _selectedSubFilter == _WorksSubFilter.inProgress,
                           color: const Color(0xFF4CD964),
-                          onTap: () {
-                            setState(() {
-                              _selectedSubFilter = 'В процессе';
-                            });
-                          },
+                          onTap: () => setState(
+                            () => _selectedSubFilter = _WorksSubFilter.inProgress,
+                          ),
                         ),
                         const Gap(8),
                         _FilterChip(
-                          label: 'Завершенные',
-                          isSelected: _selectedSubFilter == 'Завершенные',
+                          label: l10n.cityDriveCompleted,
+                          isSelected:
+                              _selectedSubFilter == _WorksSubFilter.completed,
                           color: Colors.grey,
-                          onTap: () {
-                            setState(() {
-                              _selectedSubFilter = 'Завершенные';
-                            });
-                          },
+                          onTap: () => setState(
+                            () => _selectedSubFilter = _WorksSubFilter.completed,
+                          ),
                         ),
                       ],
                     ),
@@ -93,89 +143,55 @@ class _MyWorksPageState extends State<MyWorksPage> {
                 ],
               ),
             ),
-
-            // Список работ
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  if (_selectedMainFilter == 'Заявки') ...[
-                    _WorkCard(
-                      title: 'Ремонт провала на дороге',
-                      address: 'ул. Абая, 150',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'На рассмотрении',
-                      statusColor: const Color(0xFF00D9FF),
-                      severityLabel: 'Критический',
-                      severityColor: const Color(0xFFFF6B6B),
+              child: Consumer<RoadProblemsProvider>(
+                builder: (context, provider, _) {
+                  final items = _filteredItems(provider, controllerId);
+
+                  if (items.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          _emptyMessage(l10n),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.grey, height: 1.4),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async => provider.load(),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => const Gap(16),
+                      itemBuilder: (context, index) {
+                        return _WorkCard(problem: items[index]);
+                      },
                     ),
-                    const Gap(16),
-                    _WorkCard(
-                      title: 'Заделка ямы на прекрестке',
-                      address: 'ул. Толеби/Байтурсынова, 150',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'На рассмотрении',
-                      statusColor: const Color(0xFF00D9FF),
-                      severityLabel: 'Высокий',
-                      severityColor: const Color(0xFFFFA726),
-                    ),
-                  ],
-                  if (_selectedMainFilter == 'В работе' &&
-                      _selectedSubFilter == 'В процессе') ...[
-                    _WorkCard(
-                      title: 'Ремонт провала на дороге',
-                      address: 'ул. Абая, 150',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'В процессе',
-                      statusColor: const Color(0xFF4CD964),
-                      severityLabel: 'Критический',
-                      severityColor: const Color(0xFFFF6B6B),
-                    ),
-                    const Gap(16),
-                    _WorkCard(
-                      title: 'Заделка ямы на прекрестке',
-                      address: 'ул. Абылайхана, 370',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'В работе',
-                      statusColor: const Color(0xFF00D9FF),
-                      severityLabel: 'Высокий',
-                      severityColor: const Color(0xFFFFA726),
-                    ),
-                  ],
-                  if (_selectedMainFilter == 'В работе' &&
-                      _selectedSubFilter == 'Завершенные') ...[
-                    _WorkCard(
-                      title: 'Ремонт провала на дороге',
-                      address: 'ул. Абая, 150',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'Завершено',
-                      statusColor: Colors.green,
-                      severityLabel: 'Критический',
-                      severityColor: const Color(0xFFFF6B6B),
-                    ),
-                  ],
-                  if (_selectedMainFilter == 'Отмененные') ...[
-                    _WorkCard(
-                      title: 'Ремонт провала на дороге',
-                      address: 'ул. Абая, 150',
-                      cost: '850000тг',
-                      days: '30 дней',
-                      statusLabel: 'Отменено',
-                      statusColor: Colors.grey,
-                    ),
-                  ],
-                ],
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _emptyMessage(AppLocalizations l10n) {
+    switch (_selectedMainFilter) {
+      case _WorksMainFilter.applications:
+        return l10n.cityDriveEmptyApplications;
+      case _WorksMainFilter.canceled:
+        return l10n.cityDriveEmptyCanceled;
+      case _WorksMainFilter.inWork:
+        return _selectedSubFilter == _WorksSubFilter.completed
+            ? l10n.cityDriveEmptyCompleted
+            : l10n.cityDriveEmptyInWork;
+    }
   }
 }
 
@@ -200,16 +216,15 @@ class _FilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? (color ?? const Color(0xFF4CD964))
-              : const Color(0xFFE7E7E7),
+              ? (color ?? AppColors.mainColor)
+              : Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey,
-            fontSize: 14,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? Colors.white : Colors.black,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -218,28 +233,15 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _WorkCard extends StatelessWidget {
-  const _WorkCard({
-    required this.title,
-    required this.address,
-    required this.cost,
-    required this.days,
-    required this.statusLabel,
-    required this.statusColor,
-    this.severityLabel,
-    this.severityColor,
-  });
+  const _WorkCard({required this.problem});
 
-  final String title;
-  final String address;
-  final String cost;
-  final String days;
-  final String statusLabel;
-  final Color statusColor;
-  final String? severityLabel;
-  final Color? severityColor;
+  final RoadProblemDTO problem;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final statusUi = ReportStatusUi.fromStatus(l10n, problem.status);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -249,123 +251,86 @@ class _WorkCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Статусы
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Expanded(
+                child: Text(
+                  problem.title ?? l10n.cityDriveRoadDamage,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: statusColor,
+                  color: severityColor(problem.severity).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  statusLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  severityLabel(l10n, problem.severity),
+                  style: TextStyle(
+                    color: severityColor(problem.severity),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              if (severityLabel != null && severityColor != null) ...[
-                const Gap(8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: severityColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    severityLabel!,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+            ],
+          ),
+          const Gap(12),
+          Row(
+            children: [
+              const Icon(Icons.location_on_outlined, size: 18, color: Colors.grey),
+              const Gap(4),
+              Expanded(
+                child: Text(
+                  problem.address ?? l10n.cityDriveAddressNotSpecified,
+                  style: const TextStyle(color: Colors.grey),
                 ),
-              ],
+              ),
             ],
           ),
-          const Gap(12),
-
-          // Заголовок
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+          const Gap(8),
+          Row(
+            children: [
+              Icon(statusUi.icon, size: 18, color: statusUi.color),
+              const Gap(4),
+              Text(
+                statusUi.label,
+                style: TextStyle(color: statusUi.color),
+              ),
+            ],
+          ),
+          if (problem.reportedDate != null) ...[
+            const Gap(8),
+            Text(
+              formatReportDate(l10n, problem.reportedDate),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
-          ),
-          const Gap(12),
-
-          // Информация
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined,
-                  size: 16, color: Colors.grey),
-              const Gap(4),
-              Text(
-                address,
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            ],
-          ),
-          const Gap(8),
-          Row(
-            children: [
-              const Icon(Icons.attach_money, size: 16, color: Colors.grey),
-              const Gap(4),
-              Text(
-                cost,
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            ],
-          ),
-          const Gap(8),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: Colors.grey),
-              const Gap(4),
-              Text(
-                days,
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            ],
-          ),
+          ],
           const Gap(16),
-
-          // Кнопка
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProblemDetailPage(
-                      isSubmit: true,
-                    ),
-                  ),
-                );
+                context.router.push(RoadProblemDetailRoute(problem: problem));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Подробнее',
-                style: TextStyle(
+              child: Text(
+                l10n.cityDriveMoreDetails,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

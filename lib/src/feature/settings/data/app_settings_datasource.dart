@@ -4,11 +4,11 @@ import 'dart:ui';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ikidz/src/core/utils/persisted_entry.dart';
-import 'package:ikidz/src/feature/app/model/app_theme.dart';
-import 'package:ikidz/src/feature/settings/data/theme_mode_codec.dart';
+import 'package:city_drive/src/core/utils/persisted_entry.dart';
+import 'package:city_drive/src/feature/app/model/app_theme.dart';
+import 'package:city_drive/src/feature/settings/data/theme_mode_codec.dart';
 
-import 'package:ikidz/src/feature/settings/model/app_settings.dart';
+import 'package:city_drive/src/feature/settings/model/app_settings.dart';
 
 /// {@template app_settings_datasource}
 /// [AppSettingsDatasource] sets and gets app settings.

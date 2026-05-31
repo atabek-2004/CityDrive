@@ -1,7 +1,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
-import 'package:ikidz/src/feature/app/model/app_theme.dart';
+import 'package:city_drive/src/feature/app/model/app_theme.dart';
 
 /// {@template app_settings}
 /// Application settings

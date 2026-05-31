@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PasswordEyeSuffixIcon extends StatelessWidget {

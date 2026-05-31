@@ -3,7 +3,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class CustomLoadingOverlayWidget extends StatelessWidget {
   const CustomLoadingOverlayWidget({super.key, this.noColor});

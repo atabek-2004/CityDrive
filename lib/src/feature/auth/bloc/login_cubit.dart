@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/response/auth_error_response.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/response/auth_error_response.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 part 'login_cubit.freezed.dart';
 
@@ -34,9 +34,13 @@ class LoginCubit extends Cubit<LoginState> {
     } on RestClientException catch (e) {
       _onRestClientException(e, phone);
     } catch (e) {
+      var message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.replaceFirst('Exception: ', '');
+      }
       emit(
         LoginState.error(
-          message: e.toString(),
+          message: message,
           sendedOldValue: phone,
         ),
       );

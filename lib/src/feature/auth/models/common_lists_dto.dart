@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
 
 part 'common_lists_dto.freezed.dart';
 part 'common_lists_dto.g.dart';

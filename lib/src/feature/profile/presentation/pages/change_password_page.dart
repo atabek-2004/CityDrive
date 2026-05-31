@@ -2,11 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
-import 'package:ikidz/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:city_drive/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 @RoutePage()
 class ChangePasswordPage extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/profile/data/profile_repository.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/profile/data/profile_repository.dart';
 
 
 part 'city_cubit.freezed.dart';

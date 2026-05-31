@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class ForceUpdatePage extends StatelessWidget {
   const ForceUpdatePage({

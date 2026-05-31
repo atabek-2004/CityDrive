@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/constant/localization/localization.dart';
-import 'package:ikidz/src/core/constant/localization/translations/app_localizations.dart';
-import 'package:ikidz/src/core/containers/repository_storage.dart';
-import 'package:ikidz/src/core/presentation/scopes/repository_scope.dart';
-import 'package:ikidz/src/core/utils/screen_util.dart';
-import 'package:ikidz/src/feature/app/initialization/model/dependencies_container.dart';
-import 'package:ikidz/src/feature/app/initialization/widget/dependencies_scope.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:city_drive/src/core/containers/repository_storage.dart';
+import 'package:city_drive/src/core/presentation/scopes/repository_scope.dart';
+import 'package:city_drive/src/core/utils/screen_util.dart';
+import 'package:city_drive/src/feature/app/initialization/model/dependencies_container.dart';
+import 'package:city_drive/src/feature/app/initialization/widget/dependencies_scope.dart';
 
-import 'package:ikidz/src/feature/settings/widget/settings_scope.dart';
+import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 
 /// List of extensions for [BuildContext]
 extension ContextExtension on BuildContext {
@@ -61,7 +61,8 @@ extension ContextExtension on BuildContext {
 
   /// Выбранный язык
 
-  Locale get currentLocale => SettingsScope.settingsOf(this).locale ?? const Locale('ru', 'RU');
+  Locale get currentLocale =>
+      SettingsScope.settingsOf(this).locale ?? Localization.defaultLocale;
 // AppLanguage get currentLocale => SettingsScope.appLanguageOf(this);
   /// Выбранный город
   // CityDTO? get currentCity => SettingsScope.cityOf(this);

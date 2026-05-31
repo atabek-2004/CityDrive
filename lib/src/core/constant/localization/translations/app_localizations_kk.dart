@@ -9,8 +9,7 @@ class AppLocalizationsKk extends AppLocalizations {
   AppLocalizationsKk([String locale = 'kk']) : super(locale);
 
   @override
-  String get aNewGenerationFreightTransportation =>
-      'Жаңа буындағы жүк тасымалдау биржасы – сенімді, жылдам, ыңғайлы.';
+  String get aNewGenerationFreightTransportation => 'Жаңа буындағы жүк тасымалдау биржасы – сенімді, жылдам, ыңғайлы.';
 
   @override
   String get accept => 'Қабылдау';
@@ -58,12 +57,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get advertiseProduct => 'Өнімді жарнамалау';
 
   @override
-  String get advertiseYourProductWithUs =>
-      'Өз өніміңізді бізбен бірге жарнамалаңыз!';
+  String get advertiseYourProductWithUs => 'Өз өніміңізді бізбен бірге жарнамалаңыз!';
 
   @override
-  String get agreeText =>
-      '\"Тіркелгі жасау\" батырмасын басу арқылы сіз келісесіз';
+  String get agreeText => '\"Тіркелгі жасау\" батырмасын басу арқылы сіз келісесіз';
 
   @override
   String get and => 'және';
@@ -75,30 +72,25 @@ class AppLocalizationsKk extends AppLocalizations {
   String get appTitle => 'sirius Business';
 
   @override
-  String get applicationCompletedWaitForResponses =>
-      'Өтінім аяқталды!\nЖауаптарды күтіңіз';
+  String get applicationCompletedWaitForResponses => 'Өтінім аяқталды!\nЖауаптарды күтіңіз';
 
   @override
   String get apply => 'Қолдану';
 
   @override
-  String get areYouSureYouWantLogOutYourAccount =>
-      'Сіз аккаунтан шыққыңыз келе ме ?';
+  String get areYouSureYouWantLogOutYourAccount => 'Сіз аккаунтан шыққыңыз келе ме ?';
 
   @override
-  String get areYouSureYouWantToDeleteTheOrder =>
-      'Тапсырысты жойғыңыз\nкелетініне сенімдісіз бе?';
+  String get areYouSureYouWantToDeleteTheOrder => 'Тапсырысты жойғыңыз\nкелетініне сенімдісіз бе?';
 
   @override
-  String get areYouSureYouWantToDeleteYourAccount =>
-      'Есептік жазбаңызды шынымен жойғыңыз келе ме?';
+  String get areYouSureYouWantToDeleteYourAccount => 'Есептік жазбаңызды шынымен жойғыңыз келе ме?';
 
   @override
   String get attention => 'Назар аударыңыз';
 
   @override
-  String get attentionThePlatformIsOnly =>
-      'Назар аударыңыз! Платформа тек ақпараттық платформа болып табылады және пайдаланушылар арасындағы транзакциялар үшін жауап бермейді. Келісімдерді жасамас бұрын контрагенттің құжаттары мен сенімділігін өзіңіз тексеріңіз.';
+  String get attentionThePlatformIsOnly => 'Назар аударыңыз! Платформа тек ақпараттық платформа болып табылады және пайдаланушылар арасындағы транзакциялар үшін жауап бермейді. Келісімдерді жасамас бұрын контрагенттің құжаттары мен сенімділігін өзіңіз тексеріңіз.';
 
   @override
   String get autoRenewal => 'Автоматты жаңарту';
@@ -134,8 +126,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get businessData => 'Іскерлік деректер';
 
   @override
-  String get buyPremiumSubscription =>
-      'Премиум жазылымын сатып алып, барлық контактілерге қол жеткізіңіз';
+  String get buyPremiumSubscription => 'Премиум жазылымын сатып алып, барлық контактілерге қол жеткізіңіз';
 
   @override
   String get buyoutOfGoods => 'Тауарды сатып алу';
@@ -171,8 +162,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get certificateAccountAvailability => 'Шоттың болуы туралы анықтама';
 
   @override
-  String get certificateRegistrationSoleProprietor =>
-      'ЖК/ЖШС тіркеу туралы куәлік';
+  String get certificateRegistrationSoleProprietor => 'ЖК/ЖШС тіркеу туралы куәлік';
 
   @override
   String get certification => 'Сертификация';
@@ -181,7 +171,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get changeAddress => 'Мекен-жайды өзгерту';
 
   @override
-  String get changePhoneNumber => 'Change number';
+  String get changePhoneNumber => 'Изменить номер';
 
   @override
   String get chat => 'Чат';
@@ -325,8 +315,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get documents => 'Құжаттар';
 
   @override
-  String get documentsAreBeingCheckedPleaseWaitForConfirmation =>
-      'Құжаттар тексерілуде, растауды күтіңіз.';
+  String get documentsAreBeingCheckedPleaseWaitForConfirmation => 'Құжаттар тексерілуде, растауды күтіңіз.';
 
   @override
   String get dont_you_have_an_account => 'Аккаунтыңыз жоқ па?';
@@ -335,8 +324,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get download => 'Жүктеп алу';
 
   @override
-  String get downloadDocs =>
-      'Егер сіз компания құжаттарын жүктеп салсаңыз, расталған компания ретінде құсбелгі аласыз.';
+  String get downloadDocs => 'Егер сіз компания құжаттарын жүктеп салсаңыз, расталған компания ретінде құсбелгі аласыз.';
+
+  @override
+  String get downloadPdf => 'pdf жүктеп алыңыз';
 
   @override
   String get edit => 'Өңдеу';
@@ -480,8 +471,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get exit => 'Шығу';
 
   @override
-  String get explore_the_app =>
-      'sirius — ға қош келдіңіз-сыйлық әлемінің болашағы!';
+  String get explore_the_app => 'sirius — ға қош келдіңіз-сыйлық әлемінің болашағы!';
 
   @override
   String get filesAreAdded => 'Файлдар қосылды';
@@ -496,19 +486,16 @@ class AppLocalizationsKk extends AppLocalizations {
   String get findCargo => 'Жүкті табыңыз';
 
   @override
-  String get findOutWhyYouNeedtoAdvertiseProducts =>
-      'Неліктен тауарларды жарнамалау керек екенін біліңіз?';
+  String get findOutWhyYouNeedtoAdvertiseProducts => 'Неліктен тауарларды жарнамалау керек екенін біліңіз?';
 
   @override
-  String get first_add_the_stores_address =>
-      'Алдымен дүкен мекенжайын қосыңыз!';
+  String get first_add_the_stores_address => 'Алдымен дүкен мекенжайын қосыңыз!';
 
   @override
   String get forgot_your_password => 'Құпия сөзді ұмыттыңыз ба ?';
 
   @override
-  String get foundDeliveryOutsideThePlatform =>
-      'Платформадан тыс жеткізілім табылды';
+  String get foundDeliveryOutsideThePlatform => 'Платформадан тыс жеткізілім табылды';
 
   @override
   String get freightExchange => 'Жүк алмасу';
@@ -532,15 +519,13 @@ class AppLocalizationsKk extends AppLocalizations {
   String get get_it_again => 'Тағы бір рет алыңыз';
 
   @override
-  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul =>
-      'Мұнда сізді жаңа клиенттер, ыңғайлы сатылымдар және өсу мүмкіндіктері күтеді. Дәл қазір бастаңыз!';
+  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul => 'Мұнда сізді жаңа клиенттер, ыңғайлы сатылымдар және өсу мүмкіндіктері күтеді. Дәл қазір бастаңыз!';
 
   @override
   String get giveRateTheCarrier => 'Тасымалдаушыны бағалаңыз';
 
   @override
-  String get goThroughVerificationAndBecome =>
-      'Тексеруден өтіп, расталған \nтасымалдаушы болыңыз';
+  String get goThroughVerificationAndBecome => 'Тексеруден өтіп, расталған \nтасымалдаушы болыңыз';
 
   @override
   String get goThroughVerificationText => 'Тексеруден өтіңіз';
@@ -555,8 +540,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get howManyBonusesDoYouWantSpend => 'Қанша бонус жұмсағыңыз келеді?';
 
   @override
-  String get ifYouAlreadyHaveAnAccount =>
-      'Егер сіз бұрыннан тіркелгі болсаңыз, ';
+  String get ifYouAlreadyHaveAnAccount => 'Егер сіз бұрыннан тіркелгі болсаңыз, ';
 
   @override
   String get inProcessing => 'Өңдеуде';
@@ -604,8 +588,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get lookingForCarrier => 'Тасымалдаушы іздеймін';
 
   @override
-  String get lookingForWayToStandOutInTheMarket =>
-      'Нарықта ерекшеленудің жолын іздеп жүрсіз бе?';
+  String get lookingForWayToStandOutInTheMarket => 'Нарықта ерекшеленудің жолын іздеп жүрсіз бе?';
 
   @override
   String get mail => 'Пошта';
@@ -617,12 +600,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get mainTypeActivity => 'Негізгі қызмет түрі';
 
   @override
-  String get moreThan100SuccessfulTransactionsDaily =>
-      'Күн сайын 100-ден астам\nсәтті транзакциялар!';
+  String get moreThan100SuccessfulTransactionsDaily => 'Күн сайын 100-ден астам\nсәтті транзакциялар!';
 
   @override
-  String get moreThanSuccessfulTransactionsDaily =>
-      'More than 100 successful \ntransactions daily!';
+  String get moreThanSuccessfulTransactionsDaily => 'Более 100 успешных сделок \nежедневно!';
 
   @override
   String get myDocuments => 'Менің құжаттарым';
@@ -739,15 +720,13 @@ class AppLocalizationsKk extends AppLocalizations {
   String get profile => 'Профиль';
 
   @override
-  String get provideCargoDetails =>
-      'Жүк сипаттамаларын көрсетіңіз, тасымалдаушылардан жауап алыңыз';
+  String get provideCargoDetails => 'Жүк сипаттамаларын көрсетіңіз, тасымалдаушылардан жауап алыңыз';
 
   @override
   String get pullDownToRefresh => 'Жаңарту үшін, төмен қарай тартыңыз';
 
   @override
-  String get pullUpToLoadTheData =>
-      'Деректерді жүктеу үшін жоғары қарай тартыңыз';
+  String get pullUpToLoadTheData => 'Деректерді жүктеу үшін жоғары қарай тартыңыз';
 
   @override
   String get rate => 'Бағалау';
@@ -798,8 +777,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get seeAll => 'Барлығын қараңыз';
 
   @override
-  String get selectCarrierFromTheListOfRespondentsAndRate =>
-      'Респонденттердің тізімінен операторды таңдап, оны бағалаңыз.';
+  String get selectCarrierFromTheListOfRespondentsAndRate => 'Респонденттердің тізімінен операторды таңдап, оны бағалаңыз.';
 
   @override
   String get selectCategory => 'Санатты таңдаңыз';
@@ -838,19 +816,16 @@ class AppLocalizationsKk extends AppLocalizations {
   String get shareYourExperience => 'Тәжірибеңізбен бөлісіңіз';
 
   @override
-  String get siriusDescription =>
-      'Жаңа буын жүк айырбасы – сенімді, жылдам, ыңғайлы.';
+  String get siriusDescription => 'Жаңа буын жүк айырбасы – сенімді, жылдам, ыңғайлы.';
 
   @override
   String get specifyTheRoute => 'Маршрутты көрсетіңіз';
 
   @override
-  String get specifyTheRouteCharacter =>
-      'Маршрутты, жүк сипаттамаларын көрсетіңіз және тасымалдаушылардан ұсыныстар алыңыз';
+  String get specifyTheRouteCharacter => 'Маршрутты, жүк сипаттамаларын көрсетіңіз және тасымалдаушылардан ұсыныстар алыңыз';
 
   @override
-  String get specifyTheRouteCharacteristics =>
-      'Specify the route, characteristics and receive feedback from carriers';
+  String get specifyTheRouteCharacteristics => 'Укажите маршрут, характеристики получите откликов от перевозчиков';
 
   @override
   String get statistics => 'Статистика';
@@ -874,12 +849,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get termOfUse => 'Пайдалану Шарттары';
 
   @override
-  String get theMainStateRegistrationNumber =>
-      'Негізгі мемлекеттік тіркеу нөмірі';
+  String get theMainStateRegistrationNumber => 'Негізгі мемлекеттік тіркеу нөмірі';
 
   @override
-  String get theOrderHasBeenUpdatedWaitForResponses =>
-      'Тапсырыс жаңартылды!\nЖауаптарды күтіңіз';
+  String get theOrderHasBeenUpdatedWaitForResponses => 'Тапсырыс жаңартылды!\nЖауаптарды күтіңіз';
 
   @override
   String get theServiceIsTemporarilyUnavailable => 'Сервис уақытша қолжетімсіз';
@@ -888,8 +861,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get the_list_is_empty => 'Тізім бос';
 
   @override
-  String get the_minimum_password_length_is_6 =>
-      'Парольдің минималды ұзындығы - 6';
+  String get the_minimum_password_length_is_6 => 'Парольдің минималды ұзындығы - 6';
 
   @override
   String get thisSectionIsUnderDevelopment => 'Бөлім әзірленуде';
@@ -898,8 +870,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get time => 'Уақыт';
 
   @override
-  String get toAddProductSpecifyTheStoresAddressInYourProfile =>
-      'Тауарды қосу үшін профильдегі дүкен мекенжайын көрсетіңіз.';
+  String get toAddProductSpecifyTheStoresAddressInYourProfile => 'Тауарды қосу үшін профильдегі дүкен мекенжайын көрсетіңіз.';
 
   @override
   String get toPay => 'Төлеу';
@@ -949,8 +920,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get wasAddDaysAgo => '20 күн бұрын қосылды. Тасымалдаушыны бағалаңыз';
 
   @override
-  String get we_have_sent_a_confirmation =>
-      'Біз сіздің поштаңызға код жібердік ';
+  String get we_have_sent_a_confirmation => 'Біз сіздің поштаңызға код жібердік ';
 
   @override
   String get website => 'Сайт';
@@ -983,8 +953,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get writeMessage => 'Хабарлама жазыңыз';
 
   @override
-  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp =>
-      'Бізге WhatsApp арқылы жазыңыз - біз әрқашан байланыстамыз \n және көмектесуге дайынбыз!';
+  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp => 'Бізге WhatsApp арқылы жазыңыз - біз әрқашан байланыстамыз \n және көмектесуге дайынбыз!';
 
   @override
   String get yes => 'Иә';
@@ -1003,4 +972,397 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get yuridicRegister => 'Заңды';
+
+  @override
+  String get cityDriveMap => 'Карта';
+
+  @override
+  String get cityDriveMyMarks => 'Менің белгілерім';
+
+  @override
+  String get cityDriveMyWorks => 'Менің жұмыстарым';
+
+  @override
+  String get cityDriveEditProfile => 'Профильді өңдеу';
+
+  @override
+  String get cityDriveAnnouncements => 'Хабарландырулар';
+
+  @override
+  String get cityDriveKeywords => 'Негізгі сөздер';
+
+  @override
+  String get cityDriveNew => 'Жаңа';
+
+  @override
+  String get cityDriveApplications => 'Өтінімдер';
+
+  @override
+  String get cityDriveInProgress => 'Жұмыста';
+
+  @override
+  String get cityDriveDone => 'Дайын';
+
+  @override
+  String get cityDriveNoNewMarksEmpty => 'Жаңа белгілер жоқ.\nТұрғындар оларды картадан жариялайды — мұнда пайда болады.';
+
+  @override
+  String get cityDrivePotholeRepair => 'Шұңқыр жөндеу';
+
+  @override
+  String get cityDriveAddressNotSpecified => 'Мекенжай көрсетілмеген';
+
+  @override
+  String get cityDriveUnderReview => 'Қаралуда';
+
+  @override
+  String cityDriveFromAuthor(String author) {
+    return 'Кімнен: $author';
+  }
+
+  @override
+  String get cityDriveMoreDetails => 'Толығырақ';
+
+  @override
+  String get cityDriveMarkAcceptedSnack => 'Белгі жұмысқа қабылданды';
+
+  @override
+  String get cityDriveMarkRejectedSnack => 'Белгі қабылданбады';
+
+  @override
+  String get cityDriveDetailsTitle => 'Толығырақ';
+
+  @override
+  String get cityDriveNotSpecified => 'Көрсетілмеген';
+
+  @override
+  String get cityDriveResident => 'Тұрғын';
+
+  @override
+  String get cityDriveComments => 'Пікірлер';
+
+  @override
+  String get cityDriveShowAll => 'Барлығын көрсету';
+
+  @override
+  String get cityDriveLeaveFirstComment => 'Бірінші пікір қалдырыңыз';
+
+  @override
+  String get cityDriveReject => 'Қабылдамау';
+
+  @override
+  String get cityDriveAcceptApplicationBtn => 'Өтінімді қабылдау';
+
+  @override
+  String get cityDriveSubmitReport => 'Есеп жіберу';
+
+  @override
+  String get cityDrivePhotoUnavailable => 'Фото қолжетімсіз';
+
+  @override
+  String get cityDriveInformation => 'Ақпарат';
+
+  @override
+  String get cityDriveType => 'Түрі';
+
+  @override
+  String get cityDriveAuthor => 'Автор';
+
+  @override
+  String get cityDriveDateLabel => 'Күні';
+
+  @override
+  String get cityDriveUrgency => 'Шұғылдық';
+
+  @override
+  String get cityDriveLevel => 'Деңгей';
+
+  @override
+  String get cityDriveAddress => 'Мекенжай';
+
+  @override
+  String get cityDriveSeverityCritical => 'Сыни';
+
+  @override
+  String get cityDriveSeverityHigh => 'Жоғары';
+
+  @override
+  String get cityDriveSeverityMedium => 'Орташа';
+
+  @override
+  String get cityDriveSeverityLow => 'Төмен';
+
+  @override
+  String get cityDriveStatusOpen => 'Ашық';
+
+  @override
+  String get cityDriveStatusAccepted => 'Қабылданды';
+
+  @override
+  String get cityDriveStatusInWork => 'Жұмыста';
+
+  @override
+  String get cityDriveStatusRejected => 'Қабылданбады';
+
+  @override
+  String get cityDriveStatusDone => 'Дайын';
+
+  @override
+  String get cityDriveStatusConfirmed => 'Расталды';
+
+  @override
+  String get cityDriveStatusFixed => 'Жөнделді';
+
+  @override
+  String get cityDrivePublishedRecently => 'Жақында жарияланды';
+
+  @override
+  String get cityDrivePublishedToday => 'Бүгін жарияланды';
+
+  @override
+  String get cityDrivePublishedYesterday => 'Кеше жарияланды';
+
+  @override
+  String cityDrivePublishedOn(String date) {
+    return '$date жарияланды';
+  }
+
+  @override
+  String get cityDriveWorkReportTitle => 'Жұмыс орындалуы туралы есеп';
+
+  @override
+  String get cityDriveWorkPhoto => 'Орындалған жұмыс фотосы';
+
+  @override
+  String get cityDriveWorkDescription => 'Жұмыс сипаттамасы';
+
+  @override
+  String get cityDriveWorkDescriptionHint => 'Жұмыс қалай өткенін жазыңыз';
+
+  @override
+  String get cityDriveReportSentTitle => 'Есеп жіберілді';
+
+  @override
+  String get cityDriveWaitAdminReview => 'Әкімшінің тексеруін күтіңіз';
+
+  @override
+  String get cityDriveNow => 'Қазір';
+
+  @override
+  String get cityDriveAdminReview => 'Әкімші тексеруі';
+
+  @override
+  String get cityDriveAdminReviewSubtitle => 'Әдетте 1-2 күн';
+
+  @override
+  String get cityDriveApplicationAcceptedTitle => 'Өтінім қабылданды!';
+
+  @override
+  String get cityDriveApplicationAcceptedBody => 'Белгі «Менің жұмыстарым» бөліміне қосылды. Жұмысты бастауға болады.';
+
+  @override
+  String get cityDriveApplicationSentTitle => 'Өтінім жіберілді!';
+
+  @override
+  String get cityDriveApplicationSentBody => 'Қатысу өтінімі тексеруге жіберілді';
+
+  @override
+  String get cityDriveApplicationAcceptedStep => 'Өтінім қабылданды';
+
+  @override
+  String get cityDriveApplicationSentStep => 'Өтінім жіберілді';
+
+  @override
+  String get cityDriveViewInMyWorks => 'Менің жұмыстарымда көру';
+
+  @override
+  String get cityDriveAnnouncement => 'Хабарландыру';
+
+  @override
+  String get cityDriveCommentOptional => 'Пікір (міндетті емес)';
+
+  @override
+  String get cityDriveCommentHint => 'Мысалы: келесі аптада жұмысты бастаймыз';
+
+  @override
+  String get cityDriveRoadDamage => 'Жол зақымы';
+
+  @override
+  String get cityDriveDefaultMarkTitle => 'Белгі';
+
+  @override
+  String get cityDriveLoginForMarks => 'Белгілерді көру үшін кіріңіз';
+
+  @override
+  String get cityDriveNoMarksYet => 'Әзірге белгілер жоқ.\nКартада мәселенің суретін түсіріңіз.';
+
+  @override
+  String get cityDriveViewOnMap => 'Картада көру';
+
+  @override
+  String get cityDriveNews => 'Жаңалықтар';
+
+  @override
+  String get cityDriveCanceled => 'Бас тартылған';
+
+  @override
+  String get cityDriveInProcess => 'Процесте';
+
+  @override
+  String get cityDriveCompleted => 'Аяқталған';
+
+  @override
+  String get cityDriveEmptyApplications => 'Тұрғындардан жаңа өтінімдер жоқ.\nКартада белгі жарияланғаннан кейін пайда болады.';
+
+  @override
+  String get cityDriveEmptyCanceled => 'Қабылданбаған өтінімдер жоқ.';
+
+  @override
+  String get cityDriveEmptyInWork => 'Басты бетте өтінімді қабылдаңыз — мұнда пайда болады.';
+
+  @override
+  String get cityDriveEmptyCompleted => 'Аяқталған жұмыстар әзірге жоқ.';
+
+  @override
+  String get cityDriveEmptyList => 'Тізім бос';
+
+  @override
+  String get cityDriveLoginToPublish => 'Белгі жариялау үшін аккаунтқа кіріңіз';
+
+  @override
+  String get cityDriveReportPublished => 'Есеп сәтті жарияланды!';
+
+  @override
+  String get cityDriveConfirm => 'Растау';
+
+  @override
+  String get cityDriveAddCommentHint => 'Пікір қосу (міндетті емес)...';
+
+  @override
+  String get cityDriveRetake => 'Қайта түсіру';
+
+  @override
+  String get cityDrivePublish => 'Жариялау';
+
+  @override
+  String get cityDriveResidentReported => 'Тұрғын жол зақымы туралы хабарлады.';
+
+  @override
+  String get cityDriveProblemOnRoad => 'Жолдағы мәселе';
+
+  @override
+  String cityDriveReportedOn(String date) {
+    return 'Хабарланды: $date';
+  }
+
+  @override
+  String get cityDriveNewStatus => 'Жаңа';
+
+  @override
+  String get cityDriveFixedStatus => 'Жөнделді';
+
+  @override
+  String get cityDriveUndefinedStatus => 'Анықталмаған';
+
+  @override
+  String get cityDriveJustNow => 'дәл қазір';
+
+  @override
+  String get cityDriveHour => 'сағат';
+
+  @override
+  String get cityDriveHours2to4 => 'сағат';
+
+  @override
+  String get cityDriveHoursMany => 'сағат';
+
+  @override
+  String get cityDriveDay => 'күн';
+
+  @override
+  String get cityDriveDays2to4 => 'күн';
+
+  @override
+  String get cityDriveDaysMany => 'күн';
+
+  @override
+  String get cityDriveProblemTypePothole => 'Жол шұңқыры';
+
+  @override
+  String get cityDriveProblemTypeDamage => 'Қаптама зақымы';
+
+  @override
+  String get cityDriveProblemTypeCracks => 'Жарықтар';
+
+  @override
+  String get cityDriveProblemTypeSubsidence => 'Асфальттың ойық алуы';
+
+  @override
+  String get cityDriveTypePothole => 'Шұңқыр';
+
+  @override
+  String get cityDriveTypeDamage => 'Зақым';
+
+  @override
+  String get cityDriveTypeCrack => 'Жарық';
+
+  @override
+  String get cityDriveTypeRoad => 'Жол';
+
+  @override
+  String get cityDriveAvailable => 'Қолжетімді';
+
+  @override
+  String get cityDriveSubmitApplication => 'Өтінім беру';
+
+  @override
+  String get cityDriveSendReportBtn => 'Есеп жіберу';
+
+  @override
+  String get cityDriveCameraFailed => 'Камераны ашу мүмкін болмады';
+
+  @override
+  String get cityDriveRoadProblem => 'Жол мәселесі';
+
+  @override
+  String get cityDriveDeterminingAddress => 'Мекенжай анықталуда...';
+
+  @override
+  String get cityDriveCoordsUnavailable => 'Координаттар қолжетімсіз';
+
+  @override
+  String get cityDriveDamageNeedsAttention => 'Жол зақымына назар аудару керек';
+
+  @override
+  String get cityDriveMarks => 'Белгілер';
+
+  @override
+  String get cityDriveFilterAll => 'Барлығы';
+
+  @override
+  String get cityDriveFilterConfirmed => 'Расталды';
+
+  @override
+  String get cityDriveFilterRejected => 'Қабылданбады';
+
+  @override
+  String get cityDriveMarkDetails => 'Белгі мәліметтері';
+
+  @override
+  String get cityDriveNotifications => 'Хабарландырулар';
+
+  @override
+  String get cityDriveNoNotifications => 'Әзірге хабарландырулар жоқ';
+
+  @override
+  String get cityDriveNotificationsHint => 'Сабақтар, акциялар және басқа хабарландырулар мұнда көрсетіледі';
+
+  @override
+  String get cityDriveOpen => 'Ашу';
+
+  @override
+  String get cityDriveToday => 'Бүгін';
+
+  @override
+  String get cityDriveYesterday => 'Кеше';
 }

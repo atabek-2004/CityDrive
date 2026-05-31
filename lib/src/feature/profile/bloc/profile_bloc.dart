@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
-import 'package:ikidz/src/feature/profile/data/profile_repository.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/feature/profile/data/profile_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'profile_bloc.freezed.dart';

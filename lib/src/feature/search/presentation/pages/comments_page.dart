@@ -2,9 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/search/bloc/road_problems_provider.dart';
-import 'package:ikidz/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()
@@ -31,20 +31,21 @@ class _CommentsPageState extends State<CommentsPage> {
     super.dispose();
   }
 
-  void _addComment() {
+  Future<void> _addComment() async {
     if (_commentController.text.trim().isEmpty) return;
 
     final newComment = Comment(
-      author: 'Вы', 
+      author: 'Вы',
       text: _commentController.text.trim(),
       time: DateTime.now(),
     );
 
-   
     final updatedComments = [...?widget.problem.comments, newComment];
-    
+
     final updatedProblem = RoadProblemDTO(
       id: widget.problem.id,
+      authorUserId: widget.problem.authorUserId,
+      assignedControllerId: widget.problem.assignedControllerId,
       title: widget.problem.title,
       description: widget.problem.description,
       address: widget.problem.address,
@@ -62,7 +63,7 @@ class _CommentsPageState extends State<CommentsPage> {
     );
 
    
-    context.read<RoadProblemsProvider>().updateProblem(updatedProblem);
+    await context.read<RoadProblemsProvider>().updateProblem(updatedProblem);
 
    
     _commentController.clear();

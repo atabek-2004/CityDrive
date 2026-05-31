@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/bloc/new_password_cubit.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/bloc/new_password_cubit.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
-import 'package:ikidz/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:city_drive/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 
 @RoutePage()
 class NewPasswordPage extends StatefulWidget implements AutoRouteWrapper {

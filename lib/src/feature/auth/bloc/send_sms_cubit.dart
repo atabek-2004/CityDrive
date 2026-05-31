@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
-import 'package:ikidz/src/feature/auth/models/sms_dto.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/models/sms_dto.dart';
 
 part 'send_sms_cubit.freezed.dart';
 
@@ -18,13 +18,13 @@ class SendSmsCubit extends Cubit<SendSmsState> {
     try {
       emit(const SendSmsState.loading());
 
-      final result = await _repository.forgotPasswordSmsSend(
+      await _repository.forgotPasswordSmsSend(
         phone: phone,
       );
 
       if (isClosed) return;
 
-      emit(SendSmsState.loaded(smsDTO: result));
+      emit(const SendSmsState.loaded());
     } catch (e) {
       emit(
         SendSmsState.error(

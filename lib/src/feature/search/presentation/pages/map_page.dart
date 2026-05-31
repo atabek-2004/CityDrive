@@ -8,11 +8,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/search/bloc/road_problems_provider.dart';
-import 'package:ikidz/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -25,7 +27,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late GoogleMapController _mapController;
+  GoogleMapController? _mapController;
   final Completer<GoogleMapController> _controllerCompleter = Completer();
 
   Set<Marker> _markers = {};
@@ -35,6 +37,9 @@ class _MapPageState extends State<MapPage> {
 
   bool _showCameraButton = false;
   Position? _currentPosition;
+  RoadProblemsProvider? _problemsProvider;
+  bool _listenerAttached = false;
+  bool _mapActive = true;
 
   static const CameraPosition _initialCamera = CameraPosition(
     target: LatLng(43.238949, 76.889709),
@@ -45,39 +50,76 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<RoadProblemsProvider>();
-      provider.addListener(_onProblemsUpdated);
+      if (!mounted) return;
+      _problemsProvider = context.read<RoadProblemsProvider>();
+      _attachListener();
       _loadProblems();
     });
   }
 
+  @override
+  void activate() {
+    super.activate();
+    _mapActive = true;
+    _attachListener();
+    if (mounted) _loadProblems();
+  }
+
+  @override
+  void deactivate() {
+    _mapActive = false;
+    _detachListener();
+    super.deactivate();
+  }
+
+  void _attachListener() {
+    if (_listenerAttached || !mounted) return;
+    _problemsProvider ??= context.read<RoadProblemsProvider>();
+    _problemsProvider!.addListener(_onProblemsUpdated);
+    _listenerAttached = true;
+  }
+
+  void _detachListener() {
+    if (!_listenerAttached) return;
+    _problemsProvider?.removeListener(_onProblemsUpdated);
+    _listenerAttached = false;
+  }
+
   void _onProblemsUpdated() {
-    final provider = context.read<RoadProblemsProvider>();
-    setState(() {
-      _problems = provider.problems;
-      _updateMarkers(_problems);
+    if (!mounted || !_mapActive || _problemsProvider == null) return;
+
+    final problems = _problemsProvider!.problems;
+    final newMarkers = _buildMarkers(problems);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_mapActive) return;
+      setState(() {
+        _problems = problems;
+        _markers = newMarkers;
+      });
     });
   }
 
   void _loadProblems() {
-    final provider = context.read<RoadProblemsProvider>();
-
-    if (provider.problems.isEmpty) {
-      provider.initializeWithMockData();
-    }
-
-    _problems = provider.problems;
-    _updateMarkers(_problems);
+    if (!mounted || !_mapActive) return;
+    final provider = _problemsProvider ?? context.read<RoadProblemsProvider>();
+    provider.load();
+    setState(() {
+      _problems = provider.problems;
+      _markers = _buildMarkers(_problems);
+    });
   }
 
   @override
   void dispose() {
-    final provider = context.read<RoadProblemsProvider>();
-    provider.removeListener(_onProblemsUpdated);
+    _mapActive = false;
+    _detachListener();
+    _mapController?.dispose();
+    _mapController = null;
     super.dispose();
   }
 
-  void _updateMarkers(List<RoadProblemDTO> problems) {
+  Set<Marker> _buildMarkers(List<RoadProblemDTO> problems) {
     final newMarkers = <Marker>{};
     for (final problem in problems) {
       if (problem.latitude != null && problem.longitude != null) {
@@ -95,10 +137,7 @@ class _MapPageState extends State<MapPage> {
         );
       }
     }
-
-    setState(() {
-      _markers = newMarkers;
-    });
+    return newMarkers;
   }
 
   BitmapDescriptor _getMarkerIcon(String? severity) {
@@ -125,13 +164,17 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _zoomIn() {
+    final controller = _mapController;
+    if (controller == null) return;
     _currentZoom = (_currentZoom + 1).clamp(0.0, 22.0);
-    _mapController.animateCamera(CameraUpdate.zoomTo(_currentZoom));
+    controller.animateCamera(CameraUpdate.zoomTo(_currentZoom));
   }
 
   void _zoomOut() {
+    final controller = _mapController;
+    if (controller == null) return;
     _currentZoom = (_currentZoom - 1).clamp(0.0, 22.0);
-    _mapController.animateCamera(CameraUpdate.zoomTo(_currentZoom));
+    controller.animateCamera(CameraUpdate.zoomTo(_currentZoom));
   }
 
   Future<void> _animateTo(LatLng pos, {double? zoom}) async {
@@ -205,8 +248,8 @@ class _MapPageState extends State<MapPage> {
       debugPrint('Ошибка при открытии камеры: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Не удалось открыть камеру'),
+          SnackBar(
+            content: Text(context.localized.cityDriveCameraFailed),
           ),
         );
       }
@@ -232,6 +275,7 @@ class _MapPageState extends State<MapPage> {
           maxChildSize: 0.7,
           expand: false,
           builder: (context, scrollController) {
+            final l10n = context.localized;
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.white,
@@ -247,7 +291,7 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         Expanded(
                           child: Text(
-                            problem.title ?? 'Дорожная проблема',
+                            problem.title ?? l10n.cityDriveRoadProblem,
                             style: AppTextStyles.title22BoldW700,
                           ),
                         ),
@@ -261,12 +305,12 @@ class _MapPageState extends State<MapPage> {
                     Row(
                       children: [
                         _buildChip(
-                          _getSeverityText(problem.severity),
+                          severityLabel(l10n, problem.severity),
                           _getSeverityColor(problem.severity),
                         ),
                         const Gap(8),
                         _buildChip(
-                          _getStatusText(problem.status),
+                          controllerStatusLabel(l10n, problem.status),
                           _getStatusColor(problem.status),
                         ),
                       ],
@@ -279,7 +323,7 @@ class _MapPageState extends State<MapPage> {
                         const Gap(8),
                         Expanded(
                           child: Text(
-                            problem.address ?? 'Адрес не указан',
+                            problem.address ?? l10n.cityDriveAddressNotSpecified,
                             style: AppTextStyles.body14w400,
                           ),
                         ),
@@ -293,7 +337,10 @@ class _MapPageState extends State<MapPage> {
                               color: Colors.grey, size: 18),
                           const Gap(8),
                           Text(
-                            'Сообщено: ${DateFormat('dd.MM.yyyy').format(problem.reportedDate!)}',
+                            l10n.cityDriveReportedOn(
+                              DateFormat('dd.MM.yyyy')
+                                  .format(problem.reportedDate!),
+                            ),
                             style: AppTextStyles.body14w400.copyWith(
                               color: Colors.grey,
                             ),
@@ -328,7 +375,7 @@ class _MapPageState extends State<MapPage> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text('Подробнее'),
+                        child: Text(l10n.cityDriveMoreDetails),
                       ),
                     ),
                   ],
@@ -364,19 +411,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  String _getStatusText(String? status) {
-    switch (status) {
-      case 'new':
-        return 'Новая';
-      case 'in_progress':
-        return 'В работе';
-      case 'fixed':
-        return 'Исправлено';
-      default:
-        return 'Не определен';
-    }
-  }
-
   Color _getStatusColor(String? status) {
     switch (status) {
       case 'new':
@@ -387,21 +421,6 @@ class _MapPageState extends State<MapPage> {
         return Colors.green;
       default:
         return Colors.grey;
-    }
-  }
-
-  String _getSeverityText(String? severity) {
-    switch (severity) {
-      case 'critical':
-        return 'Критическая';
-      case 'high':
-        return 'Высокая';
-      case 'medium':
-        return 'Средняя';
-      case 'low':
-        return 'Низкая';
-      default:
-        return '';
     }
   }
 

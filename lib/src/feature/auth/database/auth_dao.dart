@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ikidz/src/core/database/shared_preferences/typed_preferences_dao.dart';
+import 'package:city_drive/src/core/database/shared_preferences/typed_preferences_dao.dart';
 
 abstract class IAuthDao {
   PreferencesEntry<String> get user;

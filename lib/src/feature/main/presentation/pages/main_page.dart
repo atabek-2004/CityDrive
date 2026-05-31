@@ -3,21 +3,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/constants.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_material_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/pull_to_refresh_widgets.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/core/utils/image_util.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/main/bloc/banners_cubit.dart';
-import 'package:ikidz/src/feature/main/bloc/categories_cubit.dart';
-import 'package:ikidz/src/feature/main/bloc/centers_cubit.dart';
-import 'package:ikidz/src/feature/search/presentation/widgets/hall_contayner_widget.dart';
+import 'package:city_drive/src/core/constant/constants.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_material_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/pull_to_refresh_widgets.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/image_util.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class NewsDTO {
@@ -42,28 +37,7 @@ class MainPageFirst extends StatefulWidget implements AutoRouteWrapper {
   State<MainPageFirst> createState() => _MainPageFirstState();
 
   @override
-  Widget wrappedRoute(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        // BlocProvider(
-        //   create: (context) => CategoriesCubit(
-        //     repository: context.repository.mainRepository,
-        //   ),
-        // ),
-        BlocProvider(
-          create: (context) => CentersCubit(
-            repository: context.repository.mainRepository,
-          ),
-        ),
-        // BlocProvider(
-        //   create: (context) => BannersCubit(
-        //     repository: context.repository.mainRepository,
-        //   ),
-        // ),
-      ],
-      child: this,
-    );
-  }
+  Widget wrappedRoute(BuildContext context) => this;
 }
 
 class _MainPageFirstState extends State<MainPageFirst> {
@@ -80,14 +54,14 @@ class _MainPageFirstState extends State<MainPageFirst> {
     NewsDTO(
       title: 'Ремонт улицы Абая',
       description:
-          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая полоса',
       imageUrl: Assets.images.png.news.path,
       createdAt: '2 дня назад',
     ),
     NewsDTO(
       title: 'Ремонт улицы Абая',
       description:
-          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая поласа',
+          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая полоса',
       imageUrl: Assets.images.png.news.path,
       createdAt: '2 дня назад',
     ),
@@ -95,12 +69,6 @@ class _MainPageFirstState extends State<MainPageFirst> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // BlocProvider.of<CategoriesCubit>(context).categories();
-      BlocProvider.of<CentersCubit>(context).centers(perPage: 3);
-      // BlocProvider.of<BannersCubit>(context).banners();
-    });
-
     super.initState();
   }
 
@@ -254,22 +222,12 @@ class _MainPageFirstState extends State<MainPageFirst> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Новости',
+                        context.localized.cityDriveNews,
                         style: AppTextStyles.fs18w600.copyWith(
                           color: AppColors.text090909,
                         ),
                       ),
-                      CustomMaterialButton(
-                        onTap: () {
-                          context.router.push(const NewCenetersRoute());
-                        },
-                        child: Text(
-                          'См все',
-                          style: AppTextStyles.body15w500.copyWith(
-                            color: AppColors.mainColor,
-                          ),
-                        ),
-                      ),
+                      const SizedBox.shrink(),
                     ],
                   ),
                 ),

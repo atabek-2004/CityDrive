@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:ikidz/src/core/presentation/widgets/shimmer/animation.dart';
-import 'package:ikidz/src/core/presentation/widgets/shimmer/shimmer.dart';
+import 'package:city_drive/src/core/presentation/widgets/shimmer/animation.dart';
+import 'package:city_drive/src/core/presentation/widgets/shimmer/shimmer.dart';
 
 class ShimmerAnimator extends StatefulWidget {
   const ShimmerAnimator({

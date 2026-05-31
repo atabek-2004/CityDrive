@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class CustomTabWidget extends StatelessWidget {
   final String icon;
@@ -24,9 +25,11 @@ class CustomTabWidget extends StatelessWidget {
     return Tab(
       text: title,
       iconMargin: const EdgeInsets.only(bottom: 8),
-      icon:   SvgPicture.asset(
+      icon: SvgPicture.asset(
         tabIndex == currentIndex ? activeIcon : icon,
-        color:  tabIndex == currentIndex ? color ?? null : Colors.grey,
+        color: tabIndex == currentIndex
+            ? (color ?? AppColors.mainColor)
+            : Colors.grey,
       ),
     );
   }

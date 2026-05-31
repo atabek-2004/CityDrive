@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:ikidz/src/core/containers/repository_storage.dart';
-import 'package:ikidz/src/core/presentation/scopes/repository_scope.dart';
-import 'package:ikidz/src/core/utils/layout/window_size.dart';
-import 'package:ikidz/src/feature/app/presentation/material_context.dart';
-import 'package:ikidz/src/feature/app/initialization/logic/composition_root.dart';
-import 'package:ikidz/src/feature/app/initialization/widget/dependencies_scope.dart';
-import 'package:ikidz/src/feature/settings/widget/settings_scope.dart';
+import 'package:city_drive/src/core/containers/repository_storage.dart';
+import 'package:city_drive/src/core/presentation/scopes/repository_scope.dart';
+import 'package:city_drive/src/core/utils/layout/window_size.dart';
+import 'package:city_drive/src/feature/app/presentation/material_context.dart';
+import 'package:city_drive/src/feature/app/initialization/logic/composition_root.dart';
+import 'package:city_drive/src/feature/app/initialization/widget/dependencies_scope.dart';
+import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 
 /// {@template app}
 /// [App] is an entry point to the application.
@@ -33,6 +33,7 @@ class App extends StatelessWidget {
               sharedPreferences: result.dependencies.sharedPreferences,
               packageInfo: result.dependencies.packageInfo,
               appSettingsDatasource: result.dependencies.appSettingsDatasource,
+              hiveService: result.dependencies.hiveService,
             ),
             child: const SettingsScope(
               child: WindowSizeScope(

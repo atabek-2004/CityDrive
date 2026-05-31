@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({

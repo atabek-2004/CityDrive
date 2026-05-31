@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/app/presentation/pages/force_update_page.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/app/presentation/pages/force_update_page.dart';
 
 /// {@template initialization_failed_screen}
 /// Screen that is shown when the initialization of the app fails.

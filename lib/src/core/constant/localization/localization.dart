@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:ikidz/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
 
 /// {@template localization}
 /// Localization class which is used to localize app.
@@ -9,6 +9,9 @@ import 'package:ikidz/src/core/constant/localization/translations/app_localizati
 final class Localization {
   /// {@macro localization}
   const Localization._({required this.locale});
+
+  /// Default app language (not tied to system locale).
+  static const Locale defaultLocale = Locale('ru', 'RU');
 
   /// List of supported locales.
   static List<Locale> get supportedLocales => AppLocalizations.supportedLocales;
@@ -32,16 +35,8 @@ final class Localization {
   /// Locale which is currently used.
   final Locale locale;
 
-  /// Computes the default locale.
-  ///
-  /// This is the locale that is used when no locale is specified.
-  static Locale computeDefaultLocale() {
-    final locale = WidgetsBinding.instance.platformDispatcher.locale;
-
-    if (_delegate.isSupported(locale)) return locale;
-
-    return const Locale('ru');
-  }
+  /// Default locale for the app (Russian, independent of the OS language).
+  static Locale computeDefaultLocale() => defaultLocale;
 
   /// Obtain [AppLocalizations] instance from [BuildContext].
   static AppLocalizations of(BuildContext context) =>

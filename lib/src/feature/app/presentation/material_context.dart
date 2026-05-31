@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:ikidz/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
 
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
-import 'package:ikidz/src/feature/app/presentation/widgets/app_router_builder.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/app/presentation/widgets/app_router_builder.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
 
-import 'package:ikidz/src/feature/settings/widget/settings_scope.dart';
+import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 
 /// {@template material_context}
 /// [MaterialContext] is an entry point to the material context.
@@ -42,7 +42,9 @@ class MaterialContext extends StatelessWidget {
         // themeMode: ThemeMode.light, // theme.mode,
         localizationsDelegates: Localization.localizationDelegates,
         supportedLocales: Localization.supportedLocales,
-        locale: settings.locale,
+        locale: settings.locale ?? Localization.defaultLocale,
+        localeListResolutionCallback: (_, __) =>
+            settings.locale ?? Localization.defaultLocale,
         // home: const HomeScreen(),
         // builder: (context, child) => MediaQuery.withClampedTextScaling(
         //   maxScaleFactor: 1,

@@ -1,17 +1,18 @@
 
-import 'package:ikidz/src/feature/profile/bloc/profile_bloc.dart';
+import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 
-import 'package:ikidz/src/feature/app/bloc/app_bloc.dart';
+import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
 
-import 'package:ikidz/src/feature/app/initialization/widget/dependencies_scope.dart';
-import 'package:ikidz/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/app/initialization/widget/dependencies_scope.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 
-import 'package:ikidz/src/feature/settings/bloc/app_settings_bloc.dart';
-import 'package:ikidz/src/feature/settings/model/app_settings.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
+import 'package:city_drive/src/feature/settings/model/app_settings.dart';
 import 'package:provider/provider.dart';
 
 /// {@template settings_scope}
@@ -46,7 +47,8 @@ class SettingsScope extends StatefulWidget {
     final settingsScope = listen
         ? context.dependOnInheritedWidgetOfExactType<_InheritedSettings>()
         : context.getInheritedWidgetOfExactType<_InheritedSettings>();
-    return settingsScope!.settings ?? const AppSettings();
+    return settingsScope!.settings ??
+        const AppSettings(locale: Localization.defaultLocale);
   }
 
   @override
@@ -68,14 +70,26 @@ class _SettingsScopeState extends State<SettingsScope> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<AppSettingsBloc, AppSettingsState>(
+  Widget build(BuildContext context) => BlocConsumer<AppSettingsBloc, AppSettingsState>(
         bloc: _appSettingsBloc,
+        listenWhen: (prev, next) =>
+            prev.appSettings?.locale != next.appSettings?.locale,
+        listener: (context, state) {
+          final locale = state.appSettings?.locale;
+          if (locale != null) {
+            Localization.load(locale);
+          }
+        },
         builder: (context, state) => MultiBlocProvider(
           providers: [
             BlocProvider(
               create: (context) => AppBloc(context.repository.authRepository),
             ),
-            ChangeNotifierProvider(create: (_) => RoadProblemsProvider()),
+            ChangeNotifierProvider(
+              create: (context) => RoadProblemsProvider(
+                context.repository.roadProblemRepository,
+              ),
+            ),
             // BlocProvider(
             //   create: (context) => ProfileBLoC(
             //     authRepository: context.repository.authRepository,

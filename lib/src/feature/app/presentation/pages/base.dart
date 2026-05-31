@@ -1,13 +1,13 @@
 import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/app/presentation/widgets/base_tabs.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/app/presentation/widgets/base_tabs.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
@@ -136,6 +136,27 @@ class BaseBottomNavbar extends StatefulWidget {
 
 class _BaseBottomNavbarState extends State<BaseBottomNavbar> {
   @override
+  void initState() {
+    super.initState();
+    widget.tabController.index = widget.tabsRouter.activeIndex;
+    widget.tabsRouter.addListener(_syncTabController);
+  }
+
+  @override
+  void dispose() {
+    widget.tabsRouter.removeListener(_syncTabController);
+    super.dispose();
+  }
+
+  void _syncTabController() {
+    final index = widget.tabsRouter.activeIndex;
+    if (widget.tabController.index != index) {
+      widget.tabController.index = index;
+    }
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
@@ -167,11 +188,10 @@ class _BaseBottomNavbarState extends State<BaseBottomNavbar> {
         // indicatorSize: TabBarIndicatorSize.tab,
         // indicator: TabDotIndicator(),
         onTap: (value) {
-          // HapticFeedback.lightImpact();
-
           if (widget.tabsRouter.activeIndex == value) {
             widget.tabsRouter.maybePopTop();
           } else {
+            widget.tabController.index = value;
             widget.tabsRouter.setActiveIndex(value);
           }
         },
@@ -179,21 +199,21 @@ class _BaseBottomNavbarState extends State<BaseBottomNavbar> {
           CustomTabWidget(
             icon: Assets.icons.homeNotActive.path,
             activeIcon: Assets.icons.home.path,
-            title: 'Главная',
+            title: context.localized.main,
             currentIndex: widget.tabController.index,
             tabIndex: 0,
           ),
           CustomTabWidget(
             icon: Assets.icons.map.path,
             activeIcon: Assets.icons.map.path,
-            title: 'Карта',
+            title: context.localized.cityDriveMap,
             currentIndex: widget.tabController.index,
             tabIndex: 1,
           ),
           CustomTabWidget(
             icon: Assets.icons.addPlus.path,
             activeIcon: Assets.icons.closeIcon1.path,
-            title: 'Мои отметки',
+            title: context.localized.cityDriveMyMarks,
             currentIndex: widget.tabController.index,
             tabIndex: 2,
           ),

@@ -1,16 +1,18 @@
-# city_drive
+# City Drive
 
-A new Flutter project.
+Flutter-приложение для сообщения о проблемах на дорогах и отслеживания их решения.
 
-## Getting Started
+## Основные модули
 
-This project is a starting point for a Flutter application.
+- **auth** — вход, регистрация, роли (житель / контроллер), онбординг компании
+- **main** — главная, уведомления, мои отметки, детали проблем
+- **search** — карта, отметки на дорогах, отчёты, комментарии
+- **profile** — профиль, документы, настройки
 
-A few resources to get you started if this is your first Flutter project:
+## Запуск
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```sh
+flutter pub get
+cd ios && pod install && cd ..
+flutter run
+```

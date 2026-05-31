@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
 
 @RoutePage()
 class CompanyDocumentsPage extends StatefulWidget {
@@ -50,99 +50,98 @@ class _CompanyDocumentsPageState extends State<CompanyDocumentsPage> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              const Text(
-                'Документы компании',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Свидетельство о регистрации
-              const Text(
-                'Свидетельство о регистрации',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              DocumentUploadCard(
-                title: 'Нажмите для загрузки',
-                subtitle: 'PDF, JPG до 10 МБ',
-                uploadedFile: registrationDocument,
-                onTap: () => _pickFile('registration'),
-                onRemove: () {
-                  setState(() {
-                    registrationDocument = null;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 32),
-
-              // Портфолио работ
-              const Text(
-                'Портфолио работ',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              DocumentUploadCard(
-                title: 'Фото выполненных работ',
-                subtitle: 'PDF, JPG до 10 МБ',
-                uploadedFile: portfolioDocument,
-                onTap: () => _pickFile('portfolio'),
-                onRemove: () {
-                  setState(() {
-                    portfolioDocument = null;
-                  });
-                },
-              ),
-
-              const Spacer(),
-
-              // Подать заявку button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: canSubmit
-                      ? () {
-                          context.router.push(ApplicationSubmittedRoute());
-                        }
-                      : () {
-                          // context.router.push(ApplicationSubmittedRoute());
-                          
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(top: 24, bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Документы компании',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Свидетельство о регистрации',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      DocumentUploadCard(
+                        title: 'Нажмите для загрузки',
+                        subtitle: 'PDF, JPG до 10 МБ',
+                        uploadedFile: registrationDocument,
+                        onTap: () => _pickFile('registration'),
+                        onRemove: () {
+                          setState(() {
+                            registrationDocument = null;
+                          });
                         },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4A9EFF),
-                    disabledBackgroundColor:
-                        const Color(0xFF4A9EFF).withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
+                      ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Портфолио работ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      DocumentUploadCard(
+                        title: 'Фото выполненных работ',
+                        subtitle: 'PDF, JPG до 10 МБ',
+                        uploadedFile: portfolioDocument,
+                        onTap: () => _pickFile('portfolio'),
+                        onRemove: () {
+                          setState(() {
+                            portfolioDocument = null;
+                          });
+                        },
+                      ),
+                    ],
                   ),
-                  child: const Text(
-                    'Подать заявку',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: canSubmit
+                        ? () {
+                            context.router.push(ApplicationSubmittedRoute());
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4A9EFF),
+                      disabledBackgroundColor:
+                          const Color(0xFF4A9EFF).withValues(alpha: 0.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Подать заявку',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),

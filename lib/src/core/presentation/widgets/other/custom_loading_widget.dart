@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class CustomLoadingWidget extends StatelessWidget {
   const CustomLoadingWidget({

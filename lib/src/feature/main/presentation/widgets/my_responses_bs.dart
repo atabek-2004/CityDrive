@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 
 class MyResponsesBS extends StatefulWidget {
   const MyResponsesBS({super.key});
@@ -7,6 +9,7 @@ class MyResponsesBS extends StatefulWidget {
   @override
   State<MyResponsesBS> createState() => _MyResponsesBSState();
 
+  /// Возвращает код статуса или `null` для «Все».
   static Future<String?> show(BuildContext context) => showModalBottomSheet<String>(
         context: context,
         useRootNavigator: true,
@@ -20,18 +23,40 @@ class MyResponsesBS extends StatefulWidget {
       );
 }
 
-class _MyResponsesBSState extends State<MyResponsesBS> {
-  String selectedFilter = 'Все';
+class _FilterOption {
+  const _FilterOption({required this.status, required this.label});
 
-  final List<String> filters = [
-    'Все',
-    'На рассмотрении',
-    'Подтверждена',
-    'Отклонена',
-  ];
+  final String? status;
+  final String label;
+}
+
+class _MyResponsesBSState extends State<MyResponsesBS> {
+  String? selectedStatus;
+
+  List<_FilterOption> _options(BuildContext context) {
+    final l10n = context.localized;
+    return [
+      _FilterOption(status: null, label: l10n.cityDriveFilterAll),
+      _FilterOption(
+        status: ReportStatus.pending,
+        label: l10n.cityDriveUnderReview,
+      ),
+      _FilterOption(
+        status: ReportStatus.confirmed,
+        label: l10n.cityDriveFilterConfirmed,
+      ),
+      _FilterOption(
+        status: ReportStatus.rejected,
+        label: l10n.cityDriveFilterRejected,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final options = _options(context);
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -42,7 +67,6 @@ class _MyResponsesBSState extends State<MyResponsesBS> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Gap(8),
-            // Drag handle
             Align(
               alignment: Alignment.center,
               child: Container(
@@ -55,16 +79,14 @@ class _MyResponsesBSState extends State<MyResponsesBS> {
               ),
             ),
             const Gap(16),
-            
-            // Title with close button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Отметки',
-                    style: TextStyle(
+                  Text(
+                    l10n.cityDriveMarks,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -79,30 +101,21 @@ class _MyResponsesBSState extends State<MyResponsesBS> {
               ),
             ),
             const Gap(20),
-            
-            // Filter options
-            ...filters.map((filter) => FilterOption(
-                  title: filter,
-                  isSelected: selectedFilter == filter,
-                  onTap: () {
-                    setState(() {
-                      selectedFilter = filter;
-                    });
-                  },
-                )),
-            
+            ...options.map(
+              (option) => FilterOption(
+                title: option.label,
+                isSelected: selectedStatus == option.status,
+                onTap: () => setState(() => selectedStatus = option.status),
+              ),
+            ),
             const Gap(16),
-            
-            // Ready button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context, selectedFilter);
-                  },
+                  onPressed: () => Navigator.pop(context, selectedStatus),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4A9EFF),
                     shape: RoundedRectangleBorder(
@@ -110,9 +123,9 @@ class _MyResponsesBSState extends State<MyResponsesBS> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Готово',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.cityDriveDone,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -130,10 +143,6 @@ class _MyResponsesBSState extends State<MyResponsesBS> {
 }
 
 class FilterOption extends StatelessWidget {
-  final String title;
-  final bool isSelected;
-  final VoidCallback onTap;
-
   const FilterOption({
     super.key,
     required this.title,
@@ -141,51 +150,29 @@ class FilterOption extends StatelessWidget {
     required this.onTap,
   });
 
+  final String title;
+  final bool isSelected;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A9EFF).withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF4A9EFF) : Colors.transparent,
-            width: 1,
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? const Color(0xFF4A9EFF) : Colors.black,
-              ),
-            ),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF4A9EFF) : Colors.grey.shade400,
-                  width: 2,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
-                color: isSelected ? const Color(0xFF4A9EFF) : Colors.transparent,
               ),
-              child: isSelected
-                  ? const Icon(
-                      Icons.circle,
-                      size: 12,
-                      color: Colors.white,
-                    )
-                  : null,
             ),
+            if (isSelected)
+              const Icon(Icons.check, color: Color(0xFF4A9EFF)),
           ],
         ),
       ),

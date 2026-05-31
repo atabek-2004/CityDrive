@@ -9,8 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get aNewGenerationFreightTransportation =>
-      'A new generation freight transportation exchange - reliable, fast, convenient.';
+  String get aNewGenerationFreightTransportation => 'A new generation freight transportation exchange - reliable, fast, convenient.';
 
   @override
   String get accept => 'Accept';
@@ -61,8 +60,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get advertiseYourProductWithUs => 'Advertise your product with us!';
 
   @override
-  String get agreeText =>
-      'By clicking on the “Create Account” button You agree with';
+  String get agreeText => 'By clicking on the “Create Account” button You agree with';
 
   @override
   String get and => ' and';
@@ -74,30 +72,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'sirius Business';
 
   @override
-  String get applicationCompletedWaitForResponses =>
-      'Application completed!\n Wait for responses';
+  String get applicationCompletedWaitForResponses => 'Application completed!\n Wait for responses';
 
   @override
   String get apply => 'Apply';
 
   @override
-  String get areYouSureYouWantLogOutYourAccount =>
-      'Are you sure you want to log out of your account?';
+  String get areYouSureYouWantLogOutYourAccount => 'Are you sure you want to log out of your account?';
 
   @override
-  String get areYouSureYouWantToDeleteTheOrder =>
-      'Are you sure you want\nto delete the order?';
+  String get areYouSureYouWantToDeleteTheOrder => 'Are you sure you want\nto delete the order?';
 
   @override
-  String get areYouSureYouWantToDeleteYourAccount =>
-      'Are you sure you want to delete your account?';
+  String get areYouSureYouWantToDeleteYourAccount => 'Are you sure you want to delete your account?';
 
   @override
   String get attention => 'Attention';
 
   @override
-  String get attentionThePlatformIsOnly =>
-      'Attention! The platform is only an information platform and is not responsible for transactions between users. Before concluding agreements, check the documents and reliability of the counterparty yourself.';
+  String get attentionThePlatformIsOnly => 'Attention! The platform is only an information platform and is not responsible for transactions between users. Before concluding agreements, check the documents and reliability of the counterparty yourself.';
 
   @override
   String get autoRenewal => 'Auto-renewal';
@@ -133,8 +126,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get businessData => 'Business data';
 
   @override
-  String get buyPremiumSubscription =>
-      'Buy a premium subscription and get access to all contacts';
+  String get buyPremiumSubscription => 'Buy a premium subscription and get access to all contacts';
 
   @override
   String get buyoutOfGoods => 'Buyout of goods';
@@ -167,12 +159,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get category => 'Category';
 
   @override
-  String get certificateAccountAvailability =>
-      'Certificate of account availability';
+  String get certificateAccountAvailability => 'Certificate of account availability';
 
   @override
-  String get certificateRegistrationSoleProprietor =>
-      'Certificate of registration of sole proprietor';
+  String get certificateRegistrationSoleProprietor => 'Certificate of registration of sole proprietor';
 
   @override
   String get certification => 'Certification';
@@ -223,8 +213,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completed2 => 'Completed';
 
   @override
-  String get confirmation1 =>
-      'Confirmation of agreement with the terms of use and';
+  String get confirmation1 => 'Confirmation of agreement with the terms of use and';
 
   @override
   String get confirmation2 => 'Privacy Policy.';
@@ -326,8 +315,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documents => 'Documents';
 
   @override
-  String get documentsAreBeingCheckedPleaseWaitForConfirmation =>
-      'Documents are being checked, please wait for confirmation.';
+  String get documentsAreBeingCheckedPleaseWaitForConfirmation => 'Documents are being checked, please wait for confirmation.';
 
   @override
   String get dont_you_have_an_account => 'Don\'t you have an account?';
@@ -336,8 +324,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get download => 'Download';
 
   @override
-  String get downloadDocs =>
-      'If you upload company documents, you will get a check mark as a verified company.';
+  String get downloadDocs => 'If you upload company documents, you will get a check mark as a verified company.';
+
+  @override
+  String get downloadPdf => 'Скачать pdf';
 
   @override
   String get edit => 'Edit';
@@ -394,8 +384,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterFullName => 'Enter your full name';
 
   @override
-  String get enterFullNameOwnerSole =>
-      'Enter the full name of the owner of the sole proprietor/LLP';
+  String get enterFullNameOwnerSole => 'Enter the full name of the owner of the sole proprietor/LLP';
 
   @override
   String get enterName => 'Enter name';
@@ -482,8 +471,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exit => 'Exit';
 
   @override
-  String get explore_the_app =>
-      'Welcome to sirius — the future of the gift world!';
+  String get explore_the_app => 'Welcome to sirius — the future of the gift world!';
 
   @override
   String get filesAreAdded => 'Files are added';
@@ -498,8 +486,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get findCargo => 'Find cargo';
 
   @override
-  String get findOutWhyYouNeedtoAdvertiseProducts =>
-      'Find out why you need to advertise products?';
+  String get findOutWhyYouNeedtoAdvertiseProducts => 'Find out why you need to advertise products?';
 
   @override
   String get first_add_the_stores_address => 'First add the store\'s address!';
@@ -508,8 +495,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgot_your_password => 'Forgot your password?';
 
   @override
-  String get foundDeliveryOutsideThePlatform =>
-      'Found delivery outside the platform (not through this system).';
+  String get foundDeliveryOutsideThePlatform => 'Found delivery outside the platform (not through this system).';
 
   @override
   String get freightExchange => 'Freight exchange';
@@ -521,8 +507,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullName => 'Full name';
 
   @override
-  String get fullNameOwnerSole =>
-      'Full name of the owner of the sole proprietor/LLP';
+  String get fullNameOwnerSole => 'Full name of the owner of the sole proprietor/LLP';
 
   @override
   String get general => 'General';
@@ -534,15 +519,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get get_it_again => 'Get it again';
 
   @override
-  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul =>
-      'New customers, convenient sales and growth opportunities are waiting for you here. Start now!';
+  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul => 'New customers, convenient sales and growth opportunities are waiting for you here. Start now!';
 
   @override
   String get giveRateTheCarrier => 'Rate the carrier';
 
   @override
-  String get goThroughVerificationAndBecome =>
-      'Go through verification and become\na verified carrier';
+  String get goThroughVerificationAndBecome => 'Go through verification and become\na verified carrier';
 
   @override
   String get goThroughVerificationText => 'Go through verification';
@@ -554,8 +537,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get height => 'Height (м)';
 
   @override
-  String get howManyBonusesDoYouWantSpend =>
-      'How many bonuses do you want to spend?';
+  String get howManyBonusesDoYouWantSpend => 'How many bonuses do you want to spend?';
 
   @override
   String get ifYouAlreadyHaveAnAccount => 'If you already have an account, ';
@@ -606,8 +588,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lookingForCarrier => 'Looking for a carrier';
 
   @override
-  String get lookingForWayToStandOutInTheMarket =>
-      'Looking for a way to stand out in the market?';
+  String get lookingForWayToStandOutInTheMarket => 'Looking for a way to stand out in the market?';
 
   @override
   String get mail => 'Mail';
@@ -619,12 +600,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mainTypeActivity => 'Main type of activity';
 
   @override
-  String get moreThan100SuccessfulTransactionsDaily =>
-      'More than 100 successful transactions\ndaily!';
+  String get moreThan100SuccessfulTransactionsDaily => 'More than 100 successful transactions\ndaily!';
 
   @override
-  String get moreThanSuccessfulTransactionsDaily =>
-      'More than 100 successful \ntransactions daily!';
+  String get moreThanSuccessfulTransactionsDaily => 'More than 100 successful \ntransactions daily!';
 
   @override
   String get myDocuments => 'My documents';
@@ -741,8 +720,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile => 'Profile';
 
   @override
-  String get provideCargoDetails =>
-      'Provide cargo details to get responses from carriers';
+  String get provideCargoDetails => 'Provide cargo details to get responses from carriers';
 
   @override
   String get pullDownToRefresh => 'Pull down to refresh';
@@ -799,8 +777,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seeAll => 'See all';
 
   @override
-  String get selectCarrierFromTheListOfRespondentsAndRate =>
-      'Select a carrier from the list of respondents and rate it.';
+  String get selectCarrierFromTheListOfRespondentsAndRate => 'Select a carrier from the list of respondents and rate it.';
 
   @override
   String get selectCategory => 'Select a category';
@@ -839,19 +816,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareYourExperience => 'Share your experience';
 
   @override
-  String get siriusDescription =>
-      'New generation freight exchange - reliable, fast, convenient.';
+  String get siriusDescription => 'New generation freight exchange - reliable, fast, convenient.';
 
   @override
   String get specifyTheRoute => 'Specify the route';
 
   @override
-  String get specifyTheRouteCharacter =>
-      'Specify the route, characteristics and receive feedback from carriers';
+  String get specifyTheRouteCharacter => 'Specify the route, characteristics and receive feedback from carriers';
 
   @override
-  String get specifyTheRouteCharacteristics =>
-      'Specify the route, characteristics and receive feedback from carriers';
+  String get specifyTheRouteCharacteristics => 'Specify the route, characteristics and receive feedback from carriers';
 
   @override
   String get statistics => 'Statistics';
@@ -875,23 +849,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get termOfUse => 'Terms of Use';
 
   @override
-  String get theMainStateRegistrationNumber =>
-      'The main state registration number';
+  String get theMainStateRegistrationNumber => 'The main state registration number';
 
   @override
-  String get theOrderHasBeenUpdatedWaitForResponses =>
-      'The order has been updated!\nWait for responses';
+  String get theOrderHasBeenUpdatedWaitForResponses => 'The order has been updated!\nWait for responses';
 
   @override
-  String get theServiceIsTemporarilyUnavailable =>
-      'The service is temporarily unavailable';
+  String get theServiceIsTemporarilyUnavailable => 'The service is temporarily unavailable';
 
   @override
   String get the_list_is_empty => 'The list is empty';
 
   @override
-  String get the_minimum_password_length_is_6 =>
-      'The minimum password length is 6';
+  String get the_minimum_password_length_is_6 => 'The minimum password length is 6';
 
   @override
   String get thisSectionIsUnderDevelopment => 'Section is under development';
@@ -900,8 +870,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get time => 'Time';
 
   @override
-  String get toAddProductSpecifyTheStoresAddressInYourProfile =>
-      'To add a product, specify the store\'s address in your profile.';
+  String get toAddProductSpecifyTheStoresAddressInYourProfile => 'To add a product, specify the store\'s address in your profile.';
 
   @override
   String get toPay => 'To pay';
@@ -951,8 +920,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wasAddDaysAgo => 'was added 20 days ago. Please rate the carrier';
 
   @override
-  String get we_have_sent_a_confirmation =>
-      'We have sent a confirmation code to your email address.: ';
+  String get we_have_sent_a_confirmation => 'We have sent a confirmation code to your email address.: ';
 
   @override
   String get website => 'Website';
@@ -985,8 +953,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writeMessage => 'Write a message';
 
   @override
-  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp =>
-      'Write to us on WhatsApp - we are always in touch \n and ready to help!';
+  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp => 'Write to us on WhatsApp - we are always in touch \n and ready to help!';
 
   @override
   String get yes => 'Yes';
@@ -1005,4 +972,397 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yuridicRegister => 'Legal';
+
+  @override
+  String get cityDriveMap => 'Map';
+
+  @override
+  String get cityDriveMyMarks => 'My marks';
+
+  @override
+  String get cityDriveMyWorks => 'My works';
+
+  @override
+  String get cityDriveEditProfile => 'Edit profile';
+
+  @override
+  String get cityDriveAnnouncements => 'Announcements';
+
+  @override
+  String get cityDriveKeywords => 'Keywords';
+
+  @override
+  String get cityDriveNew => 'New';
+
+  @override
+  String get cityDriveApplications => 'Applications';
+
+  @override
+  String get cityDriveInProgress => 'In progress';
+
+  @override
+  String get cityDriveDone => 'Done';
+
+  @override
+  String get cityDriveNoNewMarksEmpty => 'No new marks yet.\nResidents publish them from the map — they will appear here.';
+
+  @override
+  String get cityDrivePotholeRepair => 'Pothole repair';
+
+  @override
+  String get cityDriveAddressNotSpecified => 'Address not specified';
+
+  @override
+  String get cityDriveUnderReview => 'Under review';
+
+  @override
+  String cityDriveFromAuthor(String author) {
+    return 'From: $author';
+  }
+
+  @override
+  String get cityDriveMoreDetails => 'Details';
+
+  @override
+  String get cityDriveMarkAcceptedSnack => 'Mark accepted for work';
+
+  @override
+  String get cityDriveMarkRejectedSnack => 'Mark rejected';
+
+  @override
+  String get cityDriveDetailsTitle => 'Details';
+
+  @override
+  String get cityDriveNotSpecified => 'Not specified';
+
+  @override
+  String get cityDriveResident => 'Resident';
+
+  @override
+  String get cityDriveComments => 'Comments';
+
+  @override
+  String get cityDriveShowAll => 'Show all';
+
+  @override
+  String get cityDriveLeaveFirstComment => 'Leave the first comment';
+
+  @override
+  String get cityDriveReject => 'Reject';
+
+  @override
+  String get cityDriveAcceptApplicationBtn => 'Accept application';
+
+  @override
+  String get cityDriveSubmitReport => 'Submit report';
+
+  @override
+  String get cityDrivePhotoUnavailable => 'Photo unavailable';
+
+  @override
+  String get cityDriveInformation => 'Information';
+
+  @override
+  String get cityDriveType => 'Type';
+
+  @override
+  String get cityDriveAuthor => 'Author';
+
+  @override
+  String get cityDriveDateLabel => 'Date';
+
+  @override
+  String get cityDriveUrgency => 'Urgency';
+
+  @override
+  String get cityDriveLevel => 'Level';
+
+  @override
+  String get cityDriveAddress => 'Address';
+
+  @override
+  String get cityDriveSeverityCritical => 'Critical';
+
+  @override
+  String get cityDriveSeverityHigh => 'High';
+
+  @override
+  String get cityDriveSeverityMedium => 'Medium';
+
+  @override
+  String get cityDriveSeverityLow => 'Low';
+
+  @override
+  String get cityDriveStatusOpen => 'Open';
+
+  @override
+  String get cityDriveStatusAccepted => 'Accepted';
+
+  @override
+  String get cityDriveStatusInWork => 'In progress';
+
+  @override
+  String get cityDriveStatusRejected => 'Rejected';
+
+  @override
+  String get cityDriveStatusDone => 'Done';
+
+  @override
+  String get cityDriveStatusConfirmed => 'Confirmed';
+
+  @override
+  String get cityDriveStatusFixed => 'Fixed';
+
+  @override
+  String get cityDrivePublishedRecently => 'Published recently';
+
+  @override
+  String get cityDrivePublishedToday => 'Published today';
+
+  @override
+  String get cityDrivePublishedYesterday => 'Published yesterday';
+
+  @override
+  String cityDrivePublishedOn(String date) {
+    return 'Published $date';
+  }
+
+  @override
+  String get cityDriveWorkReportTitle => 'Work completion report';
+
+  @override
+  String get cityDriveWorkPhoto => 'Photo of completed work';
+
+  @override
+  String get cityDriveWorkDescription => 'Work description';
+
+  @override
+  String get cityDriveWorkDescriptionHint => 'Describe how the work went';
+
+  @override
+  String get cityDriveReportSentTitle => 'Report sent';
+
+  @override
+  String get cityDriveWaitAdminReview => 'Awaiting administrator review';
+
+  @override
+  String get cityDriveNow => 'Now';
+
+  @override
+  String get cityDriveAdminReview => 'Admin review';
+
+  @override
+  String get cityDriveAdminReviewSubtitle => 'Usually 1-2 days';
+
+  @override
+  String get cityDriveApplicationAcceptedTitle => 'Application accepted!';
+
+  @override
+  String get cityDriveApplicationAcceptedBody => 'The mark was added to My works. You can start working.';
+
+  @override
+  String get cityDriveApplicationSentTitle => 'Application sent!';
+
+  @override
+  String get cityDriveApplicationSentBody => 'Your participation request was sent for review';
+
+  @override
+  String get cityDriveApplicationAcceptedStep => 'Application accepted';
+
+  @override
+  String get cityDriveApplicationSentStep => 'Application sent';
+
+  @override
+  String get cityDriveViewInMyWorks => 'View in My works';
+
+  @override
+  String get cityDriveAnnouncement => 'Announcement';
+
+  @override
+  String get cityDriveCommentOptional => 'Comment (optional)';
+
+  @override
+  String get cityDriveCommentHint => 'For example: we will start work next week';
+
+  @override
+  String get cityDriveRoadDamage => 'Road damage';
+
+  @override
+  String get cityDriveDefaultMarkTitle => 'Mark';
+
+  @override
+  String get cityDriveLoginForMarks => 'Sign in to see your marks';
+
+  @override
+  String get cityDriveNoMarksYet => 'You have no marks yet.\nTake a photo of a problem on the map.';
+
+  @override
+  String get cityDriveViewOnMap => 'View on map';
+
+  @override
+  String get cityDriveNews => 'News';
+
+  @override
+  String get cityDriveCanceled => 'Canceled';
+
+  @override
+  String get cityDriveInProcess => 'In process';
+
+  @override
+  String get cityDriveCompleted => 'Completed';
+
+  @override
+  String get cityDriveEmptyApplications => 'No new applications from residents.\nThey appear after a mark is published on the map.';
+
+  @override
+  String get cityDriveEmptyCanceled => 'No rejected applications.';
+
+  @override
+  String get cityDriveEmptyInWork => 'Accept an application on the home tab — it will appear here.';
+
+  @override
+  String get cityDriveEmptyCompleted => 'No completed work yet.';
+
+  @override
+  String get cityDriveEmptyList => 'List is empty';
+
+  @override
+  String get cityDriveLoginToPublish => 'Sign in to publish a mark';
+
+  @override
+  String get cityDriveReportPublished => 'Report published successfully!';
+
+  @override
+  String get cityDriveConfirm => 'Confirm';
+
+  @override
+  String get cityDriveAddCommentHint => 'Add a comment (optional)...';
+
+  @override
+  String get cityDriveRetake => 'Retake';
+
+  @override
+  String get cityDrivePublish => 'Publish';
+
+  @override
+  String get cityDriveResidentReported => 'A resident reported road damage.';
+
+  @override
+  String get cityDriveProblemOnRoad => 'Road problem';
+
+  @override
+  String cityDriveReportedOn(String date) {
+    return 'Reported: $date';
+  }
+
+  @override
+  String get cityDriveNewStatus => 'New';
+
+  @override
+  String get cityDriveFixedStatus => 'Fixed';
+
+  @override
+  String get cityDriveUndefinedStatus => 'Undefined';
+
+  @override
+  String get cityDriveJustNow => 'just now';
+
+  @override
+  String get cityDriveHour => 'hour';
+
+  @override
+  String get cityDriveHours2to4 => 'hours';
+
+  @override
+  String get cityDriveHoursMany => 'hours';
+
+  @override
+  String get cityDriveDay => 'day';
+
+  @override
+  String get cityDriveDays2to4 => 'days';
+
+  @override
+  String get cityDriveDaysMany => 'days';
+
+  @override
+  String get cityDriveProblemTypePothole => 'Pothole';
+
+  @override
+  String get cityDriveProblemTypeDamage => 'Surface damage';
+
+  @override
+  String get cityDriveProblemTypeCracks => 'Cracks';
+
+  @override
+  String get cityDriveProblemTypeSubsidence => 'Asphalt subsidence';
+
+  @override
+  String get cityDriveTypePothole => 'Pothole';
+
+  @override
+  String get cityDriveTypeDamage => 'Damage';
+
+  @override
+  String get cityDriveTypeCrack => 'Crack';
+
+  @override
+  String get cityDriveTypeRoad => 'Road';
+
+  @override
+  String get cityDriveAvailable => 'Available';
+
+  @override
+  String get cityDriveSubmitApplication => 'Submit application';
+
+  @override
+  String get cityDriveSendReportBtn => 'Send report';
+
+  @override
+  String get cityDriveCameraFailed => 'Could not open camera';
+
+  @override
+  String get cityDriveRoadProblem => 'Road problem';
+
+  @override
+  String get cityDriveDeterminingAddress => 'Determining address...';
+
+  @override
+  String get cityDriveCoordsUnavailable => 'Coordinates unavailable';
+
+  @override
+  String get cityDriveDamageNeedsAttention => 'Road damage needs attention';
+
+  @override
+  String get cityDriveMarks => 'Marks';
+
+  @override
+  String get cityDriveFilterAll => 'All';
+
+  @override
+  String get cityDriveFilterConfirmed => 'Confirmed';
+
+  @override
+  String get cityDriveFilterRejected => 'Rejected';
+
+  @override
+  String get cityDriveMarkDetails => 'Mark details';
+
+  @override
+  String get cityDriveNotifications => 'Notifications';
+
+  @override
+  String get cityDriveNoNotifications => 'You have no notifications yet';
+
+  @override
+  String get cityDriveNotificationsHint => 'Notifications about activities, promotions and more will appear here';
+
+  @override
+  String get cityDriveOpen => 'Open';
+
+  @override
+  String get cityDriveToday => 'Today';
+
+  @override
+  String get cityDriveYesterday => 'Yesterday';
 }

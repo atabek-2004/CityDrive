@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
-import 'package:ikidz/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/enum/enter_sms_code_type.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:city_drive/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/enum/enter_sms_code_type.dart';
 
 @RoutePage()
 class ChangePhonePage extends StatefulWidget {

@@ -3,19 +3,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/constants.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/core/utils/image_util.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/profile/bloc/profile_bloc.dart';
-import 'package:ikidz/src/feature/profile/presentation/widgets/choose_language_bottom_sheet.dart';
-import 'package:ikidz/src/feature/profile/presentation/widgets/log_out_bottom_sheet.dart';
-import 'package:ikidz/src/feature/profile/presentation/widgets/profile_page_item.dart';
-import 'package:ikidz/src/feature/profile/presentation/widgets/support_service_bottom_sheet.dart';
+import 'package:city_drive/src/core/constant/constants.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/image_util.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
+import 'package:city_drive/src/core/constant/localization/locale_util.dart';
+import 'package:city_drive/src/feature/profile/presentation/widgets/choose_language_bottom_sheet.dart';
+import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
+import 'package:city_drive/src/feature/profile/presentation/widgets/log_out_bottom_sheet.dart';
+import 'package:city_drive/src/feature/profile/presentation/widgets/profile_page_item.dart';
+import 'package:city_drive/src/feature/profile/presentation/widgets/support_service_bottom_sheet.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -37,10 +39,6 @@ class ProfilePage extends StatefulWidget implements AutoRouteWrapper {
             authRepository: context.repository.authRepository,
           ),
         ),
-        // BlocProvider(
-        //   create: (context) =>
-        //       CityListCubit(repository: context.repository.mainRepository),
-        // ),
         // BlocProvider(
         //   create: (context) =>
         //       DocumentCubit(repository: context.repository.profileRepository),
@@ -96,41 +94,57 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void _setOverlayVisible(BuildContext context, bool visible) {
+    if (!context.mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      if (visible) {
+        context.loaderOverlay.show();
+      } else {
+        context.loaderOverlay.hide();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileBLoC, ProfileState>(
-      listener: (context, state) {
-        state.maybeWhen(
-          error: (message) {
-            context.loaderOverlay.hide();
-            Toaster.showErrorTopShortToast(context, message);
-            //
-          },
-          loaded: (user) {
-            context.loaderOverlay.hide();
-            maskPhoneFormatter = MaskTextInputFormatter(
-              mask: '+7 (###) ###-##-##',
-              filter: {"#": RegExp('[0-9]')},
-              initialText: user.phone,
-            );
-            // chosenCity = CityDTO(id: user.city?.id, name: user.city?.name);
-          },
-          loading: () {
-            context.loaderOverlay.show();
-            _refreshController.resetNoData();
-          },
-          orElse: () {
-            context.loaderOverlay.hide();
-            _completeRefreshControllers();
-          },
-        );
-      },
-      builder: (context, state) {
-        return state.maybeWhen(
-          orElse: () => const SizedBox.shrink(),
-          loaded: (user) {
-            context.loaderOverlay.hide();
-            return Scaffold(
+    return LoaderOverlay(
+      overlayColor: AppColors.barrierColor,
+      overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
+      child: BlocConsumer<ProfileBLoC, ProfileState>(
+        listener: (context, state) {
+          state.maybeWhen(
+            error: (message) {
+              _setOverlayVisible(context, false);
+              Toaster.showErrorTopShortToast(context, message);
+            },
+            loaded: (user) {
+              _setOverlayVisible(context, false);
+              maskPhoneFormatter = MaskTextInputFormatter(
+                mask: '+7 (###) ###-##-##',
+                filter: {"#": RegExp('[0-9]')},
+                initialText: user.phone,
+              );
+            },
+            loading: () {
+              _setOverlayVisible(context, true);
+              _refreshController.resetNoData();
+            },
+            orElse: () {
+              _setOverlayVisible(context, false);
+              _completeRefreshControllers();
+            },
+          );
+        },
+        builder: (context, state) {
+          return state.maybeWhen(
+            orElse: () => const SizedBox.shrink(),
+            loaded: (user) {
+              final l10n = context.localized;
+              final locale =
+                  SettingsScope.settingsOf(context).locale ??
+                      context.currentLocale;
+              return Scaffold(
               backgroundColor: Colors.white,
               body: SafeArea(
                 child: SingleChildScrollView(
@@ -141,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'Профиль',
+                          l10n.profile,
                           style: AppTextStyles.title20BoldW600.copyWith(
                             color: AppColors.tabActive,
                           ),
@@ -215,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ProfileMenuItem(
                         icon: Assets.icons.edit.path,
                         color: Colors.transparent,
-                        title: 'Редактировать профиль',
+                        title: l10n.cityDriveEditProfile,
                         onTap: () async {
                           final result = await context.router.push(
                             EditProfileRoute(userDTO: user),
@@ -228,27 +242,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           }
                         },
                       ),
-                      // ProfileMenuItem(
-                      //   icon: Assets.icons.myChildren.path,
-                      //   color: Colors.green,
-                      //   title: 'Мои дети',
-                      //   onTap: () {
-                      //     context.router.push(const MyChildrenProfileRoute());
-                      //   },
-                      // ),
-                      // ProfileMenuItem(
-                      //   icon: Assets.icons.subscription.path,
-                      //   color: Colors.transparent,
-                      //   title: 'IKIDZ абонементы',
-                      //   onTap: () {
-                      //     context.router.push(const IkidzSubscriptionsRoute());
-                      //   },
-                      // ),
                       const Gap(16),
                       ProfileMenuItem(
                         icon: Assets.icons.docx.path,
                         color: Colors.transparent,
-                        title: 'Документы',
+                        title: l10n.documents,
                         onTap: () {
                           context.router.push(const DocumentsRoute());
                         },
@@ -256,7 +254,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ProfileMenuItem(
                         icon: Assets.icons.ikidsLanguage.path,
                         color: Colors.transparent,
-                        title: 'Язык',
+                        title: l10n.language,
                         trailing: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
@@ -265,7 +263,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            user.lang == 'ru' ? 'Рус' : 'Каз',
+                            LocaleUtil.shortLabelFromLocale(locale),
                             style: AppTextStyles.body12w700.copyWith(
                               color: AppColors.blue3,
                             ),
@@ -279,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         showDivider: false,
                         icon: Assets.icons.support.path,
                         color: Colors.transparent,
-                        title: 'Служба поддержки',
+                        title: l10n.supportService,
                         onTap: () {
                           SupportServiceBottomSheet.show(context);
                         },
@@ -289,7 +287,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         showDivider: false,
                         icon: Assets.icons.goout.path,
                         color: Colors.transparent,
-                        title: 'Выход',
+                        title: l10n.logOutYourAccount,
                         onTap: () {
                           LogoutBottomSheet.show(
                             context,
@@ -307,9 +305,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             );
-          },
-        );
-      },
+            },
+          );
+        },
+      ),
     );
   }
 }

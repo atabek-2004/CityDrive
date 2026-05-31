@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:ikidz/src/core/rest_client/models/basic_response.dart';
-import 'package:ikidz/src/feature/auth/models/subscription_dto.dart';
-import 'package:ikidz/src/core/rest_client/src/dio_rest_client/rest_client_dio.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/auth/models/common_lists_dto.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/rest_client_dio.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/auth/models/common_lists_dto.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 abstract interface class IAuthRemoteDS {
   // Future registration1({
@@ -69,9 +68,6 @@ abstract interface class IAuthRemoteDS {
   Future sendDeviceToken({
     required String deviceToken,
   });
-
-  // Subscription
-  Future<List<SubscriptionDTO>> getSubscriptions();
 
   Future registerVerify({
     required String phone,
@@ -372,31 +368,6 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
       }
     } catch (e, st) {
       TalkerLoggerUtil.talker.error('#login - $e', e, st);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<List<SubscriptionDTO>> getSubscriptions() async {
-    try {
-      final Map<String, dynamic> response = await restClient.get(
-        'subscriptions',
-        queryParams: {},
-      );
-
-      if (response['data'] == null) {
-        throw Exception('No data field in response');
-      }
-
-      final List<dynamic> dataList = response['data'];
-
-      final list = dataList
-          .map((e) => SubscriptionDTO.fromJson(e as Map<String, dynamic>))
-          .toList();
-
-      return list;
-    } catch (e, st) {
-      TalkerLoggerUtil.talker.error('#getSubscriptions - $e', e, st);
       rethrow;
     }
   }

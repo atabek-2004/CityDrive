@@ -2,15 +2,13 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ikidz/src/core/rest_client/models/basic_response.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/auth/models/request/child_payload.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
-import 'package:ikidz/src/feature/profile/models/child_dto.dart';
-import 'package:ikidz/src/feature/profile/models/document_dto.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/feature/profile/models/document_dto.dart';
 import 'package:image_picker/image_picker.dart';
 
 abstract interface class IProfileRemoteDS {
@@ -37,13 +35,6 @@ abstract interface class IProfileRemoteDS {
   Future<BasicResponse> deleteAccount();
 
   Future<BasicResponse> logOut();
-
-  Future<List<ChildDTO>> myChildren();
-
-  Future<ChildDTO> addChild({
-    required ChildPayload payload,
-    XFile? photoPath,
-  });
 
   // ///
   // /// `diagnostics`
@@ -180,56 +171,6 @@ class ProfileRemoteDSImpl implements IProfileRemoteDS {
       return BasicResponse.fromJson(response);
     } catch (e, st) {
       TalkerLoggerUtil.talker.error('#logout - $e', e, st);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<List<ChildDTO>> myChildren() async {
-    try {
-      final Map<String, dynamic> response = await restClient.get(
-        'children/my',
-        queryParams: {},
-      );
-
-      if (response['data'] == null) {
-        throw Exception();
-      }
-      final list = await compute<List<dynamic>, List<ChildDTO>>(
-        (list) => list
-            .map(
-              (e) => ChildDTO.fromJson(e as Map<String, dynamic>),
-            )
-            .toList(),
-        response['data'] as List,
-      );
-      return list;
-    } catch (e, st) {
-      TalkerLoggerUtil.talker.error('#myChildren - $e', e, st);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<ChildDTO> addChild({
-    required ChildPayload payload,
-    XFile? photoPath,
-  }) async {
-    try {
-      final FormData formData = FormData.fromMap(payload.toJson());
-      if (photoPath != null) {
-        formData.files.add(MapEntry(
-            'photo_path', await MultipartFile.fromFile(photoPath.path)));
-      }
-
-      final Map<String, dynamic> response = await restClient.post(
-        'children',
-        body: formData,
-      );
-
-      return ChildDTO.fromJson(response);
-    } catch (e, st) {
-      TalkerLoggerUtil.talker.error('#addChild - $e', e, st);
       rethrow;
     }
   }

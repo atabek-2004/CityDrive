@@ -1,4 +1,4 @@
-name: ikidz
+name: city_drive
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -88,6 +88,8 @@ dependencies:
   url_launcher: ^6.3.1
   ws: ^1.0.0
   google_maps_flutter: ^2.13.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   auto_route_generator: ^9.0.0

@@ -46,7 +46,7 @@ extension TalkerFlutter on Talker {
       return;
     }
     if ([TargetPlatform.iOS, TargetPlatform.macOS].contains(defaultTargetPlatform)) {
-      log(message, name: 'IKIDZ');
+      log(message, name: 'CityDrive');
       return;
     }
     debugPrint(message);

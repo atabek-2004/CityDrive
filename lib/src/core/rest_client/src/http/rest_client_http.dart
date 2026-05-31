@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 
 // if (dart.library.js_interop) 'package:syila/src/core/rest_client/src/http/check_exception_browser.dart';
 
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/core/rest_client/src/http/check_exception_io.dart';
-import 'package:ikidz/src/core/utils/refined_logger.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/rest_client/src/http/check_exception_io.dart';
+import 'package:city_drive/src/core/utils/refined_logger.dart';
 
 // coverage:ignore-start
 /// Creates an [http.Client] based on the current platform.

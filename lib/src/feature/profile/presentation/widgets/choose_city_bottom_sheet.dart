@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/bottomsheet/custom_drag_handle.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_material_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/profile/bloc/city_cubit.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/bottomsheet/custom_drag_handle.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_material_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/profile/bloc/city_cubit.dart';
 
 
 class CityBottomSheet extends StatefulWidget {

@@ -1,6 +1,6 @@
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:freezed_annotation/freezed_annotation.dart';
-// import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
+// import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
 
 // part 'password_recovery_cubit.freezed.dart';
 

@@ -1,11 +1,12 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_route/auto_route.dart';
-import 'package:ikidz/src/feature/app/logic/push_data_dto.dart';
-import 'package:ikidz/src/feature/app/logic/reactivex_service.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/database/auth_dao.dart';
+import 'package:city_drive/src/feature/app/logic/push_data_dto.dart';
+import 'package:city_drive/src/feature/app/logic/reactivex_service.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:city_drive/src/feature/app/logic/firebase_bootstrap.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -24,6 +25,9 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 class NotificationService {
   NotificationService();
+
+  bool get _isFirebaseReady => FirebaseBootstrap.isReady;
+
   late FirebaseMessaging _messaging;
 
   // Future<void> saveDeviceToken({
@@ -41,6 +45,10 @@ class NotificationService {
   // }
 
   Future<void> init() async {
+    if (!_isFirebaseReady) {
+      log('Firebase not configured, notifications disabled', name: _tag);
+      return;
+    }
     _messaging = FirebaseMessaging.instance;
     _messaging.getInitialMessage().then((value) => log('Message is $value', name: _tag));
 
@@ -100,6 +108,7 @@ class NotificationService {
   }
 
   Future<void> onMessageOpenedApp(BuildContext context) async {
+    if (!_isFirebaseReady) return;
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
         if (!context.mounted) return;
@@ -129,6 +138,7 @@ class NotificationService {
   Future<String?> getDeviceToken({
     required IAuthDao authDao,
   }) async {
+    if (!_isFirebaseReady) return null;
     if (Platform.isIOS) {
       String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
       if (apnsToken == null) {
@@ -173,6 +183,7 @@ class NotificationService {
   Future<void> subscribeToTopic({
     required String topic,
   }) async {
+    if (!_isFirebaseReady) return;
     try {
       await FirebaseMessaging.instance.subscribeToTopic('push_$topic');
     } catch (e) {
@@ -183,6 +194,7 @@ class NotificationService {
   Future<void> unsubscribeFromTopic({
     required String topic,
   }) async {
+    if (!_isFirebaseReady) return;
     try {
       await FirebaseMessaging.instance.unsubscribeFromTopic('push_$topic');
     } catch (e) {

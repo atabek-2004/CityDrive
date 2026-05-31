@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
 
 class ProfileMenuItem extends StatelessWidget {
   final String icon;

@@ -1,7 +1,7 @@
 // ignore_for_file: comment_references
 
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/presentation/widgets/shimmer/animator.dart';
+import 'package:city_drive/src/core/presentation/widgets/shimmer/animator.dart';
 
 /// Creates simple yet beautiful shimmer animations
 ///

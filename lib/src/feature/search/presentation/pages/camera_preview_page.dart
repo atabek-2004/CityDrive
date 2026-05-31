@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/search/bloc/road_problems_provider.dart';
-import 'package:ikidz/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()
@@ -29,7 +31,7 @@ class CameraPreviewPage extends StatefulWidget {
 
 class _CameraPreviewPageState extends State<CameraPreviewPage> {
   final TextEditingController _commentController = TextEditingController();
-  String _address = 'Определение адреса...';
+  String _address = '';
   bool _isLoadingAddress = true;
 
   @override
@@ -41,7 +43,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
   Future<void> _getAddressFromCoordinates() async {
     if (widget.latitude == null || widget.longitude == null) {
       setState(() {
-        _address = 'Координаты недоступны';
+        _address = context.localized.cityDriveCoordsUnavailable;
         _isLoadingAddress = false;
       });
       return;
@@ -63,45 +65,64 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
     } catch (e) {
       debugPrint('Ошибка получения адреса: $e');
       setState(() {
-        _address = 'ул. Абая, 143'; 
+        _address =
+            '${widget.latitude!.toStringAsFixed(5)}, ${widget.longitude!.toStringAsFixed(5)}';
         _isLoadingAddress = false;
       });
     }
   }
 
-  void _publishReport() {
+  Future<void> _publishReport() async {
+    final user = context.repository.authRepository.user;
+    final authorId = user?.id;
+    if (authorId == null) {
+      final l10n = context.localized;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.cityDriveLoginToPublish),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    final l10n = context.localized;
+    final authorName = user?.fullName ?? l10n.cityDriveResident;
+
     final newProblem = RoadProblemDTO(
-      id: DateTime.now().millisecondsSinceEpoch,
-      title: 'Повреждение дороги',
+      id: 0,
+      authorUserId: authorId,
+      title: l10n.cityDriveRoadDamage,
       description: _commentController.text.isEmpty
-          ? 'Повреждение дороги требует внимания'
+          ? l10n.cityDriveDamageNeedsAttention
           : _commentController.text,
       address: _address,
       latitude: widget.latitude,
       longitude: widget.longitude,
       type: 'damage',
       severity: 'high',
-      status: 'new',
+      status: ReportStatus.newReport,
       reportedDate: DateTime.now(),
       images: [widget.imagePath],
-      author: 'Вы',
+      author: authorName,
       likes: 0,
       commentsCount: 0,
       comments: [],
     );
 
-    context.read<RoadProblemsProvider>().addProblem(newProblem);
+    await context.read<RoadProblemsProvider>().addProblem(newProblem);
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Отчет успешно опубликован!'),
+      SnackBar(
+        content: Text(l10n.cityDriveReportPublished),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
 
-   
-    context.router.popUntilRoot();
+    // Возврат на карту, без popUntilRoot — иначе GoogleMap теряет channel.
+    context.router.maybePop();
   }
 
   void _retakePhoto() {
@@ -117,10 +138,15 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final displayAddress = _isLoadingAddress && _address.isEmpty
+        ? l10n.cityDriveDeterminingAddress
+        : _address;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Подтвердить'),
+        title: Text(l10n.cityDriveConfirm),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         centerTitle: true,
@@ -156,7 +182,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                       ),
                       const Gap(12),
                       Text(
-                        'Повреждение дороги',
+                        l10n.cityDriveRoadDamage,
                         style: AppTextStyles.body15w500,
                       ),
                     ],
@@ -182,7 +208,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                                     Center(child: CircularProgressIndicator(strokeWidth: 2)),
                               )
                             : Text(
-                                _address,
+                                displayAddress,
                                 style: AppTextStyles.body15w500,
                               ),
                       ),
@@ -212,7 +238,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                     controller: _commentController,
                     maxLines: 4,
                     decoration: InputDecoration(
-                      hintText: 'Добавить комментарий (необязательно)...',
+                      hintText: l10n.cityDriveAddCommentHint,
                       hintStyle: TextStyle(
                         color: Colors.grey[400],
                         fontSize: 14,
@@ -258,7 +284,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Опубликовать',
+                        l10n.cityDrivePublish,
                         style: AppTextStyles.title18W600.copyWith(
                           color: Colors.white,
                         ),
@@ -280,7 +306,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                         ),
                       ),
                       child: Text(
-                        'Переснять',
+                        l10n.cityDriveRetake,
                         style: AppTextStyles.title18W600.copyWith(
                           color: Colors.black87,
                         ),

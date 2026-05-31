@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
 
 @RoutePage()
 class CompanyDataPage extends StatefulWidget {
@@ -159,7 +161,22 @@ class _CompanyDataPageState extends State<CompanyDataPage> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: isFormValid
-                      ? () {
+                      ? () async {
+                          final userId =
+                              context.repository.authRepository.user?.id;
+                          if (userId != null) {
+                            final repo = context.repository.authRepository;
+                            if (repo is LocalAuthRepository) {
+                              await repo.saveCompany(
+                                userId: userId,
+                                name: _companyNameController.text.trim(),
+                                bin: _binController.text.trim(),
+                                address: _addressController.text.trim(),
+                                foundedYear: _yearController.text.trim(),
+                              );
+                            }
+                          }
+                          if (!context.mounted) return;
                           context.router.push(CompanyDocumentsRoute());
                         }
                       : null,

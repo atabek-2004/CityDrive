@@ -1,16 +1,18 @@
-import 'dart:ui';
+import 'dart:ui' show Locale;
 
 import 'package:clock/clock.dart';
-import 'package:ikidz/src/feature/app/initialization/model/dependencies_container.dart';
+import 'package:city_drive/src/feature/app/initialization/model/dependencies_container.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ikidz/src/core/constant/config.dart';
-import 'package:ikidz/src/core/constant/localization/localization.dart';
-import 'package:ikidz/src/core/utils/refined_logger.dart';
-import 'package:ikidz/src/feature/app/logic/tracking_manager.dart';
-import 'package:ikidz/src/feature/settings/bloc/app_settings_bloc.dart';
-import 'package:ikidz/src/feature/settings/data/app_settings_datasource.dart';
-import 'package:ikidz/src/feature/settings/data/app_settings_repository.dart';
+import 'package:city_drive/src/core/constant/config.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/core/utils/refined_logger.dart';
+import 'package:city_drive/src/core/local_storage/hive_service.dart';
+import 'package:city_drive/src/feature/app/logic/tracking_manager.dart';
+import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
+import 'package:city_drive/src/feature/settings/data/app_settings_datasource.dart';
+import 'package:city_drive/src/feature/settings/data/app_settings_repository.dart';
+import 'package:city_drive/src/feature/settings/model/app_settings.dart';
 
 /// A place where all dependencies are initialized.
 ///
@@ -81,12 +83,16 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
     final appSettingsDatasource = AppSettingsDatasourceImpl(sharedPreferences: sharedPreferencesAsync);
     final settingsBloc = await SettingsBlocFactory(appSettingsDatasource).create();
 
+    final hiveService = HiveService();
+    await hiveService.init();
+
     return DependenciesContainer(
       appSettingsBloc: settingsBloc,
       packageInfo: packageInfo,
       errorTrackingManager: errorTrackingManager,
       sharedPreferences: sharedPreferences,
       appSettingsDatasource: appSettingsDatasource,
+      hiveService: hiveService,
     );
   }
 }
@@ -117,6 +123,15 @@ class ErrorTrackingManagerFactory extends AsyncFactory<ErrorTrackingManager> {
   }
 }
 
+Locale _resolveAppLocale(Locale? saved) {
+  if (saved == null) return Localization.defaultLocale;
+  const supported = {'ru', 'kk', 'en'};
+  if (supported.contains(saved.languageCode)) {
+    return Locale(saved.languageCode);
+  }
+  return Localization.defaultLocale;
+}
+
 /// Factory that creates an instance of [AppSettingsBloc].
 class SettingsBlocFactory extends AsyncFactory<AppSettingsBloc> {
   SettingsBlocFactory(this.datasource);
@@ -130,9 +145,15 @@ class SettingsBlocFactory extends AsyncFactory<AppSettingsBloc> {
       datasource: datasource,
     );
 
-    final appSettings = await appSettingsRepository.getAppSettings();
+    final stored = await appSettingsRepository.getAppSettings();
+    final locale = _resolveAppLocale(stored?.locale);
+    final appSettings = (stored ?? const AppSettings()).copyWith(locale: locale);
 
-    Localization.load(appSettings?.locale ?? const Locale('kk'));
+    if (stored?.locale?.languageCode != locale.languageCode) {
+      await appSettingsRepository.setAppSettings(appSettings);
+    }
+
+    Localization.load(locale);
 
     final initialState = AppSettingsState.idle(appSettings: appSettings);
 

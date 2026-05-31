@@ -1,14 +1,20 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 
 @RoutePage()
 class ReportSuccessPage extends StatelessWidget {
-  const ReportSuccessPage({super.key});
+  const ReportSuccessPage({super.key, required this.problem});
+
+  final RoadProblemDTO problem;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -16,13 +22,11 @@ class ReportSuccessPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Возвращаемся на главный экран или закрываем несколько страниц
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          },
+          onPressed: () =>
+              context.router.popUntilRouteWithName(BaseSecondRoute.name),
         ),
-        title: const Text(
-          'Отчёт о выполнении работ',
+        title: Text(
+          l10n.cityDriveWorkReportTitle,
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,
@@ -37,8 +41,6 @@ class ReportSuccessPage extends StatelessWidget {
           child: Column(
             children: [
               const Gap(40),
-              
-              // Зеленая галочка
               Container(
                 width: 120,
                 height: 120,
@@ -53,28 +55,19 @@ class ReportSuccessPage extends StatelessWidget {
                 ),
               ),
               const Gap(24),
-              
-              // Заголовок
-              const Text(
-                'Отчет отправлен',
-                style: TextStyle(
+              Text(
+                l10n.cityDriveReportSentTitle,
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const Gap(8),
-              
-              // Подзаголовок
-              const Text(
-                'Ожидайте проверки администратора',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+              Text(
+                l10n.cityDriveWaitAdminReview,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const Gap(32),
-              
-              // Карточка с информацией о работе
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -97,31 +90,23 @@ class ReportSuccessPage extends StatelessWidget {
                       ),
                     ),
                     const Gap(16),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Ямочный ремонт',
-                            style: TextStyle(
+                            problem.title ?? l10n.cityDrivePotholeRepair,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          Gap(4),
+                          const Gap(4),
                           Text(
-                            'ул. Абая, 150',
-                            style: TextStyle(
+                            problem.address ?? '—',
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
-                            ),
-                          ),
-                          Gap(4),
-                          Text(
-                            '850 000 ₸',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -131,9 +116,8 @@ class ReportSuccessPage extends StatelessWidget {
                 ),
               ),
               const Gap(24),
-              
-              // Статус
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F5F5),
@@ -142,106 +126,93 @@ class ReportSuccessPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Статус',
-                      style: TextStyle(
+                    Text(
+                      l10n.status,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const Gap(20),
-                    
-                    // Отчет отправлен
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF4CD964),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        const Gap(12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Отчёт отправлен',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Gap(2),
-                              Text(
-                                'Сейчас',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    _StatusStep(
+                      icon: Icons.check,
+                      iconColor: Color(0xFF4CD964),
+                      title: l10n.cityDriveReportSentTitle,
+                      subtitle: l10n.cityDriveNow,
+                      isActive: true,
                     ),
                     const Gap(20),
-                    
-                    // Проверка админом
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.schedule,
-                            color: Colors.grey.shade600,
-                            size: 20,
-                          ),
-                        ),
-                        const Gap(12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Проверка админом',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Gap(2),
-                              Text(
-                                'Обычно 1-2 дня',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    _StatusStep(
+                      icon: Icons.schedule,
+                      iconColor: Colors.grey,
+                      title: l10n.cityDriveAdminReview,
+                      subtitle: l10n.cityDriveAdminReviewSubtitle,
+                      isActive: false,
                     ),
                   ],
                 ),
               ),
-              
               const Spacer(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StatusStep extends StatelessWidget {
+  const _StatusStep({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.isActive,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: isActive ? iconColor : Colors.grey.shade300,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: isActive ? Colors.white : Colors.grey.shade600,
+            size: 20,
+          ),
+        ),
+        const Gap(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Gap(2),
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/containers/repository_storage.dart';
-import 'package:ikidz/src/core/presentation/scopes/scope.dart';
+import 'package:city_drive/src/core/containers/repository_storage.dart';
+import 'package:city_drive/src/core/presentation/scopes/scope.dart';
 
 class RepositoryScope extends Scope {
   const RepositoryScope({

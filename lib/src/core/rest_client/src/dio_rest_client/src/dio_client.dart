@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
-import 'package:ikidz/src/feature/auth/database/auth_dao.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
-// import 'package:ikidz/src/feature/auth/models/response/user_dto.dart';
-import 'package:ikidz/src/feature/settings/data/app_settings_datasource.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
+// import 'package:city_drive/src/feature/auth/models/response/user_dto.dart';
+import 'package:city_drive/src/feature/settings/data/app_settings_datasource.dart';
 import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';

@@ -1,13 +1,32 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 
 @RoutePage()
 class ProblemDetailPage extends StatelessWidget {
+  const ProblemDetailPage({
+    super.key,
+    this.isSubmit = false,
+    this.problem,
+  });
+
   final bool isSubmit;
-  const ProblemDetailPage({super.key, this.isSubmit = false});
+  final RoadProblemDTO? problem;
+
+  static final RoadProblemDTO _demoProblem = RoadProblemDTO(
+    id: 0,
+    title: 'Ремонт провала на дороге',
+    address: 'ул. Абая, 150',
+    type: 'pothole',
+    severity: 'critical',
+    description:
+        'Глубокий провал асфальта. Требуется: выемка, подготовка основания, укладка нового асфальта',
+  );
+
+  RoadProblemDTO get _effectiveProblem => problem ?? _demoProblem;
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +243,13 @@ class ProblemDetailPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                         isSubmit ? context.router.push(WorkReportRoute()) : context.router.push(SubmitApplicationRoute());
+                        if (isSubmit) {
+                          context.router.push(
+                            WorkReportRoute(problem: _effectiveProblem),
+                          );
+                        } else {
+                          context.router.push(SubmitApplicationRoute());
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.mainColor,

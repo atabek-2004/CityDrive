@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
 
-import 'package:ikidz/src/feature/app/logic/not_auth_logic.dart';
+import 'package:city_drive/src/feature/app/logic/not_auth_logic.dart';
 
 /// `DioInterceptor` - This class is used to intercept `dio` errors.
 class DioInterceptor extends Interceptor {

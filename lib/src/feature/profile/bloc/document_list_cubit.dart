@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/feature/profile/data/profile_repository.dart';
-import 'package:ikidz/src/feature/profile/models/document_dto.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/feature/profile/data/profile_repository.dart';
+import 'package:city_drive/src/feature/profile/models/document_dto.dart';
 
 
 part 'document_list_cubit.freezed.dart';

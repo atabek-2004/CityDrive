@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 
 /// Namespace
 @sealed

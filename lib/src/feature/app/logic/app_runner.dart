@@ -1,17 +1,16 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:ikidz/src/core/constant/config.dart';
-import 'package:ikidz/src/core/utils/app_bloc_observer.dart';
-import 'package:ikidz/src/core/utils/refined_logger.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
-import 'package:ikidz/src/feature/app/bloc/app_restart_bloc.dart';
-import 'package:ikidz/src/feature/app/initialization/logic/composition_root.dart';
-import 'package:ikidz/src/feature/app/initialization/widget/initialization_failed_app.dart';
-import 'package:ikidz/src/feature/app/logic/notification_service.dart';
-import 'package:ikidz/src/feature/app/presentation/app.dart';
+import 'package:city_drive/src/core/constant/config.dart';
+import 'package:city_drive/src/core/utils/app_bloc_observer.dart';
+import 'package:city_drive/src/core/utils/refined_logger.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/feature/app/bloc/app_restart_bloc.dart';
+import 'package:city_drive/src/feature/app/initialization/logic/composition_root.dart';
+import 'package:city_drive/src/feature/app/initialization/widget/initialization_failed_app.dart';
+import 'package:city_drive/src/feature/app/logic/firebase_bootstrap.dart';
+import 'package:city_drive/src/feature/app/logic/notification_service.dart';
+import 'package:city_drive/src/feature/app/presentation/app.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart' as bloc_concurrency;
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -88,20 +87,11 @@ final class AppRunner {
       }
     }
 
-    // try {
-    //   await Firebase.initializeApp(
-    //     options: DefaultFirebaseOptions.currentPlatform,
-    //   );
-    //   await NotificationService().init();
-    // } catch (e) {
-    //   if (kDebugMode) {
-    //     print(e);
-    //   }
-    // } finally {
-    //   await initializeAndRun();
-    // }
+    final firebaseReady = await FirebaseBootstrap.initialize();
+    if (firebaseReady) {
+      await NotificationService().init();
+    }
 
-    // Run the app
     await initializeAndRun();
   }
 }

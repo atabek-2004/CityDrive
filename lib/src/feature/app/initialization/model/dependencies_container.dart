@@ -1,9 +1,10 @@
-import 'package:ikidz/src/feature/settings/data/app_settings_datasource.dart';
+import 'package:city_drive/src/core/local_storage/hive_service.dart';
+import 'package:city_drive/src/feature/settings/data/app_settings_datasource.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ikidz/src/feature/app/logic/tracking_manager.dart';
-import 'package:ikidz/src/feature/settings/bloc/app_settings_bloc.dart';
+import 'package:city_drive/src/feature/app/logic/tracking_manager.dart';
+import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
 
 /// {@template dependencies_container}
 /// Composed dependencies from the [CompositionRoot].
@@ -21,6 +22,7 @@ base class DependenciesContainer {
     required this.packageInfo,
     required this.sharedPreferences,
     required this.appSettingsDatasource,
+    required this.hiveService,
   });
 
   /// [AppSettingsBloc] instance, used to manage theme and locale.
@@ -34,6 +36,8 @@ base class DependenciesContainer {
   final SharedPreferencesWithCache sharedPreferences;
 
   final AppSettingsDatasource appSettingsDatasource;
+
+  final HiveService hiveService;
 }
 
 /// {@template testing_dependencies_container}

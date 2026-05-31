@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/feature/app/router/router_observer.dart';
+import 'package:city_drive/src/feature/app/router/router_observer.dart';
 
 class NavigatorObserversFactory {
   const NavigatorObserversFactory();

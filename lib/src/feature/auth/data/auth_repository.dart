@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ikidz/src/core/rest_client/models/basic_response.dart';
-import 'package:ikidz/src/feature/auth/models/subscription_dto.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ikidz/src/feature/auth/data/auth_remote_ds.dart';
-import 'package:ikidz/src/feature/auth/database/auth_dao.dart';
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/auth/models/common_lists_dto.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/feature/auth/data/auth_remote_ds.dart';
+import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/auth/models/common_lists_dto.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 abstract interface class IAuthRepository {
   bool get isAuthenticated;
@@ -82,9 +81,6 @@ abstract interface class IAuthRepository {
     required String phone,
     required String code,
   });
-
-  // Subs
-  Future<List<SubscriptionDTO>> getSubscriptions();
 
   Future<BasicResponse> logout();
 }
@@ -314,15 +310,6 @@ class AuthRepositoryImpl implements IAuthRepository {
       await _authDao.user.setValue(jsonEncode(user.toJson()));
 
       return user;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<List<SubscriptionDTO>> getSubscriptions() async {
-    try {
-      return _remoteDS.getSubscriptions();
     } catch (e) {
       rethrow;
     }

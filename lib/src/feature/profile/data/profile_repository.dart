@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:ikidz/src/feature/auth/models/common_dto.dart';
-import 'package:ikidz/src/feature/auth/models/request/child_payload.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
-import 'package:ikidz/src/feature/profile/data/profile_remote_ds.dart';
-import 'package:ikidz/src/feature/profile/models/child_dto.dart';
-import 'package:ikidz/src/feature/profile/models/document_dto.dart';
+import 'package:city_drive/src/feature/auth/models/common_dto.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/feature/profile/data/profile_remote_ds.dart';
+import 'package:city_drive/src/feature/profile/models/document_dto.dart';
 import 'package:image_picker/image_picker.dart';
 
 abstract interface class IProfileRepository {
@@ -36,13 +34,6 @@ abstract interface class IProfileRepository {
   Future editProfile({
     required UserPayload payload,
     XFile? imageFile,
-  });
-
-  Future<List<ChildDTO>> myChildren();
-
-  Future<ChildDTO> addChild({
-    required ChildPayload payload,
-    XFile? photoPath,
   });
 
   Future<List<DocumentDTO>> getDocuments();
@@ -162,28 +153,6 @@ class ProfileRepositoryImpl implements IProfileRepository {
     try {
       return await _remoteDS.editAccount(
           userPayload: payload, avatar: imageFile);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<List<ChildDTO>> myChildren() async {
-    try {
-      return await _remoteDS.myChildren();
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<ChildDTO> addChild(
-      {required ChildPayload payload, XFile? photoPath}) async {
-    try {
-      return await _remoteDS.addChild(
-        payload: payload,
-        photoPath: photoPath,
-      );
     } catch (e) {
       rethrow;
     }

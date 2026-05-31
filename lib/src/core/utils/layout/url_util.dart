@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UrlUtil {

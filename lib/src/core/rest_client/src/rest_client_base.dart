@@ -4,7 +4,7 @@ import 'dart:isolate';
 
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
 
 /// {@macro rest_client}
 @immutable

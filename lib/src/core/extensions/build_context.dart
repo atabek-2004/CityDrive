@@ -1,9 +1,9 @@
-// import 'package:ikidz/src/feature/settings/widget/settings_scope.dart';
+// import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:ikidz/src/core/utils/screen_util.dart';
-import 'package:ikidz/src/feature/app/bloc/app_bloc.dart';
+import 'package:city_drive/src/core/utils/screen_util.dart';
+import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
 
 extension BuildContextX on BuildContext {
   // IEnvironmentStorage get environment => EnvironmentScope.of(this);

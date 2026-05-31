@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/rest_client/models/basic_response.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 
 part 'register_verify_cubit.freezed.dart';
 
@@ -21,20 +21,20 @@ class RegisterVerifyCubit extends Cubit<RegisterVerifyState> {
     try {
       emit(const RegisterVerifyState.loading());
 
-      final result = await _repository.registerVerify(
+      await _repository.registerVerify(
         phone: phone,
         code: code,
       );
 
       if (isClosed) return;
 
-      emit(RegisterVerifyState.loaded());
+      emit(const RegisterVerifyState.loaded());
     } catch (e) {
-      emit(
-        RegisterVerifyState.error(
-          message: e.toString(),
-        ),
-      );
+      var message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.replaceFirst('Exception: ', '');
+      }
+      emit(RegisterVerifyState.error(message: message));
     }
   }
 }

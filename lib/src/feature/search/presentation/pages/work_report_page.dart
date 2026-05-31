@@ -1,16 +1,22 @@
 import 'dart:io';
-import 'package:auto_route/annotations.dart';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/search/presentation/pages/report_success_page.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:provider/provider.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 
 @RoutePage()
 class WorkReportPage extends StatefulWidget {
-  const WorkReportPage({super.key});
+  const WorkReportPage({super.key, required this.problem});
+
+  final RoadProblemDTO problem;
 
   @override
   State<WorkReportPage> createState() => _WorkReportPageState();
@@ -20,14 +26,51 @@ class _WorkReportPageState extends State<WorkReportPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final List<File?> _images = [null, null, null];
   final ImagePicker _picker = ImagePicker();
+  bool _isSubmitting = false;
 
   Future<void> _pickImage(int index) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        _images[index] = File(image.path);
-      });
+      setState(() => _images[index] = File(image.path));
     }
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    final imagePaths = _images
+        .whereType<File>()
+        .map((f) => f.path)
+        .toList();
+
+    final updated = RoadProblemDTO(
+      id: widget.problem.id,
+      authorUserId: widget.problem.authorUserId,
+      assignedControllerId: widget.problem.assignedControllerId,
+      title: widget.problem.title,
+      description: _descriptionController.text.isEmpty
+          ? widget.problem.description
+          : _descriptionController.text,
+      address: widget.problem.address,
+      latitude: widget.problem.latitude,
+      longitude: widget.problem.longitude,
+      type: widget.problem.type,
+      severity: widget.problem.severity,
+      status: ReportStatus.fixed,
+      reportedDate: widget.problem.reportedDate,
+      images: imagePaths.isNotEmpty ? imagePaths : widget.problem.images,
+      author: widget.problem.author,
+      likes: widget.problem.likes,
+      commentsCount: widget.problem.commentsCount,
+      comments: widget.problem.comments,
+    );
+
+    await context.read<RoadProblemsProvider>().updateProblem(updated);
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    context.router.push(ReportSuccessRoute(problem: widget.problem));
   }
 
   @override
@@ -38,6 +81,9 @@ class _WorkReportPageState extends State<WorkReportPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final p = widget.problem;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -45,11 +91,11 @@ class _WorkReportPageState extends State<WorkReportPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.router.maybePop(),
         ),
-        title: const Text(
-          'Отчёт о выполнении работ',
-          style: TextStyle(
+        title: Text(
+          l10n.cityDriveWorkReportTitle,
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -61,7 +107,6 @@ class _WorkReportPageState extends State<WorkReportPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Информация о работе
             Row(
               children: [
                 Container(
@@ -82,27 +127,19 @@ class _WorkReportPageState extends State<WorkReportPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Ямочный ремонт',
-                        style: TextStyle(
+                      Text(
+                        p.title ?? l10n.cityDrivePotholeRepair,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const Gap(4),
-                      const Text(
-                        'ул. Абая, 150',
-                        style: TextStyle(
+                      Text(
+                        p.address ?? '—',
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
-                        ),
-                      ),
-                      const Gap(4),
-                      const Text(
-                        '850 000 ₸',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -111,11 +148,9 @@ class _WorkReportPageState extends State<WorkReportPage> {
               ],
             ),
             const Gap(32),
-
-            // Фото выполненной работы
-            const Text(
-              'Фото выполненной работы',
-              style: TextStyle(
+            Text(
+              l10n.cityDriveWorkPhoto,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -158,11 +193,9 @@ class _WorkReportPageState extends State<WorkReportPage> {
               ],
             ),
             const Gap(32),
-
-            // Описание работ
-            const Text(
-              'Описание работ',
-              style: TextStyle(
+            Text(
+              l10n.cityDriveWorkDescription,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -180,29 +213,18 @@ class _WorkReportPageState extends State<WorkReportPage> {
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Напишите как прошел работа',
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                style: const TextStyle(
-                  fontSize: 14,
+                  hintText: l10n.cityDriveWorkDescriptionHint,
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
             ),
             const Gap(32),
-
-            // Кнопка отправить
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Переход на страницу успеха
-                 context.router.push(ReportSuccessRoute());
-                },
+                onPressed: _isSubmitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.mainColor,
                   padding: const EdgeInsets.symmetric(vertical: 18),
@@ -210,14 +232,23 @@ class _WorkReportPageState extends State<WorkReportPage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text(
-                  'Отправить отчет',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l10n.cityDriveSubmitReport,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
             ),
           ],

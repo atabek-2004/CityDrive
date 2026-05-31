@@ -2,8 +2,8 @@
 
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/core/rest_client/src/dio_rest_client/src/dio_client.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/dio_client.dart';
 
 /// Rest client that uses `Dio` as HTTP library.
 final class RestClientDio extends RestClientBase {

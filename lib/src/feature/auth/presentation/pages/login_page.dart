@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
-import 'package:ikidz/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/core/utils/input/validator_util.dart';
-import 'package:ikidz/src/feature/app/bloc/app_bloc.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/bloc/login_cubit.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:city_drive/src/core/presentation/widgets/textfields/custom_validator_textfield.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/input/validator_util.dart';
+import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/bloc/login_cubit.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget implements AutoRouteWrapper {
@@ -204,22 +204,10 @@ class _LoginPageState extends State<LoginPage> {
                                 return CustomButton(
                                   allowTapButton: _allowTapButton,
                                   onPressed: () {
-                                    if (phoneController.text ==
-                                            '+7(707) 418-12-02' &&
-                                        passwordController.text == '12345678') {
-                                      context.router.replaceAll(
-                                          [const BaseSecondRoute()]);
-                                    } else {
-                                      BlocProvider.of<LoginCubit>(context)
-                                          .login(
-                                        phone: phoneController.text
-                                            .replaceAll(RegExp(r'[^\d]'), '')
-                                            .replaceFirst(RegExp(r'^7'), ''),
-                                        password: passwordController.text,
-                                      );
-                                    }
-
-                                    print(phoneController.text);
+                                    BlocProvider.of<LoginCubit>(context).login(
+                                      phone: phoneController.text,
+                                      password: passwordController.text,
+                                    );
                                   },
                                   style: CustomButtonStyles.mainButtonStyle(
                                           context)

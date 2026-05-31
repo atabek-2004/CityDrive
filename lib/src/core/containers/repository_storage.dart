@@ -1,50 +1,33 @@
-import 'package:ikidz/src/feature/main/data/main_remote_ds.dart';
-import 'package:ikidz/src/feature/main/data/main_repository.dart';
-import 'package:ikidz/src/feature/search/data/search_remote_ds.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/core/rest_client/src/dio_rest_client/src/dio_client.dart';
-import 'package:ikidz/src/core/rest_client/src/dio_rest_client/src/interceptor/dio_interceptor.dart';
-import 'package:ikidz/src/core/rest_client/src/dio_rest_client/src/rest_client_dio.dart';
-import 'package:ikidz/src/feature/auth/data/auth_remote_ds.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/database/auth_dao.dart';
-import 'package:ikidz/src/feature/chat/data/chat_remote_ds.dart';
-import 'package:ikidz/src/feature/chat/data/chat_repository.dart';
-import 'package:ikidz/src/feature/main/data/orders_remote_ds.dart';
-import 'package:ikidz/src/feature/main/data/orders_repository.dart';
-import 'package:ikidz/src/feature/search/data/search_repository.dart';
-import 'package:ikidz/src/feature/profile/data/profile_remote_ds.dart';
-import 'package:ikidz/src/feature/profile/data/profile_repository.dart';
-import 'package:ikidz/src/feature/settings/data/app_settings_datasource.dart';
+import 'package:city_drive/src/core/data/session_repository.dart';
+import 'package:city_drive/src/core/local_storage/hive_service.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/dio_client.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/interceptor/dio_interceptor.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/rest_client_dio.dart';
+import 'package:city_drive/src/feature/auth/data/auth_remote_ds.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/data/local_auth_data_source.dart';
+import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
+import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
+import 'package:city_drive/src/feature/profile/data/local_profile_repository.dart';
+import 'package:city_drive/src/feature/profile/data/profile_remote_ds.dart';
+import 'package:city_drive/src/feature/profile/data/profile_repository.dart';
+import 'package:city_drive/src/feature/search/data/road_problem_local_ds.dart';
+import 'package:city_drive/src/feature/search/data/road_problem_repository.dart';
+import 'package:city_drive/src/feature/settings/data/app_settings_datasource.dart';
 
 abstract class IRepositoryStorage {
-  // dao's
   IAuthDao get authDao;
-  // ISettingsDao get settingsDao;
-  // ITipsDao get tipsDao;
-
-  /// Network
+  HiveService get hiveService;
+  ISessionRepository get sessionRepository;
   IRestClient get restClient;
-
-  // Repositories
-  // ISettingsRepository get settings;
   IAuthRepository get authRepository;
-  IMainRepository get mainRepository;
-  // IOrdersRepository get ordersRepository;
-  ISearchRepository get searchRepository;
   IProfileRepository get profileRepository;
-  // IChatRepository get chatRepository;
-
-  // Data sources
+  IRoadProblemRepository get roadProblemRepository;
   IAuthRemoteDS get authRemoteDS;
-  // IOrdersRemoteDS get ordersRemoteDS;
-  ISearchRemoteDS get searchRemoteDS;
-  // IChatRemoteDS get chatRemoteDS;
   IProfileRemoteDS get profileRemoteDS;
-  IMainRemoteDS get mainRemoteDS;
-  // IProfileRemoteDS get profileRemoteDS;
 
   void close();
 }
@@ -54,89 +37,73 @@ class RepositoryStorage implements IRepositoryStorage {
     required SharedPreferencesWithCache sharedPreferences,
     required PackageInfo packageInfo,
     required AppSettingsDatasource appSettingsDatasource,
+    required HiveService hiveService,
   })  : _sharedPreferences = sharedPreferences,
         _packageInfo = packageInfo,
-        _appSettingsDatasource = appSettingsDatasource;
+        _appSettingsDatasource = appSettingsDatasource,
+        _hiveService = hiveService;
   final SharedPreferencesWithCache _sharedPreferences;
   final PackageInfo _packageInfo;
   final AppSettingsDatasource _appSettingsDatasource;
+  final HiveService _hiveService;
   IRestClient? _restClient;
+  ISessionRepository? _sessionRepository;
+  LocalAuthDataSource? _localAuthDS;
+  IAuthRepository? _authRepository;
+  IProfileRepository? _profileRepository;
+  IRoadProblemRepository? _roadProblemRepository;
+
+  @override
+  HiveService get hiveService => _hiveService;
+
+  @override
+  ISessionRepository get sessionRepository =>
+      _sessionRepository ??= SessionRepository(_hiveService);
 
   @override
   Future<void> close() async {
     _restClient = null;
-    // _portalRestClient = null;
-    // _marketplaceRestClient = null;
-    // _gamificationRestClient = null;
+    await _hiveService.close();
   }
 
-  ///
-  /// Network
-  ///
   @override
   IRestClient get restClient => _restClient ??= RestClientDio(
-        baseUrl: 'http://91.243.71.181:8080/api/', // TODO: Env.apiUrl,
-        // baseUrl: 'http://185.100.67.120:8084/api/v1', // TODO: Env.apiUrl,
+        baseUrl: 'http://91.243.71.181:8080/api/',
         dioClient: DioClient(
           baseUrl: 'http://91.243.71.181:8080/api',
-          // baseUrl: 'http://185.100.67.120:8084/api/v1',
           interceptor: const DioInterceptor(),
           authDao: authDao,
           packageInfo: _packageInfo,
           appSettingsDS: _appSettingsDatasource,
-          // settings: SettingsDao(sharedPreferences: sharedPreferences),
         ),
       );
 
-  ///
-  /// Repositories
-  ///
+  LocalAuthDataSource get _localAuth =>
+      _localAuthDS ??= LocalAuthDataSource(_hiveService);
+
   @override
-  IAuthRepository get authRepository => AuthRepositoryImpl(
-        remoteDS: authRemoteDS,
+  IAuthRepository get authRepository => _authRepository ??= LocalAuthRepository(
         authDao: authDao,
-      );
-
-  // @override
-  // IOrdersRepository get ordersRepository => OrdersRepositoryImpl(
-  //       remoteDS: ordersRemoteDS,
-  //     );
-
-  @override
-  ISearchRepository get searchRepository => ProductRepositoryImpl(
-        remoteDS: searchRemoteDS,
+        localDS: _localAuth,
+        sessionRepository: sessionRepository,
+        hiveService: _hiveService,
       );
 
   @override
-  IProfileRepository get profileRepository => ProfileRepositoryImpl(
-        remoteDS: profileRemoteDS,
+  IProfileRepository get profileRepository => _profileRepository ??=
+      LocalProfileRepository(
+        authRepository: authRepository,
+        localAuthDS: _localAuth,
       );
 
   @override
-  IMainRepository get mainRepository => MainRepositoryImpl(
-        remoteDS: mainRemoteDS,
+  IRoadProblemRepository get roadProblemRepository =>
+      _roadProblemRepository ??= RoadProblemRepository(
+        RoadProblemLocalDataSource(_hiveService),
       );
 
-  @override
-  IMainRemoteDS get mainRemoteDS => MainRemoteDSImpl(
-        restClient: restClient,
-      );
-
-  // @override
-  // IChatRepository get chatRepository => ChatRepositoryImpl(
-  //       remoteDS: chatRemoteDS,
-  //     );
-
-  ///
-  /// Remote datasources
-  ///
   @override
   IAuthRemoteDS get authRemoteDS => AuthRemoteDSImpl(
-        restClient: restClient,
-      );
-
-  @override
-  ISearchRemoteDS get searchRemoteDS => ProductRemoteDSImpl(
         restClient: restClient,
       );
 
@@ -145,19 +112,6 @@ class RepositoryStorage implements IRepositoryStorage {
         restClient: restClient,
       );
 
-  // @override
-  // IChatRemoteDS get chatRemoteDS => ChatRemoteDSImpl(
-  //       restClient: restClient,
-  //     );
-
-  // @override
-  // IOrdersRemoteDS get ordersRemoteDS => OrdersRemoteDSImpl(
-  //       restClient: restClient,
-  //     );
-
-  ///
-  /// Data Access Object
-  ///
   @override
   IAuthDao get authDao => AuthDao(sharedPreferences: _sharedPreferences);
 }

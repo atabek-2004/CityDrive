@@ -9,8 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get aNewGenerationFreightTransportation =>
-      'Биржа грузоперевозок нового поколения — надёжно, быстро, удобно.';
+  String get aNewGenerationFreightTransportation => 'Биржа грузоперевозок нового поколения — надёжно, быстро, удобно.';
 
   @override
   String get accept => 'Принять';
@@ -61,8 +60,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get advertiseYourProductWithUs => 'Рекламируйте свой товар с нами!';
 
   @override
-  String get agreeText =>
-      'Нажимая на кнопку “Создать аккаунт” вы соглашаетесь  с';
+  String get agreeText => 'Нажимая на кнопку “Создать аккаунт” вы соглашаетесь  с';
 
   @override
   String get and => 'и';
@@ -74,30 +72,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'sirius Business';
 
   @override
-  String get applicationCompletedWaitForResponses =>
-      'Заявка оформлена! \nЖдите откликов';
+  String get applicationCompletedWaitForResponses => 'Заявка оформлена! \nЖдите откликов';
 
   @override
   String get apply => 'Применить';
 
   @override
-  String get areYouSureYouWantLogOutYourAccount =>
-      'Вы точно хотите выйти из аккаунта ?';
+  String get areYouSureYouWantLogOutYourAccount => 'Вы точно хотите выйти из аккаунта ?';
 
   @override
-  String get areYouSureYouWantToDeleteTheOrder =>
-      'Вы действительно хотите\nудалить заказ?';
+  String get areYouSureYouWantToDeleteTheOrder => 'Вы действительно хотите\nудалить заказ?';
 
   @override
-  String get areYouSureYouWantToDeleteYourAccount =>
-      'Вы действительно хотите удалить аккаунт?';
+  String get areYouSureYouWantToDeleteYourAccount => 'Вы действительно хотите удалить аккаунт?';
 
   @override
   String get attention => 'Внимание';
 
   @override
-  String get attentionThePlatformIsOnly =>
-      'Внимание! Платформа является лишь информационной площадкой и не несет ответственности за сделки между пользователями. Перед заключением соглашений проверяйте документы и благонадежность контрагента самостоятельно.';
+  String get attentionThePlatformIsOnly => 'Внимание! Платформа является лишь информационной площадкой и не несет ответственности за сделки между пользователями. Перед заключением соглашений проверяйте документы и благонадежность контрагента самостоятельно.';
 
   @override
   String get autoRenewal => 'Автопродление';
@@ -133,8 +126,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get businessData => 'Деловые данные';
 
   @override
-  String get buyPremiumSubscription =>
-      'Приобретите премиум подписку, и получите доступ ко всем контактам';
+  String get buyPremiumSubscription => 'Приобретите премиум подписку, и получите доступ ко всем контактам';
 
   @override
   String get buyoutOfGoods => 'Выкуп товара';
@@ -170,8 +162,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get certificateAccountAvailability => 'Справка о наличии счета';
 
   @override
-  String get certificateRegistrationSoleProprietor =>
-      'Свидетельство о регистрации ИП/ТОО';
+  String get certificateRegistrationSoleProprietor => 'Свидетельство о регистрации ИП/ТОО';
 
   @override
   String get certification => 'Сертификация';
@@ -222,8 +213,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get completed2 => 'Завершен';
 
   @override
-  String get confirmation1 =>
-      'Подтверждение соглашения с условиями использования и  ';
+  String get confirmation1 => 'Подтверждение соглашения с условиями использования и  ';
 
   @override
   String get confirmation2 => 'Политикой Конфиденциальности. ';
@@ -325,8 +315,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get documents => 'Документы';
 
   @override
-  String get documentsAreBeingCheckedPleaseWaitForConfirmation =>
-      'Документы на проверке, ожидайте подтверждения.';
+  String get documentsAreBeingCheckedPleaseWaitForConfirmation => 'Документы на проверке, ожидайте подтверждения.';
 
   @override
   String get dont_you_have_an_account => 'У вас нет аккаунта? ';
@@ -335,8 +324,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get download => 'Загрузить';
 
   @override
-  String get downloadDocs =>
-      'Если вы загрузите документы компании, то вы получите галочку как проверенная компания';
+  String get downloadDocs => 'Если вы загрузите документы компании, то вы получите галочку как проверенная компания';
+
+  @override
+  String get downloadPdf => 'Скачать pdf';
 
   @override
   String get edit => 'Редактировать';
@@ -480,8 +471,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exit => 'Выйти';
 
   @override
-  String get explore_the_app =>
-      'Добро пожаловать в sirius — будущее мира подарков!';
+  String get explore_the_app => 'Добро пожаловать в sirius — будущее мира подарков!';
 
   @override
   String get filesAreAdded => 'Файлы добавлены';
@@ -496,8 +486,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get findCargo => 'Найти груз';
 
   @override
-  String get findOutWhyYouNeedtoAdvertiseProducts =>
-      'Узнайте почему нужно рекламировать товары?';
+  String get findOutWhyYouNeedtoAdvertiseProducts => 'Узнайте почему нужно рекламировать товары?';
 
   @override
   String get first_add_the_stores_address => 'Сначала добавьте адрес магазина!';
@@ -506,8 +495,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get forgot_your_password => 'Забыли пароль ?';
 
   @override
-  String get foundDeliveryOutsideThePlatform =>
-      'Нашел доставку вне платформы (не через эту систему).';
+  String get foundDeliveryOutsideThePlatform => 'Нашел доставку вне платформы (не через эту систему).';
 
   @override
   String get freightExchange => 'Биржа грузоперевозок';
@@ -531,15 +519,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get get_it_again => 'Получить еще раз';
 
   @override
-  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul =>
-      'Здесь вас ждут новые клиенты, удобные продажи и возможности для роста. Начните прямо сейчас!';
+  String get gifts_in_a_couple_of_clicks_fast_stylish_with_a_soul => 'Здесь вас ждут новые клиенты, удобные продажи и возможности для роста. Начните прямо сейчас!';
 
   @override
   String get giveRateTheCarrier => 'Поставьте оценку перевозчику';
 
   @override
-  String get goThroughVerificationAndBecome =>
-      'Пройдите верификацию и станьте \nпроверенным перевозчиком';
+  String get goThroughVerificationAndBecome => 'Пройдите верификацию и станьте \nпроверенным перевозчиком';
 
   @override
   String get goThroughVerificationText => 'Пройти верификацию';
@@ -551,8 +537,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get height => 'Высота (м)';
 
   @override
-  String get howManyBonusesDoYouWantSpend =>
-      'Сколько хотите потратить бонусов?';
+  String get howManyBonusesDoYouWantSpend => 'Сколько хотите потратить бонусов?';
 
   @override
   String get ifYouAlreadyHaveAnAccount => 'Если у вас есть уже аккаунт, ';
@@ -603,8 +588,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lookingForCarrier => 'Ищу перевозчика';
 
   @override
-  String get lookingForWayToStandOutInTheMarket =>
-      'Ищете способ выделиться на рынке?';
+  String get lookingForWayToStandOutInTheMarket => 'Ищете способ выделиться на рынке?';
 
   @override
   String get mail => 'Почта';
@@ -616,12 +600,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mainTypeActivity => 'Основной вид деятельности';
 
   @override
-  String get moreThan100SuccessfulTransactionsDaily =>
-      'Более 100 успешных сделок\nежедневно!';
+  String get moreThan100SuccessfulTransactionsDaily => 'Более 100 успешных сделок\nежедневно!';
 
   @override
-  String get moreThanSuccessfulTransactionsDaily =>
-      'Более 100 успешных сделок \nежедневно!';
+  String get moreThanSuccessfulTransactionsDaily => 'Более 100 успешных сделок \nежедневно!';
 
   @override
   String get myDocuments => 'Мои документы';
@@ -738,8 +720,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profile => 'Профиль';
 
   @override
-  String get provideCargoDetails =>
-      'Укажите характеристики, чтобы получить отклики от перевозчиков';
+  String get provideCargoDetails => 'Укажите характеристики, чтобы получить отклики от перевозчиков';
 
   @override
   String get pullDownToRefresh => 'Потяните вниз, чтобы обновить';
@@ -796,8 +777,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get seeAll => 'См все';
 
   @override
-  String get selectCarrierFromTheListOfRespondentsAndRate =>
-      'Выбрать перевозчика из списка откликнувшихся и оценить его.';
+  String get selectCarrierFromTheListOfRespondentsAndRate => 'Выбрать перевозчика из списка откликнувшихся и оценить его.';
 
   @override
   String get selectCategory => 'Выберите категорию';
@@ -836,19 +816,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shareYourExperience => 'Поделитесь опытом';
 
   @override
-  String get siriusDescription =>
-      'Биржа грузоперевозок нового поколения — надёжно, быстро, удобно.';
+  String get siriusDescription => 'Биржа грузоперевозок нового поколения — надёжно, быстро, удобно.';
 
   @override
   String get specifyTheRoute => 'Укажите маршрут';
 
   @override
-  String get specifyTheRouteCharacter =>
-      'Укажите маршрут, характеристики получите откликов от перевозчиков';
+  String get specifyTheRouteCharacter => 'Укажите маршрут, характеристики получите откликов от перевозчиков';
 
   @override
-  String get specifyTheRouteCharacteristics =>
-      'Укажите маршрут, характеристики получите откликов от перевозчиков';
+  String get specifyTheRouteCharacteristics => 'Укажите маршрут, характеристики получите откликов от перевозчиков';
 
   @override
   String get statistics => 'Статистика';
@@ -872,12 +849,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get termOfUse => 'Условиями Использования';
 
   @override
-  String get theMainStateRegistrationNumber =>
-      'Основной государственный регистрационный номер';
+  String get theMainStateRegistrationNumber => 'Основной государственный регистрационный номер';
 
   @override
-  String get theOrderHasBeenUpdatedWaitForResponses =>
-      'Заказ обновлен!\nЖдите ответов';
+  String get theOrderHasBeenUpdatedWaitForResponses => 'Заказ обновлен!\nЖдите ответов';
 
   @override
   String get theServiceIsTemporarilyUnavailable => 'Сервис временно недоступен';
@@ -895,8 +870,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get time => 'Время';
 
   @override
-  String get toAddProductSpecifyTheStoresAddressInYourProfile =>
-      'Чтобы добавить товар, укажите адрес магазина в профиле.';
+  String get toAddProductSpecifyTheStoresAddressInYourProfile => 'Чтобы добавить товар, укажите адрес магазина в профиле.';
 
   @override
   String get toPay => 'Оплатить';
@@ -943,8 +917,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get volumes => 'Объемы';
 
   @override
-  String get wasAddDaysAgo =>
-      'был добавлен 20 дней\nназад. Пожалуйста, оцените перевозчика';
+  String get wasAddDaysAgo => 'был добавлен 20 дней\nназад. Пожалуйста, оцените перевозчика';
 
   @override
   String get we_have_sent_a_confirmation => 'Мы отправили код на ваш номер ';
@@ -980,8 +953,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get writeMessage => 'Напишите сообщение';
 
   @override
-  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp =>
-      'Напишите нам в WhatsApp — мы всегда на \n связи и готовы помочь!';
+  String get writeToUsOnWhatsAppweAreAlwaysTouchAndReadytoHelp => 'Напишите нам в WhatsApp — мы всегда на \n связи и готовы помочь!';
 
   @override
   String get yes => 'Да';
@@ -1000,4 +972,397 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get yuridicRegister => 'Юридический';
+
+  @override
+  String get cityDriveMap => 'Карта';
+
+  @override
+  String get cityDriveMyMarks => 'Мои отметки';
+
+  @override
+  String get cityDriveMyWorks => 'Мои работы';
+
+  @override
+  String get cityDriveEditProfile => 'Редактировать профиль';
+
+  @override
+  String get cityDriveAnnouncements => 'Объявлении';
+
+  @override
+  String get cityDriveKeywords => 'Ключевые слова';
+
+  @override
+  String get cityDriveNew => 'Новые';
+
+  @override
+  String get cityDriveApplications => 'Заявки';
+
+  @override
+  String get cityDriveInProgress => 'В работе';
+
+  @override
+  String get cityDriveDone => 'Готово';
+
+  @override
+  String get cityDriveNoNewMarksEmpty => 'Новых отметок нет.\nЖитель публикует их с карты — они появятся здесь.';
+
+  @override
+  String get cityDrivePotholeRepair => 'Ямочный ремонт';
+
+  @override
+  String get cityDriveAddressNotSpecified => 'Адрес не указан';
+
+  @override
+  String get cityDriveUnderReview => 'На рассмотрении';
+
+  @override
+  String cityDriveFromAuthor(String author) {
+    return 'От: $author';
+  }
+
+  @override
+  String get cityDriveMoreDetails => 'Подробнее';
+
+  @override
+  String get cityDriveMarkAcceptedSnack => 'Отметка принята в работу';
+
+  @override
+  String get cityDriveMarkRejectedSnack => 'Отметка отклонена';
+
+  @override
+  String get cityDriveDetailsTitle => 'Подробности';
+
+  @override
+  String get cityDriveNotSpecified => 'Не указано';
+
+  @override
+  String get cityDriveResident => 'Житель';
+
+  @override
+  String get cityDriveComments => 'Комментарии';
+
+  @override
+  String get cityDriveShowAll => 'Показать все';
+
+  @override
+  String get cityDriveLeaveFirstComment => 'Оставьте первый комментарий';
+
+  @override
+  String get cityDriveReject => 'Отклонить';
+
+  @override
+  String get cityDriveAcceptApplicationBtn => 'Принять заявку';
+
+  @override
+  String get cityDriveSubmitReport => 'Отправить отчёт';
+
+  @override
+  String get cityDrivePhotoUnavailable => 'Фото недоступно';
+
+  @override
+  String get cityDriveInformation => 'Информация';
+
+  @override
+  String get cityDriveType => 'Тип';
+
+  @override
+  String get cityDriveAuthor => 'Автор';
+
+  @override
+  String get cityDriveDateLabel => 'Дата';
+
+  @override
+  String get cityDriveUrgency => 'Срочность';
+
+  @override
+  String get cityDriveLevel => 'Уровень';
+
+  @override
+  String get cityDriveAddress => 'Адрес';
+
+  @override
+  String get cityDriveSeverityCritical => 'Критический';
+
+  @override
+  String get cityDriveSeverityHigh => 'Высокий';
+
+  @override
+  String get cityDriveSeverityMedium => 'Средний';
+
+  @override
+  String get cityDriveSeverityLow => 'Низкий';
+
+  @override
+  String get cityDriveStatusOpen => 'Открыто';
+
+  @override
+  String get cityDriveStatusAccepted => 'Принято';
+
+  @override
+  String get cityDriveStatusInWork => 'В работе';
+
+  @override
+  String get cityDriveStatusRejected => 'Отклонено';
+
+  @override
+  String get cityDriveStatusDone => 'Готово';
+
+  @override
+  String get cityDriveStatusConfirmed => 'Подтверждена';
+
+  @override
+  String get cityDriveStatusFixed => 'Исправлено';
+
+  @override
+  String get cityDrivePublishedRecently => 'Опубликовано недавно';
+
+  @override
+  String get cityDrivePublishedToday => 'Опубликовано сегодня';
+
+  @override
+  String get cityDrivePublishedYesterday => 'Опубликовано вчера';
+
+  @override
+  String cityDrivePublishedOn(String date) {
+    return 'Опубликовано $date';
+  }
+
+  @override
+  String get cityDriveWorkReportTitle => 'Отчёт о выполнении работ';
+
+  @override
+  String get cityDriveWorkPhoto => 'Фото выполненной работы';
+
+  @override
+  String get cityDriveWorkDescription => 'Описание работ';
+
+  @override
+  String get cityDriveWorkDescriptionHint => 'Напишите, как прошла работа';
+
+  @override
+  String get cityDriveReportSentTitle => 'Отчет отправлен';
+
+  @override
+  String get cityDriveWaitAdminReview => 'Ожидайте проверки администратора';
+
+  @override
+  String get cityDriveNow => 'Сейчас';
+
+  @override
+  String get cityDriveAdminReview => 'Проверка админом';
+
+  @override
+  String get cityDriveAdminReviewSubtitle => 'Обычно 1-2 дня';
+
+  @override
+  String get cityDriveApplicationAcceptedTitle => 'Заявка принята!';
+
+  @override
+  String get cityDriveApplicationAcceptedBody => 'Отметка добавлена в «Мои работы». Можете приступить к работе.';
+
+  @override
+  String get cityDriveApplicationSentTitle => 'Заявка отправлена!';
+
+  @override
+  String get cityDriveApplicationSentBody => 'Ваша заявка на участие отправлена на проверку';
+
+  @override
+  String get cityDriveApplicationAcceptedStep => 'Заявка принята';
+
+  @override
+  String get cityDriveApplicationSentStep => 'Заявка отправлена';
+
+  @override
+  String get cityDriveViewInMyWorks => 'Посмотреть в Мои работы';
+
+  @override
+  String get cityDriveAnnouncement => 'Объявление';
+
+  @override
+  String get cityDriveCommentOptional => 'Комментарий (необязательно)';
+
+  @override
+  String get cityDriveCommentHint => 'Например: примем в работу на следующей неделе';
+
+  @override
+  String get cityDriveRoadDamage => 'Повреждение дороги';
+
+  @override
+  String get cityDriveDefaultMarkTitle => 'Отметка';
+
+  @override
+  String get cityDriveLoginForMarks => 'Войдите, чтобы видеть свои отметки';
+
+  @override
+  String get cityDriveNoMarksYet => 'У вас пока нет отметок.\nСфотографируйте проблему на карте.';
+
+  @override
+  String get cityDriveViewOnMap => 'Посмотреть на карте';
+
+  @override
+  String get cityDriveNews => 'Новости';
+
+  @override
+  String get cityDriveCanceled => 'Отмененные';
+
+  @override
+  String get cityDriveInProcess => 'В процессе';
+
+  @override
+  String get cityDriveCompleted => 'Завершенные';
+
+  @override
+  String get cityDriveEmptyApplications => 'Новых заявок от жителей нет.\nОни появятся после публикации отметки на карте.';
+
+  @override
+  String get cityDriveEmptyCanceled => 'Отклонённых заявок нет.';
+
+  @override
+  String get cityDriveEmptyInWork => 'Примите заявку на главной вкладке — она появится здесь.';
+
+  @override
+  String get cityDriveEmptyCompleted => 'Завершённых работ пока нет.';
+
+  @override
+  String get cityDriveEmptyList => 'Список пуст';
+
+  @override
+  String get cityDriveLoginToPublish => 'Войдите в аккаунт, чтобы опубликовать отметку';
+
+  @override
+  String get cityDriveReportPublished => 'Отчет успешно опубликован!';
+
+  @override
+  String get cityDriveConfirm => 'Подтвердить';
+
+  @override
+  String get cityDriveAddCommentHint => 'Добавить комментарий (необязательно)...';
+
+  @override
+  String get cityDriveRetake => 'Переснять';
+
+  @override
+  String get cityDrivePublish => 'Опубликовать';
+
+  @override
+  String get cityDriveResidentReported => 'Житель сообщил о повреждении дороги.';
+
+  @override
+  String get cityDriveProblemOnRoad => 'Проблема на дороге';
+
+  @override
+  String cityDriveReportedOn(String date) {
+    return 'Сообщено: $date';
+  }
+
+  @override
+  String get cityDriveNewStatus => 'Новая';
+
+  @override
+  String get cityDriveFixedStatus => 'Исправлено';
+
+  @override
+  String get cityDriveUndefinedStatus => 'Не определен';
+
+  @override
+  String get cityDriveJustNow => 'только что';
+
+  @override
+  String get cityDriveHour => 'час';
+
+  @override
+  String get cityDriveHours2to4 => 'часа';
+
+  @override
+  String get cityDriveHoursMany => 'часов';
+
+  @override
+  String get cityDriveDay => 'день';
+
+  @override
+  String get cityDriveDays2to4 => 'дня';
+
+  @override
+  String get cityDriveDaysMany => 'дней';
+
+  @override
+  String get cityDriveProblemTypePothole => 'Яма на дороге';
+
+  @override
+  String get cityDriveProblemTypeDamage => 'Повреждение покрытия';
+
+  @override
+  String get cityDriveProblemTypeCracks => 'Трещины';
+
+  @override
+  String get cityDriveProblemTypeSubsidence => 'Проседание асфальта';
+
+  @override
+  String get cityDriveTypePothole => 'Ямка';
+
+  @override
+  String get cityDriveTypeDamage => 'Повреждение';
+
+  @override
+  String get cityDriveTypeCrack => 'Трещина';
+
+  @override
+  String get cityDriveTypeRoad => 'Дорога';
+
+  @override
+  String get cityDriveAvailable => 'Доступно';
+
+  @override
+  String get cityDriveSubmitApplication => 'Подать заявку';
+
+  @override
+  String get cityDriveSendReportBtn => 'Отправить отчет';
+
+  @override
+  String get cityDriveCameraFailed => 'Не удалось открыть камеру';
+
+  @override
+  String get cityDriveRoadProblem => 'Дорожная проблема';
+
+  @override
+  String get cityDriveDeterminingAddress => 'Определение адреса...';
+
+  @override
+  String get cityDriveCoordsUnavailable => 'Координаты недоступны';
+
+  @override
+  String get cityDriveDamageNeedsAttention => 'Повреждение дороги требует внимания';
+
+  @override
+  String get cityDriveMarks => 'Отметки';
+
+  @override
+  String get cityDriveFilterAll => 'Все';
+
+  @override
+  String get cityDriveFilterConfirmed => 'Подтверждена';
+
+  @override
+  String get cityDriveFilterRejected => 'Отклонена';
+
+  @override
+  String get cityDriveMarkDetails => 'Детали отметки';
+
+  @override
+  String get cityDriveNotifications => 'Уведомления';
+
+  @override
+  String get cityDriveNoNotifications => 'У вас пока нет уведомлений';
+
+  @override
+  String get cityDriveNotificationsHint => 'Здесь будут отображаться уведомления по занятиям, акциям и многое другое';
+
+  @override
+  String get cityDriveOpen => 'Открыть';
+
+  @override
+  String get cityDriveToday => 'Сегодня';
+
+  @override
+  String get cityDriveYesterday => 'Вчера';
 }

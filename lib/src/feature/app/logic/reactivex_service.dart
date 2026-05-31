@@ -1,4 +1,4 @@
-import 'package:ikidz/src/feature/app/logic/push_data_dto.dart';
+import 'package:city_drive/src/feature/app/logic/push_data_dto.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ReactiveXService {

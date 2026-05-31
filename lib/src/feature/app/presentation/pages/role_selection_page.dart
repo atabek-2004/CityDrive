@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/presentation/pages/auth_second_page.dart';
+import 'package:city_drive/src/core/local_storage/user_role.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/presentation/pages/auth_second_page.dart';
 
 
 @RoutePage()
@@ -77,10 +79,13 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: selectedRole != null
-                      ? () {
-             
-                          print('Selected role: $selectedRole');
-
+                      ? () async {
+                          final role = selectedRole == 'controller'
+                              ? UserRole.controller
+                              : UserRole.resident;
+                          await context.repository.sessionRepository
+                              .setPendingRole(role);
+                          if (!context.mounted) return;
                           if (selectedRole == 'resident') {
                             context.router.push(AuthRoute());
                           } else {

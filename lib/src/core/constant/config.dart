@@ -1,4 +1,4 @@
-import 'package:ikidz/src/feature/app/initialization/model/environment.dart';
+import 'package:city_drive/src/feature/app/initialization/model/environment.dart';
 
 /// Application configuration
 class Config {

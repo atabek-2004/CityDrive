@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:pure/pure.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
 
 abstract class ISharedPreferencesDao implements SharedPreferencesWithCache {
   String key(String name);

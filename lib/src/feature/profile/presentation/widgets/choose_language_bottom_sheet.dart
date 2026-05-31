@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter_svg/svg.dart';
-import 'package:gap/gap.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart' show Assets;
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
+import 'package:gap/gap.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/constant/localization/locale_util.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
+import 'package:city_drive/src/feature/settings/model/app_settings.dart';
+import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 
 class ChooseLanguageBottomSheet extends StatefulWidget {
   const ChooseLanguageBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) async {
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -29,12 +32,33 @@ class ChooseLanguageBottomSheet extends StatefulWidget {
 }
 
 class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
-  String? selectedLanguage;
+  late String selectedLanguage;
 
-  final List<String> languages = ['Қазақ тілі', 'Русский', 'English'];
+  @override
+  void initState() {
+    super.initState();
+    final locale =
+        SettingsScope.settingsOf(context, listen: false).locale ??
+            Localization.defaultLocale;
+    selectedLanguage = LocaleUtil.labelFromLocale(locale);
+  }
+
+  void _applyLanguage() {
+    final locale = LocaleUtil.localeFromLabel(selectedLanguage);
+    final settings = SettingsScope.settingsOf(context, listen: false);
+    final updated = (settings).copyWith(locale: locale);
+
+    SettingsScope.of(context).add(
+      AppSettingsEvent.updateAppSettings(appSettings: updated),
+    );
+    Localization.load(locale);
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+
     return DraggableScrollableSheet(
       expand: false,
       maxChildSize: 0.85,
@@ -47,25 +71,21 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Text(
-                'Язык',
-                style: AppTextStyles.title22BoldW700.copyWith(color: AppColors.blac151619),
+                l10n.language,
+                style: AppTextStyles.title22BoldW700
+                    .copyWith(color: AppColors.blac151619),
               ),
               const Gap(15),
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  itemCount: languages.length,
+                  itemCount: LocaleUtil.labels.length,
                   itemBuilder: (context, index) {
-                    final language = languages[index];
+                    final language = LocaleUtil.labels[index];
                     final isSelected = selectedLanguage == language;
                     return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedLanguage = language;
-                        });
-                      },
+                      onTap: () => setState(() => selectedLanguage = language),
                       child: Container(
                         height: 52,
                         margin: const EdgeInsets.only(bottom: 12),
@@ -79,7 +99,8 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
                           children: [
                             Text(
                               language,
-                              style: AppTextStyles.title16W400.copyWith(color: AppColors.text434343),
+                              style: AppTextStyles.title16W400
+                                  .copyWith(color: AppColors.text434343),
                             ),
                             SvgPicture.asset(
                               isSelected
@@ -93,30 +114,20 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
                   },
                 ),
               ),
-              
               CustomButton(
-                // allowTapButton: _allowTapButton,
-                onPressed: () {
-                  // context.router.push(const MyChildrenRoute());
-                },
+                onPressed: _applyLanguage,
                 style: CustomButtonStyles.mainButtonStyle(context).copyWith(
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  backgroundColor: WidgetStatePropertyAll(
-                    selectedLanguage != null
-                        ? AppColors.mainColor
-                        : AppColors.backgroundButtonF5F5F5,
-                  ),
-                  foregroundColor: WidgetStatePropertyAll(
-                    selectedLanguage != null
-                        ? AppColors.white
-                        : AppColors.foregroundTextButoonWhenIsnotAllowed,
-                  ),
+                  backgroundColor:
+                      const WidgetStatePropertyAll(AppColors.mainColor),
+                  foregroundColor:
+                      const WidgetStatePropertyAll(AppColors.white),
                 ),
-                text: 'Готово',
+                text: l10n.save,
                 child: null,
               ),
               const Gap(15),

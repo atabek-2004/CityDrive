@@ -6,23 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ikidz/src/core/presentation/widgets/dialog/toaster.dart';
-import 'package:ikidz/src/feature/app/bloc/app_bloc.dart';
-import 'package:ikidz/src/feature/auth/bloc/enter_sms_code_cubit.dart';
-import 'package:ikidz/src/feature/auth/bloc/register_verify_cubit.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
+import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
+import 'package:city_drive/src/core/utils/phone_util.dart';
+import 'package:city_drive/src/feature/auth/bloc/enter_sms_code_cubit.dart';
+import 'package:city_drive/src/feature/auth/bloc/register_verify_cubit.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pinput/pinput.dart';
-import 'package:ikidz/src/core/constant/generated/assets.gen.dart';
-import 'package:ikidz/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:ikidz/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:ikidz/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/core/utils/extensions/context_extension.dart';
-import 'package:ikidz/src/core/utils/extensions/integer_extension.dart';
-import 'package:ikidz/src/feature/app/router/app_router.dart';
-import 'package:ikidz/src/feature/auth/enum/enter_sms_code_type.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
+import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
+import 'package:city_drive/src/core/presentation/widgets/scroll/scroll_wrapper.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/extensions/integer_extension.dart';
+import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/enum/enter_sms_code_type.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 
 @RoutePage()
 class EnterSmsCodePage extends StatefulWidget implements AutoRouteWrapper {
@@ -235,6 +237,21 @@ class _EnterSmsCodePageState extends State<EnterSmsCodePage> {
                         style: AppTextStyles.body18Regular
                             .copyWith(color: const Color(0xFF0F0F0F)),
                       ),
+                      const Gap(8),
+                      Builder(
+                        builder: (context) {
+                          final repo = context.repository.authRepository;
+                          if (repo is! LocalAuthRepository) {
+                            return const SizedBox.shrink();
+                          }
+                          return Text(
+                            repo.devSmsHint,
+                            style: AppTextStyles.body14Regular.copyWith(
+                              color: AppColors.mainColor,
+                            ),
+                          );
+                        },
+                      ),
                       const Gap(26),
                       Center(
                         child: ValueListenableBuilder(
@@ -283,18 +300,20 @@ class _EnterSmsCodePageState extends State<EnterSmsCodePage> {
                             },
                             loaded: () {
                               context.loaderOverlay.hide();
-
+                              final authUser =
+                                  context.repository.authRepository.user;
+                              if (authUser != null) {
+                                BlocProvider.of<AppBloc>(context).add(
+                                  AppEvent.logining(user: authUser),
+                                );
+                              }
                               if (widget.isSignUpSecond) {
                                 context.router.replaceAll(
-                                  [
-                                    const CompanyDataRoute(),
-                                  ],
+                                  [const CompanyDataRoute()],
                                 );
                               } else {
                                 context.router.replaceAll(
-                                  [
-                                    const LoginRoute(),
-                                  ],
+                                  [const LauncherRoute()],
                                 );
                               }
                             },
@@ -306,12 +325,23 @@ class _EnterSmsCodePageState extends State<EnterSmsCodePage> {
                             return CustomButton(
                               allowTapButton: _allowTapButton,
                               onPressed: () {
-                                BlocProvider.of<RegisterVerifyCubit>(context)
-                                    .registerVerify(
-                                  code: pinputController.text,
-                                  phone: widget.phone
-                                      .replaceAll(RegExp(r'[^\d]'), ''),
-                                );
+                                final phone =
+                                    PhoneUtil.normalize(widget.phone);
+                                final code = pinputController.text.trim();
+                                if (widget.flowType ==
+                                    EnterSmsCodeType.forgotPassword) {
+                                  BlocProvider.of<EnterSmsCodeCubit>(context)
+                                      .forgotPasswordSmsCheck(
+                                    phone: phone,
+                                    code: code,
+                                  );
+                                } else {
+                                  BlocProvider.of<RegisterVerifyCubit>(context)
+                                      .registerVerify(
+                                    code: code,
+                                    phone: phone,
+                                  );
+                                }
                               },
                               style: CustomButtonStyles.mainButtonStyle(context)
                                   .copyWith(

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ikidz/src/core/constant/constants.dart';
+import 'package:city_drive/src/core/constant/constants.dart';
 import 'package:tuple/tuple.dart';
 
 /// Common extensions for [String]

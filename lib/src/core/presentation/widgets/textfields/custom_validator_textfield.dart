@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ikidz/src/core/presentation/widgets/error/error_text_widget.dart';
-import 'package:ikidz/src/core/presentation/widgets/textfields/custom_textfield.dart';
-import 'package:ikidz/src/core/theme/resources.dart';
-import 'package:ikidz/src/feature/auth/presentation/widgets/password_eye_suffix_icon.dart';
+import 'package:city_drive/src/core/presentation/widgets/error/error_text_widget.dart';
+import 'package:city_drive/src/core/presentation/widgets/textfields/custom_textfield.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/auth/presentation/widgets/password_eye_suffix_icon.dart';
 
 class CustomValidatorTextfield extends StatelessWidget {
   final bool showEye;

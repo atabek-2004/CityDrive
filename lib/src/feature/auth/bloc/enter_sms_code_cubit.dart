@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/rest_client/rest_client.dart';
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/core/rest_client/rest_client.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 part 'enter_sms_code_cubit.freezed.dart';
 
@@ -37,11 +37,11 @@ class EnterSmsCodeCubit extends Cubit<EnterSmsCodeState> {
         ),
       );
     } catch (e) {
-      emit(
-        EnterSmsCodeState.error(
-          message: e.toString(),
-        ),
-      );
+      var message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.replaceFirst('Exception: ', '');
+      }
+      emit(EnterSmsCodeState.error(message: message));
     }
   }
 

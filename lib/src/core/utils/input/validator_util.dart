@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:ikidz/src/core/utils/extensions/string_extension.dart';
+import 'package:city_drive/src/core/utils/extensions/string_extension.dart';
 
 class ValidatorUtil {
   const ValidatorUtil._();

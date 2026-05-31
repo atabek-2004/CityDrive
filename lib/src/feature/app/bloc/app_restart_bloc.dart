@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/utils/talker_logger_util.dart';
+import 'package:city_drive/src/core/utils/talker_logger_util.dart';
 
 part 'app_restart_bloc.freezed.dart';
 

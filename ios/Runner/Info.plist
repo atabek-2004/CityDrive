@@ -83,5 +83,14 @@
 
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Нужно для hot reload / отладки по Wi‑Fi (Flutter Dart VM Service) -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Разрешите доступ к локальной сети, чтобы компьютер мог подключиться к приложению для отладки.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+		<string>_dartobservatory._tcp</string>
+	</array>
 </dict>
 </plist>

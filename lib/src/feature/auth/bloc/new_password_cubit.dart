@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ikidz/src/core/rest_client/models/basic_response.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 
-import 'package:ikidz/src/feature/auth/data/auth_repository.dart';
-import 'package:ikidz/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 
 part 'new_password_cubit.freezed.dart';
 
