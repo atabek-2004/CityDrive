@@ -14,7 +14,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         super(const RegisterState.initial());
   final IAuthRepository _repository;
 
-  Future<void> register({required UserPayload payload}) async {
+  Future<void> register({required UserPayload payload, String? role}) async {
     try {
       emit(const RegisterState.loading());
 
@@ -25,15 +25,28 @@ class RegisterCubit extends Cubit<RegisterState> {
         phone: payload.phone,
         password: payload.password,
         passwordConfirmation: payload.passwordConfirmation,
+        role: role,
       );
 
       if (isClosed) return;
 
       emit(RegisterState.loaded(user: data));
+    } on UnsupportedError {
+      emit(
+        const RegisterState.error(
+          message:
+              'Регистрация в приложении недоступна. Войдите с тестовым аккаунтом '
+              '(житель: +77001111111 / resident1). Новых пользователей добавляет '
+              'админ-панель на ноутбуке с backend.',
+        ),
+      );
     } catch (e) {
       var message = e.toString();
       if (message.startsWith('Exception: ')) {
         message = message.replaceFirst('Exception: ', '');
+      }
+      if (message.startsWith('Unsupported operation: ')) {
+        message = message.replaceFirst('Unsupported operation: ', '');
       }
       emit(RegisterState.error(message: message));
     }

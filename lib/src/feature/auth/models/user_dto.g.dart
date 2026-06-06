@@ -19,6 +19,8 @@ _$UserDTOImpl _$$UserDTOImplFromJson(Map<String, dynamic> json) =>
       phone: json['phone'] as String?,
       password: json['password'] as String?,
       token: json['token'] as String?,
+      role: json['role'] as String?,
+      isApproved: json['isApproved'] as bool?,
       deviceToken: json['device_token'] as String?,
       deviceType: json['device_type'] as String?,
       createdAt: json['created_at'] == null
@@ -42,6 +44,8 @@ Map<String, dynamic> _$$UserDTOImplToJson(_$UserDTOImpl instance) =>
       'phone': instance.phone,
       'password': instance.password,
       'token': instance.token,
+      'role': instance.role,
+      'isApproved': instance.isApproved,
       'device_token': instance.deviceToken,
       'device_type': instance.deviceType,
       'created_at': instance.createdAt?.toIso8601String(),

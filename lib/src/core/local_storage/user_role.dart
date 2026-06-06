@@ -5,8 +5,10 @@ enum UserRole {
   String get value => name;
 
   static UserRole fromString(String? value) {
-    switch (value) {
+    switch (value?.toLowerCase()) {
       case 'controller':
+        return UserRole.controller;
+      case 'admin':
         return UserRole.controller;
       case 'resident':
       default:

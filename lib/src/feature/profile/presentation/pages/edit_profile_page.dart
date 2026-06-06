@@ -48,6 +48,7 @@ class EditProfilePage extends StatefulWidget implements AutoRouteWrapper {
         BlocProvider(
           create: (context) => ProfileCubit(
             repository: context.repository.profileRepository,
+            authRepository: context.repository.authRepository,
           ),
         ),
         BlocProvider(

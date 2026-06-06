@@ -18,6 +18,7 @@ import 'package:city_drive/src/core/utils/input/validator_util.dart';
 import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/auth/bloc/login_cubit.dart';
+import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget implements AutoRouteWrapper {
@@ -87,10 +88,10 @@ class _LoginPageState extends State<LoginPage> {
               },
               loaded: (user) {
                 context.loaderOverlay.hide();
-                BlocProvider.of<AppBloc>(context)
-                    .add(AppEvent.logining(user: user));
-                context.router.replaceAll([const LauncherRoute()]);
-                Toaster.showTopShortToast(context, message: 'Успешно');
+                navigateAfterAuth(context, user);
+                if (context.repository.authRepository.isApproved) {
+                  Toaster.showTopShortToast(context, message: 'Успешно');
+                }
               },
               orElse: () => context.loaderOverlay.hide(),
             );

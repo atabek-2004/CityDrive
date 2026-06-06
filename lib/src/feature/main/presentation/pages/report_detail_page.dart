@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:provider/provider.dart';
+import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
 
 @RoutePage()
 class ReportDetailPage extends StatefulWidget {
-  final String imageUrl;
   const ReportDetailPage({
     super.key,
     required this.reportId,
@@ -12,6 +20,7 @@ class ReportDetailPage extends StatefulWidget {
   });
 
   final String reportId;
+  final String imageUrl;
 
   @override
   State<ReportDetailPage> createState() => _ReportDetailPageState();
@@ -19,7 +28,31 @@ class ReportDetailPage extends StatefulWidget {
 
 class _ReportDetailPageState extends State<ReportDetailPage> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<RoadProblemsProvider>().load();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = context.localized;
+    final id = int.tryParse(widget.reportId);
+    final problem = id != null
+        ? context.watch<RoadProblemsProvider>().getProblemById(id)
+        : null;
+
+    final status = problem?.status;
+    final imageUrl = problem?.images?.isNotEmpty == true
+        ? problem!.images!.first
+        : widget.imageUrl;
+    final title = problem?.title ?? l10n.cityDriveProblemOnRoad;
+    final address = problem?.address ?? l10n.cityDriveAddressNotSpecified;
+    final description = problem?.description ?? '';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -30,9 +63,9 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => context.router.maybePop(),
         ),
-        title: const Text(
-          'Детали отметки',
-          style: TextStyle(
+        title: Text(
+          l10n.cityDriveMarkDetails,
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -43,43 +76,24 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main image
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 300,
-              color: Colors.grey.shade300,
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(
-                      Icons.image,
-                      color: Colors.grey,
-                      size: 60,
-                    ),
-                  );
-                },
-              ),
+              child: _ReportImage(imageUrl: imageUrl),
             ),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
-                  const Text(
-                    'Провал на дороге',
-                    style: TextStyle(
+                  Text(
+                    title,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Gap(8),
-
-                  // Address
                   Row(
                     children: [
                       Icon(
@@ -88,39 +102,52 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                         size: 20,
                       ),
                       const Gap(4),
-                      Text(
-                        'ул. Абая, 150',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
+                      Expanded(
+                        child: Text(
+                          address,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const Gap(24),
-
-                  // Description section
-                  const Text(
-                    'ОПИСАНИЕ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black54,
-                      letterSpacing: 0.5,
+                  if (description.isNotEmpty) ...[
+                    const Gap(24),
+                    Text(
+                      l10n.description.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                  const Gap(8),
-                  Text(
-                    'Глубокий провал на дороге, примерно 40 см. Опасно для машин и пешеходов. Находится возле автобусной остановки.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade800,
-                      height: 1.5,
+                    const Gap(8),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade800,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
+                  ],
                   const Gap(32),
-
-                  // Status timeline
+                  Text(
+                    l10n.status,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Gap(12),
+                  ReportStatusBadge(
+                    status: status,
+                    label: controllerStatusLabel(l10n, status),
+                  ),
+                  const Gap(24),
                   const Text(
                     'Статус заявки',
                     style: TextStyle(
@@ -129,44 +156,8 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                     ),
                   ),
                   const Gap(20),
-
-                  StatusTimeline(
-                    steps: [
-                      StatusStep(
-                        title: 'Отправлено на проверку',
-                        isCompleted: true,
-                        isActive: false,
-                        color: const Color(0xFF34C759),
-                      ),
-                      StatusStep(
-                        title: 'Подтверждено',
-                        isCompleted: true,
-                        isActive: true,
-                        color: Colors.orange,
-                      ),
-                      StatusStep(
-                        title: 'Ждёт ремонта',
-                        isCompleted: false,
-                        isActive: false,
-                        color: Colors.grey,
-                      ),
-                      StatusStep(
-                        title: 'В работе',
-                        isCompleted: false,
-                        isActive: false,
-                        color: Colors.grey,
-                      ),
-                      StatusStep(
-                        title: 'Решено',
-                        isCompleted: false,
-                        isActive: false,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
+                  StatusTimeline(steps: _buildTimelineSteps(l10n, status)),
                   const Gap(32),
-
-                  // Info text
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -174,7 +165,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Администратор проверит вашу отметку и подтвердит её или отклонит. Вы получите уведомление о решении.',
+                      _infoText(status),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -184,15 +175,13 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                     ),
                   ),
                   const Gap(24),
-
-                  // Delete button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        _showDeleteDialog(context);
-                      },
+                      onPressed: id == null
+                          ? null
+                          : () => _showDeleteDialog(context, id),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF3B30),
                         shape: RoundedRectangleBorder(
@@ -220,25 +209,38 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
+  String _infoText(String? status) {
+    if (status == ReportStatus.rejected) {
+      return 'Администратор отклонил вашу отметку. Вы можете удалить её или отправить новую с карты.';
+    }
+    if (status == ReportStatus.fixed) {
+      return 'Проблема отмечена как исправленная. Спасибо за участие в улучшении города!';
+    }
+    return 'Администратор проверит вашу отметку и подтвердит её или отклонит. Вы получите уведомление о решении.';
+  }
+
+  void _showDeleteDialog(BuildContext context, int id) {
+    showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Удалить отметку?'),
         content: const Text('Это действие нельзя отменить.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(context.localized.cancel),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.router.maybePop();
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await context.read<RoadProblemsProvider>().removeProblem(id);
+              if (context.mounted) {
+                context.router.maybePop();
+              }
             },
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Color(0xFFFF3B30)),
+            child: Text(
+              context.localized.delete,
+              style: const TextStyle(color: Color(0xFFFF3B30)),
             ),
           ),
         ],
@@ -247,27 +249,86 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 }
 
+List<StatusStep> _buildTimelineSteps(AppLocalizations l10n, String? status) {
+  final stage = _timelineStage(status);
+  final isRejected = status == ReportStatus.rejected;
+
+  if (isRejected) {
+    return [
+      StatusStep(
+        title: l10n.cityDriveOnVerification,
+        icon: ReportStatusUi.iconFor(ReportStatus.pending),
+        color: ReportStatusUi.colorFor(ReportStatus.pending),
+        isCompleted: true,
+        isActive: false,
+      ),
+      StatusStep(
+        title: l10n.cityDriveStatusRejected,
+        icon: ReportStatusUi.iconFor(ReportStatus.rejected),
+        color: ReportStatusUi.colorFor(ReportStatus.rejected),
+        isCompleted: false,
+        isActive: true,
+      ),
+    ];
+  }
+
+  final steps = <({String title, String statusKey})>[
+    (title: l10n.cityDriveOnVerification, statusKey: ReportStatus.pending),
+    (title: l10n.cityDriveStatusAccepted, statusKey: ReportStatus.confirmed),
+    (title: l10n.cityDriveStatusInWork, statusKey: ReportStatus.inProgress),
+    (title: l10n.cityDriveStatusFixed, statusKey: ReportStatus.fixed),
+  ];
+
+  return List.generate(steps.length, (index) {
+    final step = steps[index];
+    final isCompleted = stage > index;
+    final isActive = stage == index;
+    return StatusStep(
+      title: step.title,
+      icon: ReportStatusUi.iconFor(step.statusKey),
+      color: ReportStatusUi.colorFor(step.statusKey),
+      isCompleted: isCompleted,
+      isActive: isActive,
+    );
+  });
+}
+
+int _timelineStage(String? status) {
+  switch (status) {
+    case ReportStatus.newReport:
+    case ReportStatus.pending:
+      return 0;
+    case ReportStatus.confirmed:
+      return 1;
+    case ReportStatus.inProgress:
+      return 2;
+    case ReportStatus.fixed:
+      return 3;
+    default:
+      return 0;
+  }
+}
+
 class StatusStep {
   final String title;
+  final IconData icon;
+  final Color color;
   final bool isCompleted;
   final bool isActive;
-  final Color color;
 
   StatusStep({
     required this.title,
+    required this.icon,
+    required this.color,
     required this.isCompleted,
     required this.isActive,
-    required this.color,
   });
 }
 
 class StatusTimeline extends StatelessWidget {
-  final List<StatusStep> steps;
+  const StatusTimeline({super.key, required this.steps});
 
-  const StatusTimeline({
-    super.key,
-    required this.steps,
-  });
+  final List<StatusStep> steps;
 
   @override
   Widget build(BuildContext context) {
@@ -275,6 +336,7 @@ class StatusTimeline extends StatelessWidget {
       children: List.generate(steps.length, (index) {
         final step = steps[index];
         final isLast = index == steps.length - 1;
+        final isHighlighted = step.isCompleted || step.isActive;
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,49 +344,38 @@ class StatusTimeline extends StatelessWidget {
             Column(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: step.isCompleted || step.isActive
-                        ? step.color
-                        : Colors.grey.shade300,
+                    color: isHighlighted ? step.color : Colors.grey.shade300,
                   ),
-                  child: step.isCompleted
-                      ? const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 18,
-                        )
-                      : step.isActive
-                          ? const Icon(
-                              Icons.access_time,
-                              color: Colors.white,
-                              size: 18,
-                            )
-                          : null,
+                  child: Icon(
+                    step.icon,
+                    color: isHighlighted ? Colors.white : Colors.grey.shade500,
+                    size: 20,
+                  ),
                 ),
                 if (!isLast)
                   Container(
                     width: 2,
                     height: 40,
-                    color: Colors.grey.shade300,
+                    color: step.isCompleted
+                        ? step.color.withValues(alpha: 0.5)
+                        : Colors.grey.shade300,
                   ),
               ],
             ),
             const Gap(12),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(top: 6),
+                padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   step.title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight:
-                        step.isActive ? FontWeight.w600 : FontWeight.w400,
-                    color: step.isCompleted || step.isActive
-                        ? Colors.black
-                        : Colors.grey.shade500,
+                    fontWeight: step.isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: isHighlighted ? Colors.black : Colors.grey.shade500,
                   ),
                 ),
               ),
@@ -332,6 +383,46 @@ class StatusTimeline extends StatelessWidget {
           ],
         );
       }),
+    );
+  }
+}
+
+class _ReportImage extends StatelessWidget {
+  const _ReportImage({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl.isEmpty) {
+      return ColoredBox(
+        color: Colors.grey.shade300,
+        child: const Center(
+          child: Icon(Icons.image, color: Colors.grey, size: 60),
+        ),
+      );
+    }
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => ColoredBox(
+          color: Colors.grey.shade300,
+          child: const Center(
+            child: Icon(Icons.image, color: Colors.grey, size: 60),
+          ),
+        ),
+      );
+    }
+    final file = File(imageUrl);
+    if (file.existsSync()) {
+      return Image.file(file, fit: BoxFit.cover);
+    }
+    return ColoredBox(
+      color: Colors.grey.shade300,
+      child: const Center(
+        child: Icon(Icons.image, color: Colors.grey, size: 60),
+      ),
     );
   }
 }

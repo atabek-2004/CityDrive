@@ -5,10 +5,11 @@ import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/constant/localization/locale_util.dart';
 import 'package:city_drive/src/core/constant/localization/localization.dart';
 import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
-import 'package:city_drive/src/feature/settings/model/app_settings.dart';
 import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 
 class ChooseLanguageBottomSheet extends StatefulWidget {
@@ -33,6 +34,7 @@ class ChooseLanguageBottomSheet extends StatefulWidget {
 
 class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
   late String selectedLanguage;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -43,16 +45,34 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
     selectedLanguage = LocaleUtil.labelFromLocale(locale);
   }
 
-  void _applyLanguage() {
-    final locale = LocaleUtil.localeFromLabel(selectedLanguage);
-    final settings = SettingsScope.settingsOf(context, listen: false);
-    final updated = (settings).copyWith(locale: locale);
+  Future<void> _applyLanguage() async {
+    if (_saving) return;
 
-    SettingsScope.of(context).add(
-      AppSettingsEvent.updateAppSettings(appSettings: updated),
-    );
-    Localization.load(locale);
-    Navigator.of(context).pop();
+    final locale = LocaleUtil.localeFromLabel(selectedLanguage);
+    setState(() => _saving = true);
+
+    try {
+      final updatedUser = await context.repository.profileRepository.editProfile(
+        payload: UserPayload(lang: locale.languageCode),
+      );
+      await context.repository.authRepository.updateStoredUser(updatedUser);
+
+      final settings = SettingsScope.settingsOf(context, listen: false);
+      SettingsScope.of(context).add(
+        AppSettingsEvent.updateAppSettings(
+          appSettings: settings.copyWith(locale: locale),
+        ),
+      );
+      Localization.load(locale);
+
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        Toaster.showErrorTopShortToast(context, e.toString());
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -85,7 +105,9 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
                     final language = LocaleUtil.labels[index];
                     final isSelected = selectedLanguage == language;
                     return GestureDetector(
-                      onTap: () => setState(() => selectedLanguage = language),
+                      onTap: _saving
+                          ? null
+                          : () => setState(() => selectedLanguage = language),
                       child: Container(
                         height: 52,
                         margin: const EdgeInsets.only(bottom: 12),
@@ -115,7 +137,7 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
                 ),
               ),
               CustomButton(
-                onPressed: _applyLanguage,
+                onPressed: _saving ? null : _applyLanguage,
                 style: CustomButtonStyles.mainButtonStyle(context).copyWith(
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(
@@ -127,7 +149,7 @@ class _ChooseLanguageBottomSheetState extends State<ChooseLanguageBottomSheet> {
                   foregroundColor:
                       const WidgetStatePropertyAll(AppColors.white),
                 ),
-                text: l10n.save,
+                text: _saving ? '...' : l10n.save,
                 child: null,
               ),
               const Gap(15),

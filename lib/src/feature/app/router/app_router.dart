@@ -11,6 +11,7 @@ import 'package:city_drive/src/feature/auth/presentation/pages/auth_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/auth_second_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/company_data_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/company_documents_page.dart';
+import 'package:city_drive/src/feature/auth/presentation/pages/pending_approval_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/sign_up_page.dart';
 import 'package:city_drive/src/feature/main/presentation/main_feed.dart';
 import 'package:city_drive/src/feature/main/presentation/pages/my_responses_page.dart';
@@ -71,6 +72,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: CompanyDataRoute.page),
         AutoRoute(page: CompanyDocumentsRoute.page),
         AutoRoute(page: ApplicationSubmittedRoute.page),
+        AutoRoute(page: PendingApprovalRoute.page),
         AutoRoute(page: NotificationRoute.page),
         AutoRoute(page: NotificationsRoute.page),
         AutoRoute(page: ProblemDetailRoute.page),

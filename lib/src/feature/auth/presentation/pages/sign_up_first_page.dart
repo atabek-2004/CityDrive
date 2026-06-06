@@ -515,12 +515,9 @@ class _SignUpFirstPageState extends State<SignUpFirstPage> {
                                     phone: phoneController.text,
                                     passwordConfirmation:
                                         passwordRepeatController.text.trim(),
-
                                     birthDate: _selectedDate.toString(),
-                                    // deviceType:
-                                    //     Platform.isAndroid ? 'android' : 'ios',
-                                    // deviceToken: '',
                                   ),
+                                  role: 'RESIDENT',
                                 );
                               },
                               style: CustomButtonStyles.mainButtonStyle(context)

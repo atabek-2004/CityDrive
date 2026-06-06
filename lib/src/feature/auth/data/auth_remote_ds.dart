@@ -4,6 +4,7 @@ import 'package:city_drive/src/core/rest_client/src/dio_rest_client/rest_client_
 import 'package:city_drive/src/core/utils/talker_logger_util.dart';
 import 'package:city_drive/src/feature/auth/models/common_dto.dart';
 import 'package:city_drive/src/feature/auth/models/common_lists_dto.dart';
+import 'package:city_drive/src/feature/auth/data/api_login_result.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 abstract interface class IAuthRemoteDS {
@@ -26,9 +27,10 @@ abstract interface class IAuthRemoteDS {
     required String? phone,
     required String? password,
     required String? passwordConfirmation,
+    String? role,
   });
 
-  Future<UserDTO> login({
+  Future<ApiLoginResult> login({
     required String phone,
     required String password,
     String? deviceToken,
@@ -69,7 +71,7 @@ abstract interface class IAuthRemoteDS {
     required String deviceToken,
   });
 
-  Future registerVerify({
+  Future<ApiLoginResult> registerVerify({
     required String phone,
     required String code,
   });
@@ -84,7 +86,7 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
   final IRestClient restClient;
 
   @override
-  Future<UserDTO> login({
+  Future<ApiLoginResult> login({
     required String phone,
     required String password,
     String? deviceToken,
@@ -101,7 +103,7 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
         },
       );
 
-      return UserDTO.fromJson(response);
+      return _parseAuthResponse(response);
     } catch (e, st) {
       TalkerLoggerUtil.talker.error('#login - $e', e, st);
       rethrow;
@@ -189,6 +191,7 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
     required String? phone,
     required String? password,
     required String? passwordConfirmation,
+    String? role,
   }) async {
     try {
       final Map<String, dynamic> response = await restClient.post(
@@ -200,10 +203,14 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
           'phone': phone,
           'password': password,
           'password_confirmation': passwordConfirmation,
+          if (role != null) 'role': role,
         },
       );
 
-      return UserDTO.fromJson(response);
+      return UserDTO(
+        phone: response['phone'] as String?,
+        fullName: response['full_name'] as String?,
+      );
     } catch (e, st) {
       TalkerLoggerUtil.talker.error('#registration - $e', e, st);
       rethrow;
@@ -373,19 +380,64 @@ class AuthRemoteDSImpl implements IAuthRemoteDS {
   }
 
   @override
-  Future registerVerify({required String phone, required String code}) async {
+  Future<ApiLoginResult> registerVerify({
+    required String phone,
+    required String code,
+  }) async {
     try {
-      await restClient.post(
-        '/register/verify',
+      final Map<String, dynamic> response = await restClient.post(
+        'register/verify',
         body: {
           'phone': phone,
           'code': code,
         },
       );
+
+      return _parseAuthResponse(response);
     } catch (e, st) {
       TalkerLoggerUtil.talker.error('#registerVerify - $e', e, st);
       rethrow;
     }
+  }
+
+  ApiLoginResult _parseAuthResponse(Map<String, dynamic> response) {
+    final token = response['token'] as String?;
+    final role = response['role'] as String? ?? 'RESIDENT';
+    final isApproved = _parseIsApproved(response);
+
+    final userMap = response['user'] as Map<String, dynamic>?;
+    final userJson = userMap != null
+        ? {
+            ...userMap,
+            if (token != null) 'token': token,
+            'role': role,
+            'isApproved': isApproved,
+          }
+        : {
+            if (response['id'] != null) 'id': response['id'],
+            if (response['full_name'] != null)
+              'full_name': response['full_name'],
+            if (response['phone'] != null) 'phone': response['phone'],
+            if (token != null) 'token': token,
+            'role': role,
+            'isApproved': isApproved,
+          };
+
+    return ApiLoginResult(
+      user: UserDTO.fromJson(userJson),
+      role: role,
+      isApproved: isApproved,
+    );
+  }
+
+  bool _parseIsApproved(Map<String, dynamic> response) {
+    final userMap = response['user'] as Map<String, dynamic>?;
+    final value = response['isApproved'] ??
+        response['is_approved'] ??
+        userMap?['isApproved'] ??
+        userMap?['is_approved'];
+    if (value is bool) return value;
+    return true;
   }
 
   @override

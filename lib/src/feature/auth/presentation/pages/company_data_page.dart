@@ -1,39 +1,65 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
+import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
-import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
+import 'package:city_drive/src/feature/auth/bloc/company_cubit.dart';
+import 'package:city_drive/src/feature/auth/models/company_dto.dart';
 
 @RoutePage()
-class CompanyDataPage extends StatefulWidget {
-  const CompanyDataPage({super.key});
+class CompanyDataPage extends StatefulWidget implements AutoRouteWrapper {
+  const CompanyDataPage({super.key, this.onCompanySaved});
+
+  /// When embedded in [ControllerRegistrationGate], advances the gate instead
+  /// of pushing a duplicate documents route.
+  final VoidCallback? onCompanySaved;
 
   @override
   State<CompanyDataPage> createState() => _CompanyDataPageState();
+
+  @override
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CompanyCubit(
+        repository: context.repository.companyRepository,
+      ),
+      child: this,
+    );
+  }
 }
 
 class _CompanyDataPageState extends State<CompanyDataPage> {
-  final _formKey = GlobalKey<FormState>();
   final _companyNameController = TextEditingController();
   final _binController = TextEditingController();
   final _addressController = TextEditingController();
   final _yearController = TextEditingController();
 
   bool get isFormValid {
-    return _companyNameController.text.isNotEmpty &&
-        _binController.text.isNotEmpty &&
-        _addressController.text.isNotEmpty &&
-        _yearController.text.isNotEmpty;
+    final year = int.tryParse(_yearController.text);
+    final currentYear = DateTime.now().year;
+    return _companyNameController.text.trim().isNotEmpty &&
+        _binController.text.length == 12 &&
+        _addressController.text.trim().isNotEmpty &&
+        year != null &&
+        year >= 1900 &&
+        year <= currentYear;
   }
 
   @override
   void initState() {
     super.initState();
-    _companyNameController.addListener(() => setState(() {}));
-    _binController.addListener(() => setState(() {}));
-    _addressController.addListener(() => setState(() {}));
-    _yearController.addListener(() => setState(() {}));
+    for (final c in [
+      _companyNameController,
+      _binController,
+      _addressController,
+      _yearController,
+    ]) {
+      c.addListener(() => setState(() {}));
+    }
   }
 
   @override
@@ -45,181 +71,162 @@ class _CompanyDataPageState extends State<CompanyDataPage> {
     super.dispose();
   }
 
+  void _submit() {
+    final year = int.parse(_yearController.text);
+    context.read<CompanyCubit>().saveCompany(
+          CompanyRequest(
+            name: _companyNameController.text.trim(),
+            bin: _binController.text.trim(),
+            legalAddress: _addressController.text.trim(),
+            foundedYear: year,
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Заполните данные о компании',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                      
-                        const Text(
-                          'Название компании',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _companyNameController,
-                          
-                          hintText: 'Введите название компании',
-                        ),
-                        const SizedBox(height: 24),
-                        
-    
-                        const Text(
-                          'Бин',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _binController,
-                          hintText: '180540012345',
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(12),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        
-                        // Юридический адрес
-                        const Text(
-                          'Юридический адрес',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _addressController,
-                          hintText: 'г. Алматы, ул. Тимирязева, 42',
-                        ),
-                        const SizedBox(height: 24),
-                        
-                        // Год основания
-                        const Text(
-                          'Год основания',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _yearController,
-                          hintText: '2018',
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(4),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Далее button
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: isFormValid
-                      ? () async {
-                          final userId =
-                              context.repository.authRepository.user?.id;
-                          if (userId != null) {
-                            final repo = context.repository.authRepository;
-                            if (repo is LocalAuthRepository) {
-                              await repo.saveCompany(
-                                userId: userId,
-                                name: _companyNameController.text.trim(),
-                                bin: _binController.text.trim(),
-                                address: _addressController.text.trim(),
-                                foundedYear: _yearController.text.trim(),
-                              );
-                            }
-                          }
-                          if (!context.mounted) return;
-                          context.router.push(CompanyDocumentsRoute());
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4A9EFF),
-                    disabledBackgroundColor: const Color(0xFF4A9EFF).withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Далее',
+    return LoaderOverlay(
+      overlayWidgetBuilder: (_) => const CustomLoadingOverlayWidget(),
+      child: BlocListener<CompanyCubit, CompanyState>(
+        listener: (context, state) {
+          state.maybeWhen(
+            loading: () => context.loaderOverlay.show(),
+            companySaved: (_) {
+              context.loaderOverlay.hide();
+              final onSaved = widget.onCompanySaved;
+              if (onSaved != null) {
+                onSaved();
+              } else {
+                context.router.replace(CompanyDocumentsRoute());
+              }
+            },
+            error: (message) {
+              context.loaderOverlay.hide();
+              Toaster.showErrorTopShortToast(context, message);
+            },
+            orElse: () => context.loaderOverlay.hide(),
+          );
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => context.router.maybePop(),
+            ),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Заполните данные о компании',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 32),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _fieldLabel('Название компании'),
+                          _CompanyTextField(
+                            controller: _companyNameController,
+                            hintText: 'Введите название компании',
+                          ),
+                          const SizedBox(height: 24),
+                          _fieldLabel('БИН'),
+                          _CompanyTextField(
+                            controller: _binController,
+                            hintText: '180540012345',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(12),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          _fieldLabel('Юридический адрес'),
+                          _CompanyTextField(
+                            controller: _addressController,
+                            hintText: 'г. Алматы, ул. Тимирязева, 42',
+                          ),
+                          const SizedBox(height: 24),
+                          _fieldLabel('Год основания'),
+                          _CompanyTextField(
+                            controller: _yearController,
+                            hintText: '2018',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: isFormValid ? _submit : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4A9EFF),
+                        disabledBackgroundColor:
+                            const Color(0xFF4A9EFF).withValues(alpha: 0.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Далее',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _fieldLabel(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 16, color: Colors.black87),
+        ),
+      );
 }
 
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hintText;
-  final TextInputType? keyboardType;
-  final List<TextInputFormatter>? inputFormatters;
-
-  const CustomTextField({
-    super.key,
+class _CompanyTextField extends StatelessWidget {
+  const _CompanyTextField({
     required this.controller,
     required this.hintText,
     this.keyboardType,
     this.inputFormatters,
   });
+
+  final TextEditingController controller;
+  final String hintText;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -229,34 +236,16 @@ class CustomTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
-        
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
-        ),
         decoration: InputDecoration(
-          
           hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 16,
-            color: Colors.grey.shade500,
-          ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 18,
           ),
           border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: Color(0xFF4A9EFF),
-              width: 2,
-            ),
-          ),
         ),
       ),
     );

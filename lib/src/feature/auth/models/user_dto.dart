@@ -18,6 +18,8 @@ class UserDTO with _$UserDTO {
     String? phone,
     String? password,
     String? token,
+    String? role,
+    @JsonKey(name: 'isApproved') bool? isApproved,
     @JsonKey(name: 'device_token') String? deviceToken,
     @JsonKey(name: 'device_type') String? deviceType,
     @JsonKey(name: 'created_at') DateTime? createdAt,

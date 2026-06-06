@@ -36,6 +36,8 @@ mixin _$UserPayload {
   String? get deviceType => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false, name: 'device_token')
   String? get deviceToken => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get lang => throw _privateConstructorUsedError;
 
   /// Serializes this UserPayload to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -62,8 +64,8 @@ abstract class $UserPayloadCopyWith<$Res> {
       @JsonKey(includeIfNull: false, name: 'password_confirmation')
       String? passwordConfirmation,
       @JsonKey(includeIfNull: false, name: 'device_type') String? deviceType,
-      @JsonKey(includeIfNull: false, name: 'device_token')
-      String? deviceToken});
+      @JsonKey(includeIfNull: false, name: 'device_token') String? deviceToken,
+      @JsonKey(includeIfNull: false) String? lang});
 }
 
 /// @nodoc
@@ -89,6 +91,7 @@ class _$UserPayloadCopyWithImpl<$Res, $Val extends UserPayload>
     Object? passwordConfirmation = freezed,
     Object? deviceType = freezed,
     Object? deviceToken = freezed,
+    Object? lang = freezed,
   }) {
     return _then(_value.copyWith(
       fullName: freezed == fullName
@@ -123,6 +126,10 @@ class _$UserPayloadCopyWithImpl<$Res, $Val extends UserPayload>
           ? _value.deviceToken
           : deviceToken // ignore: cast_nullable_to_non_nullable
               as String?,
+      lang: freezed == lang
+          ? _value.lang
+          : lang // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -144,8 +151,8 @@ abstract class _$$UserPayloadImplCopyWith<$Res>
       @JsonKey(includeIfNull: false, name: 'password_confirmation')
       String? passwordConfirmation,
       @JsonKey(includeIfNull: false, name: 'device_type') String? deviceType,
-      @JsonKey(includeIfNull: false, name: 'device_token')
-      String? deviceToken});
+      @JsonKey(includeIfNull: false, name: 'device_token') String? deviceToken,
+      @JsonKey(includeIfNull: false) String? lang});
 }
 
 /// @nodoc
@@ -169,6 +176,7 @@ class __$$UserPayloadImplCopyWithImpl<$Res>
     Object? passwordConfirmation = freezed,
     Object? deviceType = freezed,
     Object? deviceToken = freezed,
+    Object? lang = freezed,
   }) {
     return _then(_$UserPayloadImpl(
       fullName: freezed == fullName
@@ -203,6 +211,10 @@ class __$$UserPayloadImplCopyWithImpl<$Res>
           ? _value.deviceToken
           : deviceToken // ignore: cast_nullable_to_non_nullable
               as String?,
+      lang: freezed == lang
+          ? _value.lang
+          : lang // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -219,7 +231,8 @@ class _$UserPayloadImpl implements _UserPayload {
       @JsonKey(includeIfNull: false, name: 'password_confirmation')
       this.passwordConfirmation,
       @JsonKey(includeIfNull: false, name: 'device_type') this.deviceType,
-      @JsonKey(includeIfNull: false, name: 'device_token') this.deviceToken});
+      @JsonKey(includeIfNull: false, name: 'device_token') this.deviceToken,
+      @JsonKey(includeIfNull: false) this.lang});
 
   factory _$UserPayloadImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserPayloadImplFromJson(json);
@@ -248,10 +261,13 @@ class _$UserPayloadImpl implements _UserPayload {
   @override
   @JsonKey(includeIfNull: false, name: 'device_token')
   final String? deviceToken;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? lang;
 
   @override
   String toString() {
-    return 'UserPayload(fullName: $fullName, birthDate: $birthDate, cityId: $cityId, phone: $phone, password: $password, passwordConfirmation: $passwordConfirmation, deviceType: $deviceType, deviceToken: $deviceToken)';
+    return 'UserPayload(fullName: $fullName, birthDate: $birthDate, cityId: $cityId, phone: $phone, password: $password, passwordConfirmation: $passwordConfirmation, deviceType: $deviceType, deviceToken: $deviceToken, lang: $lang)';
   }
 
   @override
@@ -272,13 +288,14 @@ class _$UserPayloadImpl implements _UserPayload {
             (identical(other.deviceType, deviceType) ||
                 other.deviceType == deviceType) &&
             (identical(other.deviceToken, deviceToken) ||
-                other.deviceToken == deviceToken));
+                other.deviceToken == deviceToken) &&
+            (identical(other.lang, lang) || other.lang == lang));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, fullName, birthDate, cityId,
-      phone, password, passwordConfirmation, deviceType, deviceToken);
+      phone, password, passwordConfirmation, deviceType, deviceToken, lang);
 
   /// Create a copy of UserPayload
   /// with the given fields replaced by the non-null parameter values.
@@ -309,7 +326,8 @@ abstract class _UserPayload implements UserPayload {
       @JsonKey(includeIfNull: false, name: 'device_type')
       final String? deviceType,
       @JsonKey(includeIfNull: false, name: 'device_token')
-      final String? deviceToken}) = _$UserPayloadImpl;
+      final String? deviceToken,
+      @JsonKey(includeIfNull: false) final String? lang}) = _$UserPayloadImpl;
 
   factory _UserPayload.fromJson(Map<String, dynamic> json) =
       _$UserPayloadImpl.fromJson;
@@ -338,6 +356,9 @@ abstract class _UserPayload implements UserPayload {
   @override
   @JsonKey(includeIfNull: false, name: 'device_token')
   String? get deviceToken;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get lang;
 
   /// Create a copy of UserPayload
   /// with the given fields replaced by the non-null parameter values.

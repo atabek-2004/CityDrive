@@ -36,6 +36,9 @@ mixin _$UserDTO {
   String? get phone => throw _privateConstructorUsedError;
   String? get password => throw _privateConstructorUsedError;
   String? get token => throw _privateConstructorUsedError;
+  String? get role => throw _privateConstructorUsedError;
+  @JsonKey(name: 'isApproved')
+  bool? get isApproved => throw _privateConstructorUsedError;
   @JsonKey(name: 'device_token')
   String? get deviceToken => throw _privateConstructorUsedError;
   @JsonKey(name: 'device_type')
@@ -71,6 +74,8 @@ abstract class $UserDTOCopyWith<$Res> {
       String? phone,
       String? password,
       String? token,
+      String? role,
+      @JsonKey(name: 'isApproved') bool? isApproved,
       @JsonKey(name: 'device_token') String? deviceToken,
       @JsonKey(name: 'device_type') String? deviceType,
       @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -103,6 +108,8 @@ class _$UserDTOCopyWithImpl<$Res, $Val extends UserDTO>
     Object? phone = freezed,
     Object? password = freezed,
     Object? token = freezed,
+    Object? role = freezed,
+    Object? isApproved = freezed,
     Object? deviceToken = freezed,
     Object? deviceType = freezed,
     Object? createdAt = freezed,
@@ -153,6 +160,14 @@ class _$UserDTOCopyWithImpl<$Res, $Val extends UserDTO>
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
               as String?,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isApproved: freezed == isApproved
+          ? _value.isApproved
+          : isApproved // ignore: cast_nullable_to_non_nullable
+              as bool?,
       deviceToken: freezed == deviceToken
           ? _value.deviceToken
           : deviceToken // ignore: cast_nullable_to_non_nullable
@@ -192,6 +207,8 @@ abstract class _$$UserDTOImplCopyWith<$Res> implements $UserDTOCopyWith<$Res> {
       String? phone,
       String? password,
       String? token,
+      String? role,
+      @JsonKey(name: 'isApproved') bool? isApproved,
       @JsonKey(name: 'device_token') String? deviceToken,
       @JsonKey(name: 'device_type') String? deviceType,
       @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -222,6 +239,8 @@ class __$$UserDTOImplCopyWithImpl<$Res>
     Object? phone = freezed,
     Object? password = freezed,
     Object? token = freezed,
+    Object? role = freezed,
+    Object? isApproved = freezed,
     Object? deviceToken = freezed,
     Object? deviceType = freezed,
     Object? createdAt = freezed,
@@ -272,6 +291,14 @@ class __$$UserDTOImplCopyWithImpl<$Res>
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
               as String?,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isApproved: freezed == isApproved
+          ? _value.isApproved
+          : isApproved // ignore: cast_nullable_to_non_nullable
+              as bool?,
       deviceToken: freezed == deviceToken
           ? _value.deviceToken
           : deviceToken // ignore: cast_nullable_to_non_nullable
@@ -307,6 +334,8 @@ class _$UserDTOImpl implements _UserDTO {
       this.phone,
       this.password,
       this.token,
+      this.role,
+      @JsonKey(name: 'isApproved') this.isApproved,
       @JsonKey(name: 'device_token') this.deviceToken,
       @JsonKey(name: 'device_type') this.deviceType,
       @JsonKey(name: 'created_at') this.createdAt,
@@ -343,6 +372,11 @@ class _$UserDTOImpl implements _UserDTO {
   @override
   final String? token;
   @override
+  final String? role;
+  @override
+  @JsonKey(name: 'isApproved')
+  final bool? isApproved;
+  @override
   @JsonKey(name: 'device_token')
   final String? deviceToken;
   @override
@@ -357,7 +391,7 @@ class _$UserDTOImpl implements _UserDTO {
 
   @override
   String toString() {
-    return 'UserDTO(message: $message, lang: $lang, id: $id, fullName: $fullName, avatarUrl: $avatarUrl, birthDate: $birthDate, passwordConfirmation: $passwordConfirmation, cityId: $cityId, phone: $phone, password: $password, token: $token, deviceToken: $deviceToken, deviceType: $deviceType, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserDTO(message: $message, lang: $lang, id: $id, fullName: $fullName, avatarUrl: $avatarUrl, birthDate: $birthDate, passwordConfirmation: $passwordConfirmation, cityId: $cityId, phone: $phone, password: $password, token: $token, role: $role, isApproved: $isApproved, deviceToken: $deviceToken, deviceType: $deviceType, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -381,6 +415,9 @@ class _$UserDTOImpl implements _UserDTO {
             (identical(other.password, password) ||
                 other.password == password) &&
             (identical(other.token, token) || other.token == token) &&
+            (identical(other.role, role) || other.role == role) &&
+            (identical(other.isApproved, isApproved) ||
+                other.isApproved == isApproved) &&
             (identical(other.deviceToken, deviceToken) ||
                 other.deviceToken == deviceToken) &&
             (identical(other.deviceType, deviceType) ||
@@ -406,6 +443,8 @@ class _$UserDTOImpl implements _UserDTO {
       phone,
       password,
       token,
+      role,
+      isApproved,
       deviceToken,
       deviceType,
       createdAt,
@@ -441,6 +480,8 @@ abstract class _UserDTO implements UserDTO {
       final String? phone,
       final String? password,
       final String? token,
+      final String? role,
+      @JsonKey(name: 'isApproved') final bool? isApproved,
       @JsonKey(name: 'device_token') final String? deviceToken,
       @JsonKey(name: 'device_type') final String? deviceType,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
@@ -475,6 +516,11 @@ abstract class _UserDTO implements UserDTO {
   String? get password;
   @override
   String? get token;
+  @override
+  String? get role;
+  @override
+  @JsonKey(name: 'isApproved')
+  bool? get isApproved;
   @override
   @JsonKey(name: 'device_token')
   String? get deviceToken;

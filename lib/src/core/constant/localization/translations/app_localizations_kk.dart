@@ -1016,6 +1016,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get cityDriveUnderReview => 'Қаралуда';
 
   @override
+  String get cityDriveOnVerification => 'Тексеруде';
+
+  @override
   String cityDriveFromAuthor(String author) {
     return 'Кімнен: $author';
   }
@@ -1176,6 +1179,11 @@ class AppLocalizationsKk extends AppLocalizations {
   String get cityDriveViewInMyWorks => 'Менің жұмыстарымда көру';
 
   @override
+  String cityDriveAssignedTo(String name) {
+    return 'Орындаушы: $name';
+  }
+
+  @override
   String get cityDriveAnnouncement => 'Хабарландыру';
 
   @override
@@ -1231,6 +1239,17 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get cityDriveReportPublished => 'Есеп сәтті жарияланды!';
+
+  @override
+  String get cityDriveReportSubmittedPending =>
+      'Өтінім жіберілді, тексеруді күтуде';
+
+  @override
+  String get cityDriveReportSubmitAlertTitle => 'Өтінім жіберілді';
+
+  @override
+  String get cityDriveReportSubmitAlertMessage =>
+      'Сіздің хабарламаңыз жіберілді және жауапты мамандар тексеруде. Оң шешім қабылданса, сұрауыңыз қабылданады.';
 
   @override
   String get cityDriveConfirm => 'Растау';

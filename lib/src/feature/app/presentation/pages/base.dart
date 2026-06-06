@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +8,14 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/rest_client_dio.dart';
+import 'package:city_drive/src/feature/app/logic/admin_updates_polling_service.dart';
 import 'package:city_drive/src/feature/app/presentation/widgets/base_tabs.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/main/bloc/news_provider.dart';
+import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/search/data/road_problem_remote_ds.dart';
+import 'package:provider/provider.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
@@ -27,10 +35,29 @@ class _BaseState extends State<Base> with TickerProviderStateMixin {
       length: 4,
       vsync: this,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!context.repository.authRepository.isAuthenticated) return;
+
+      final dio = (context.repository.restClient as RestClientDio).dioClient.dio;
+      AdminUpdatesPollingService.instance.configure(
+        marksRemote: RoadProblemRemoteDS(dio),
+        newsRemote: context.repository.newsRemoteDS,
+      );
+      AdminUpdatesPollingService.instance.onPollTick = () {
+        if (!mounted) return;
+        unawaited(context.read<RoadProblemsProvider>().refreshSilently());
+        unawaited(context.read<NewsProvider>().refreshSilently());
+      };
+      AdminUpdatesPollingService.instance.start();
+    });
   }
 
   @override
   void dispose() {
+    AdminUpdatesPollingService.instance.onPollTick = null;
+    AdminUpdatesPollingService.instance.stop();
     _tabController.dispose();
     super.dispose();
   }
@@ -193,6 +220,10 @@ class _BaseBottomNavbarState extends State<BaseBottomNavbar> {
           } else {
             widget.tabController.index = value;
             widget.tabsRouter.setActiveIndex(value);
+          }
+          // Вкладка «Карта» (index 1) — обновить marks + marks/mine
+          if (value == 1) {
+            context.read<RoadProblemsProvider>().load();
           }
         },
         tabs: [

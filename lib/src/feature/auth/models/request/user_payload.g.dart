@@ -16,6 +16,7 @@ _$UserPayloadImpl _$$UserPayloadImplFromJson(Map<String, dynamic> json) =>
       passwordConfirmation: json['password_confirmation'] as String?,
       deviceType: json['device_type'] as String?,
       deviceToken: json['device_token'] as String?,
+      lang: json['lang'] as String?,
     );
 
 Map<String, dynamic> _$$UserPayloadImplToJson(_$UserPayloadImpl instance) =>
@@ -29,4 +30,5 @@ Map<String, dynamic> _$$UserPayloadImplToJson(_$UserPayloadImpl instance) =>
         'password_confirmation': value,
       if (instance.deviceType case final value?) 'device_type': value,
       if (instance.deviceToken case final value?) 'device_token': value,
+      if (instance.lang case final value?) 'lang': value,
     };

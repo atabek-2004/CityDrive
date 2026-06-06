@@ -1016,6 +1016,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cityDriveUnderReview => 'На рассмотрении';
 
   @override
+  String get cityDriveOnVerification => 'На проверке';
+
+  @override
   String cityDriveFromAuthor(String author) {
     return 'От: $author';
   }
@@ -1096,7 +1099,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cityDriveStatusOpen => 'Открыто';
 
   @override
-  String get cityDriveStatusAccepted => 'Принято';
+  String get cityDriveStatusAccepted => 'Принята';
 
   @override
   String get cityDriveStatusInWork => 'В работе';
@@ -1176,6 +1179,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cityDriveViewInMyWorks => 'Посмотреть в Мои работы';
 
   @override
+  String cityDriveAssignedTo(String name) {
+    return 'Исполнитель: $name';
+  }
+
+  @override
   String get cityDriveAnnouncement => 'Объявление';
 
   @override
@@ -1231,6 +1239,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cityDriveReportPublished => 'Отчет успешно опубликован!';
+
+  @override
+  String get cityDriveReportSubmittedPending =>
+      'Заявка отправлена и ожидает проверки';
+
+  @override
+  String get cityDriveReportSubmitAlertTitle => 'Заявка отправлена';
+
+  @override
+  String get cityDriveReportSubmitAlertMessage =>
+      'Ваша отметка принята на рассмотрение в админ-панели. После проверки администратором вы получите push-уведомление, а отметка появится на карте для всех пользователей.';
 
   @override
   String get cityDriveConfirm => 'Подтвердить';

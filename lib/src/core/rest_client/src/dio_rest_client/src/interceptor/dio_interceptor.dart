@@ -56,6 +56,8 @@ class DioInterceptor extends Interceptor {
       case HttpStatus.notFound:
         return ((error.response?.data as Map<String, dynamic>)['message'] as String?) ??
             'The content you are looking for has not been found!';
+      case HttpStatus.forbidden:
+        return 'Нет доступа. Комментарии и лайки доступны только для одобренных отметок (confirmed / in_progress / fixed). Если отметка уже одобрена — попросите бэкендера открыить POST /marks/{id}/comments для роли RESIDENT.';
       // return 'The content you are looking for has not been found!';
       case HttpStatus.requestEntityTooLarge:
         return 'Request Entity Too Large';

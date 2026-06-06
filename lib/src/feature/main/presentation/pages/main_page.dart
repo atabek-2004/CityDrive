@@ -4,30 +4,16 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:city_drive/src/core/constant/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
-import 'package:city_drive/src/core/presentation/widgets/buttons/custom_material_button.dart';
-import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
 import 'package:city_drive/src/core/presentation/widgets/scroll/pull_to_refresh_widgets.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
-import 'package:city_drive/src/core/utils/image_util.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/main/bloc/news_provider.dart';
+import 'package:city_drive/src/feature/main/model/news_dto.dart';
+import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-class NewsDTO {
-  final String title;
-  final String description;
-  final String imageUrl;
-  final String createdAt;
-
-  NewsDTO({
-    required this.title,
-    required this.description,
-    required this.imageUrl,
-    required this.createdAt,
-  });
-}
 
 @RoutePage()
 class MainPageFirst extends StatefulWidget implements AutoRouteWrapper {
@@ -44,39 +30,18 @@ class _MainPageFirstState extends State<MainPageFirst> {
   final RefreshController _refreshController = RefreshController();
   int currentIndex = 0;
 
-  final colors = [
-    const Color(0xFF90D72F),
-    const Color(0xFFFAAD14),
-    const Color(0xFF91D5FF),
-  ];
-
-  final news = [
-    NewsDTO(
-      title: 'Ремонт улицы Абая',
-      description:
-          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая полоса',
-      imageUrl: Assets.images.png.news.path,
-      createdAt: '2 дня назад',
-    ),
-    NewsDTO(
-      title: 'Ремонт улицы Абая',
-      description:
-          'Ремонт улицы Абая с 15 по 30 ноября перекрыта правая полоса',
-      imageUrl: Assets.images.png.news.path,
-      createdAt: '2 дня назад',
-    ),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   final images = [
     Assets.images.png.onBoardThree.path,
     Assets.images.png.onboardTwo.path,
     Assets.images.png.onboardOne.path,
   ];
+
+  Future<void> _onRefresh() async {
+    await context.read<NewsProvider>().load();
+    if (mounted) {
+      _refreshController.refreshCompleted();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +49,11 @@ class _MainPageFirstState extends State<MainPageFirst> {
       child: SmartRefresher(
         header: const RefreshClassicHeader(),
         controller: _refreshController,
-        onRefresh: () {
-          _refreshController.refreshCompleted();
-        },
+        onRefresh: _onRefresh,
         child: CustomScrollView(
           slivers: [
             SliverList.list(
               children: [
-                /// Header (images)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -114,94 +76,39 @@ class _MainPageFirstState extends State<MainPageFirst> {
                     ],
                   ),
                 ),
-
                 const Gap(8),
-
-                /// Баннер
                 Container(
                   height: 175,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(22),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Stack(
-                    children: [
-                      CarouselSlider(
-                        options: CarouselOptions(
-                          autoPlay: true,
-                          height: double.infinity,
-                          viewportFraction: 1,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              currentIndex = index;
-                            });
-                          },
-                        ),
-                        items: images
-                            .map(
-                              (item) => ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Image.asset(
-                                  item,
-                                  fit: BoxFit.contain,
-                                  width: double.infinity,
-                                  height: 430,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                      // if (currentIndex == 0)
-                      //   Padding(
-                      //     padding: const EdgeInsets.symmetric(
-                      //         horizontal: 16),
-                      //     child: Column(
-                      //       crossAxisAlignment:
-                      //           CrossAxisAlignment.start,
-                      //       mainAxisAlignment:
-                      //           MainAxisAlignment.spaceAround,
-                      //       children: [
-                      //         Text(
-                      //           'Абонемент\n1-6-9-12\nмесяцев(0–16 лет)',
-                      //           style: AppTextStyles
-                      //               .title20BoldW600
-                      //               .copyWith(
-                      //                   color:
-                      //                       AppColors.white),
-                      //         ),
-                      //         Container(
-                      //           width: 152,
-                      //           height: 40,
-                      //           decoration: BoxDecoration(
-                      //             color: AppColors.white,
-                      //             borderRadius:
-                      //                 BorderRadius.circular(
-                      //                     16),
-                      //           ),
-                      //           child: CustomMaterialButton(
-                      //             onTap: () {
-                      //               context.router.push(
-                      //                   const SubscriptionRoute());
-                      //             },
-                      //             child: Center(
-                      //               child: Text(
-                      //                 'Купить абонемент',
-                      //                 style: AppTextStyles
-                      //                     .body14w500
-                      //                     .copyWith(
-                      //                         color: AppColors
-                      //                             .black000000),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                    ],
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      height: double.infinity,
+                      viewportFraction: 1,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                    ),
+                    items: images
+                        .map(
+                          (item) => ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              item,
+                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: 430,
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
-
                 const Gap(8),
                 DotsIndicator(
                   dotsCount: images.length,
@@ -212,109 +119,60 @@ class _MainPageFirstState extends State<MainPageFirst> {
                     color: AppColors.greyText,
                   ),
                 ),
-
-                // new centers
-
                 const Gap(44),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.localized.cityDriveNews,
-                        style: AppTextStyles.fs18w600.copyWith(
-                          color: AppColors.text090909,
-                        ),
-                      ),
-                      const SizedBox.shrink(),
-                    ],
+                  child: Text(
+                    context.localized.cityDriveNews,
+                    style: AppTextStyles.fs18w600.copyWith(
+                      color: AppColors.text090909,
+                    ),
                   ),
                 ),
-
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: news.length,
-                  itemBuilder: (context, index) {
-                    final item = news[index];
-                    return Column(
-                      children: [
-                        const Gap(10),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(8),
-                                ),
-                                child: Image.asset(
-                                  item.imageUrl,
-                                  width: double.infinity,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: double.infinity,
-                                      height: 200,
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.image, size: 50),
-                                    );
-                                  },
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    const Gap(8),
-                                    Text(
-                                      item.description,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[600],
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const Gap(12),
-                                    Text(
-                                      item.createdAt,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[500],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                Consumer<NewsProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading && provider.items.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (provider.loadError != null && provider.items.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          provider.loadError!,
+                          style: TextStyle(color: Colors.grey[600]),
                         ),
-                      ],
+                      );
+                    }
+                    if (provider.items.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          context.localized.emptyHereForNow,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: provider.items.length,
+                      itemBuilder: (context, index) {
+                        final item = provider.items[index];
+                        return _NewsCard(
+                          item: item,
+                          dateLabel: publishedLabel(
+                            context.localized,
+                            item.publishedAt,
+                          ),
+                        );
+                      },
                     );
                   },
-                )
+                ),
               ],
             ),
           ],
@@ -322,37 +180,110 @@ class _MainPageFirstState extends State<MainPageFirst> {
       ),
     );
   }
+}
 
-  Widget categoryContaeyner(
-      {required String icon, required String text, required Color color}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: color,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Image.asset(icon, width: 46, height: 46),
-          const Gap(15),
-          Text(
-            text,
-            style: AppTextStyles.body12w400.copyWith(
-              color: AppColors.text1D1D21,
-            ),
+class _NewsCard extends StatelessWidget {
+  const _NewsCard({
+    required this.item,
+    required this.dateLabel,
+  });
+
+  final NewsDTO item;
+  final String dateLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Gap(10),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+                child: _NewsImage(imageUrl: item.imageUrl),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const Gap(8),
+                    Text(
+                      item.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                    const Gap(12),
+                    Text(
+                      dateLabel,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
+}
 
-  Color hexToColor(String hex) {
-    hex = hex.replaceFirst('#', '');
-    if (hex.length == 6) {
-      hex = 'FF$hex';
+class _NewsImage extends StatelessWidget {
+  const _NewsImage({this.imageUrl});
+
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = Size(double.infinity, 200);
+    final fallback = Image.asset(
+      Assets.images.png.news.path,
+      width: size.width,
+      height: size.height,
+      fit: BoxFit.cover,
+    );
+
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return fallback;
     }
-    return Color(int.parse(hex, radix: 16));
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl!,
+      width: size.width,
+      height: size.height,
+      fit: BoxFit.cover,
+      placeholder: (_, __) => fallback,
+      errorWidget: (_, __, ___) => fallback,
+    );
   }
 }

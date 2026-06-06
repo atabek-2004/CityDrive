@@ -10,6 +10,7 @@ class DocumentDTO with _$DocumentDTO {
   const factory DocumentDTO({
     int? id,
     String? title,
+    String? url,
     String? content,
     String? type,
     @JsonKey(name: 'created_at') String? createdAt,

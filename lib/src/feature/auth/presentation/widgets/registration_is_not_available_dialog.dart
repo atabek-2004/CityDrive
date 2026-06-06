@@ -28,7 +28,11 @@ class _RegisterIsNotAvailableDialogState
       content: Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: Text(
-          'Регистрация недоступна\nРегистрация доступна только пользователям старше 18 лет.',
+          'Регистрация в приложении отключена.\n\n'
+          'Войдите с тестовым аккаунтом:\n'
+          '• житель: +77001111111 / resident1\n'
+          '• контролёр: +77002222222 / controller1\n\n'
+          'Новых пользователей добавляет админ на ноутбуке с backend.',
           textAlign: TextAlign.center,
           style: AppTextStyles.body17w600.copyWith(color: AppColors.black000000),
         ),

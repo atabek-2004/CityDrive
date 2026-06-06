@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:city_drive/src/feature/auth/models/common_dto.dart';
 import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 import 'package:city_drive/src/feature/profile/data/profile_remote_ds.dart';
 import 'package:city_drive/src/feature/profile/models/document_dto.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,7 +37,9 @@ abstract interface class IProfileRepository {
     XFile? imageFile,
   });
 
-  Future<List<DocumentDTO>> getDocuments();
+  Future<BasicResponse> logOut();
+
+  Future<List<DocumentDTO>> getDocuments({required String languageCode});
 
   // Future scanDocument({
   //   String? iin,
@@ -159,9 +162,18 @@ class ProfileRepositoryImpl implements IProfileRepository {
   }
 
   @override
-  Future<List<DocumentDTO>> getDocuments() async {
+  Future<List<DocumentDTO>> getDocuments({required String languageCode}) async {
     try {
-      return await _remoteDS.getDocuments();
+      return await _remoteDS.getDocuments(languageCode: languageCode);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<BasicResponse> logOut() async {
+    try {
+      return await _remoteDS.logOut();
     } catch (e) {
       rethrow;
     }

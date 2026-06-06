@@ -14,8 +14,10 @@ import 'package:city_drive/src/core/local_storage/user_role.dart';
 import 'package:city_drive/src/feature/app/presentation/pages/base.dart';
 import 'package:city_drive/src/feature/app/presentation/pages/base_second.dart';
 import 'package:city_drive/src/feature/app/presentation/pages/force_update_page.dart';
-import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
+import 'package:city_drive/src/feature/auth/data/backend_auth_repository.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/auth_page.dart';
+import 'package:city_drive/src/feature/auth/presentation/pages/pending_approval_page.dart';
+import 'package:city_drive/src/feature/auth/presentation/widgets/controller_registration_gate.dart';
 
 
 @RoutePage(name: 'LauncherRoute')
@@ -37,8 +39,14 @@ class _LauncherState extends State<Launcher> with WidgetsBindingObserver {
         authDao: context.repository.authDao,
       );
       final auth = context.repository.authRepository;
-      if (auth is LocalAuthRepository) {
+      if (auth is BackendAuthRepository) {
         await auth.restoreSessionRole();
+      }
+      final user = context.repository.authRepository.user;
+      if (context.repository.authRepository.isAuthenticated &&
+          context.repository.authRepository.isApproved &&
+          user != null) {
+        BlocProvider.of<AppBloc>(context).add(AppEvent.logining(user: user));
       }
     });
 
@@ -88,6 +96,14 @@ class _LauncherState extends State<Launcher> with WidgetsBindingObserver {
             onTap: () async {},
           ),
           inApp: () {
+            if (!context.repository.authRepository.isApproved) {
+              final role = context.repository.sessionRepository.currentRole;
+              if (role == UserRole.controller) {
+                return const ControllerRegistrationGate();
+              }
+              return const PendingApprovalPage();
+            }
+
             final role = context.repository.sessionRepository.currentRole;
             if (role == UserRole.controller) {
               return const BaseSecondPage();

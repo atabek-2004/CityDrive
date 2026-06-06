@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,7 +12,10 @@ import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
+import 'package:city_drive/src/core/utils/map_status_marker_icon.dart';
 import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -28,11 +30,13 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   GoogleMapController? _mapController;
-  final Completer<GoogleMapController> _controllerCompleter = Completer();
+  Completer<GoogleMapController> _controllerCompleter =
+      Completer<GoogleMapController>();
 
   Set<Marker> _markers = {};
   RoadProblemDTO? _selectedProblem;
   double _currentZoom = 14.0;
+  int _markerZoomBucket = MapStatusMarkerIcon.zoomBucket(14.0);
   List<RoadProblemDTO> _problems = [];
 
   bool _showCameraButton = false;
@@ -40,11 +44,70 @@ class _MapPageState extends State<MapPage> {
   RoadProblemsProvider? _problemsProvider;
   bool _listenerAttached = false;
   bool _mapActive = true;
+  TabsRouter? _tabsRouter;
+  int? _mapTabIndex;
 
   static const CameraPosition _initialCamera = CameraPosition(
     target: LatLng(43.238949, 76.889709),
     zoom: 14,
   );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final tabsRouter = TabsRouterScope.of(context)?.controller;
+    if (tabsRouter == null) return;
+
+    _mapTabIndex ??= _resolveMapTabIndex(tabsRouter);
+    if (_tabsRouter != tabsRouter) {
+      _tabsRouter?.removeListener(_onTabsChanged);
+      _tabsRouter = tabsRouter;
+      _tabsRouter!.addListener(_onTabsChanged);
+    }
+    _syncMapVisibility();
+  }
+
+  int _resolveMapTabIndex(TabsRouter tabsRouter) {
+    for (var i = 0; i < tabsRouter.pageCount; i++) {
+      if (tabsRouter.stackRouterOfIndex(i)?.current.name == MapRoute.name) {
+        return i;
+      }
+    }
+    return 1;
+  }
+
+  bool get _isMapTabVisible {
+    final tabsRouter = _tabsRouter;
+    final mapIndex = _mapTabIndex;
+    if (tabsRouter == null || mapIndex == null) return _mapActive;
+    return tabsRouter.activeIndex == mapIndex;
+  }
+
+  void _onTabsChanged() => _syncMapVisibility();
+
+  void _syncMapVisibility() {
+    final visible = _isMapTabVisible;
+    if (visible == _mapActive) return;
+
+    _mapActive = visible;
+    if (!visible) {
+      _teardownMapPlatform();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _mapActive) _loadProblems();
+      });
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _teardownMapPlatform() {
+    _mapController?.dispose();
+    _mapController = null;
+    _controllerCompleter = Completer<GoogleMapController>();
+    _markers = {};
+  }
+
+  bool get _canUpdateMap => mounted && _mapActive && _isMapTabVisible;
 
   @override
   void initState() {
@@ -53,22 +116,20 @@ class _MapPageState extends State<MapPage> {
       if (!mounted) return;
       _problemsProvider = context.read<RoadProblemsProvider>();
       _attachListener();
-      _loadProblems();
+      if (_canUpdateMap) _loadProblems();
     });
   }
 
   @override
   void activate() {
     super.activate();
-    _mapActive = true;
     _attachListener();
-    if (mounted) _loadProblems();
+    _syncMapVisibility();
   }
 
   @override
   void deactivate() {
-    _mapActive = false;
-    _detachListener();
+    _teardownMapPlatform();
     super.deactivate();
   }
 
@@ -86,74 +147,85 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _onProblemsUpdated() {
-    if (!mounted || !_mapActive || _problemsProvider == null) return;
+    if (!_canUpdateMap || _problemsProvider == null) return;
 
     final problems = _problemsProvider!.problems;
-    final newMarkers = _buildMarkers(problems);
+    unawaited(_applyMarkers(problems));
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_mapActive) return;
-      setState(() {
-        _problems = problems;
-        _markers = newMarkers;
-      });
+  Future<void> _applyMarkers(List<RoadProblemDTO> problems) async {
+    if (!_canUpdateMap) return;
+    final newMarkers = await _buildMarkers(problems);
+    if (!_canUpdateMap) return;
+    setState(() {
+      _problems = problems;
+      _markers = newMarkers;
     });
   }
 
-  void _loadProblems() {
-    if (!mounted || !_mapActive) return;
+  Future<void> _loadProblems() async {
+    if (!_canUpdateMap) return;
     final provider = _problemsProvider ?? context.read<RoadProblemsProvider>();
-    provider.load();
+    await provider.load();
+    if (!_canUpdateMap) return;
+    if (provider.loadError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(provider.loadError!)),
+      );
+    }
     setState(() {
       _problems = provider.problems;
-      _markers = _buildMarkers(_problems);
     });
+    await _applyMarkers(_problems);
   }
 
   @override
   void dispose() {
     _mapActive = false;
+    _tabsRouter?.removeListener(_onTabsChanged);
     _detachListener();
     _mapController?.dispose();
     _mapController = null;
     super.dispose();
   }
 
-  Set<Marker> _buildMarkers(List<RoadProblemDTO> problems) {
+  Future<Set<Marker>> _buildMarkers(List<RoadProblemDTO> problems) async {
+    if (!_canUpdateMap) return {};
+    final l10n = context.localized;
     final newMarkers = <Marker>{};
     for (final problem in problems) {
-      if (problem.latitude != null && problem.longitude != null) {
-        newMarkers.add(
-          Marker(
-            markerId: MarkerId(problem.id.toString()),
-            position: LatLng(
-              problem.latitude!,
-              problem.longitude!,
-            ),
-            infoWindow: InfoWindow(title: problem.title),
-            onTap: () => _onMarkerTap(problem),
-            icon: _getMarkerIcon(problem.severity),
+      if (!ReportStatus.showOnMap(problem.status)) continue;
+      if (problem.latitude == null || problem.longitude == null) continue;
+
+      final status = problem.status;
+      final icon = await MapStatusMarkerIcon.forStatus(
+        status,
+        zoom: _currentZoom,
+      );
+      newMarkers.add(
+        Marker(
+          markerId: MarkerId(problem.id.toString()),
+          position: LatLng(problem.latitude!, problem.longitude!),
+          anchor: const Offset(0.5, 1.0),
+          infoWindow: InfoWindow(
+            title: mapStatusLabel(l10n, status),
+            snippet: problem.title ?? problem.address ?? '',
           ),
-        );
-      }
+          onTap: () => _onMarkerTap(problem),
+          icon: icon,
+        ),
+      );
     }
     return newMarkers;
   }
 
-  BitmapDescriptor _getMarkerIcon(String? severity) {
-    switch (severity) {
-      case 'critical':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
-      case 'high':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
-      case 'medium':
-        return BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow);
-      case 'low':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
-      default:
-        return BitmapDescriptor.defaultMarker;
-    }
+  void _onCameraMove(CameraPosition position) {
+    if (!_canUpdateMap) return;
+    _currentZoom = position.zoom;
+    final bucket = MapStatusMarkerIcon.zoomBucket(_currentZoom);
+    if (bucket == _markerZoomBucket) return;
+    _markerZoomBucket = bucket;
+    unawaited(_applyMarkers(_problems));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -228,6 +300,20 @@ class _MapPageState extends State<MapPage> {
     final ImagePicker picker = ImagePicker();
 
     try {
+      Position? capturePosition = _currentPosition;
+      try {
+        capturePosition = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+          ),
+        );
+        if (mounted) {
+          setState(() => _currentPosition = capturePosition);
+        }
+      } catch (e) {
+        debugPrint('Не удалось обновить GPS перед съёмкой: $e');
+      }
+
       final XFile? photo = await picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 80,
@@ -238,8 +324,8 @@ class _MapPageState extends State<MapPage> {
           context.router.push(
             CameraPreviewRoute(
               imagePath: photo.path,
-              latitude: _currentPosition?.latitude,
-              longitude: _currentPosition?.longitude,
+              latitude: capturePosition?.latitude,
+              longitude: capturePosition?.longitude,
             ),
           );
         }
@@ -305,13 +391,13 @@ class _MapPageState extends State<MapPage> {
                     Row(
                       children: [
                         _buildChip(
-                          severityLabel(l10n, problem.severity),
-                          _getSeverityColor(problem.severity),
+                          severityLabel(l10n, problem.normalizedSeverity),
+                          _getSeverityColor(problem.normalizedSeverity),
                         ),
                         const Gap(8),
-                        _buildChip(
-                          controllerStatusLabel(l10n, problem.status),
-                          _getStatusColor(problem.status),
+                        _buildStatusChip(
+                          mapStatusLabel(l10n, problem.status),
+                          problem.status,
                         ),
                       ],
                     ),
@@ -346,6 +432,23 @@ class _MapPageState extends State<MapPage> {
                             ),
                           ),
                         ],
+                      ),
+                      const Gap(16),
+                    ],
+                    if (problem.images != null &&
+                        problem.images!.isNotEmpty) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedNetworkImage(
+                          imageUrl: problem.images!.first,
+                          height: 160,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => const SizedBox(
+                            height: 160,
+                            child: Icon(Icons.broken_image),
+                          ),
+                        ),
                       ),
                       const Gap(16),
                     ],
@@ -386,10 +489,40 @@ class _MapPageState extends State<MapPage> {
         );
       },
     ).whenComplete(() {
-      setState(() {
-        _selectedProblem = null;
-      });
+      if (mounted && _canUpdateMap) {
+        setState(() {
+          _selectedProblem = null;
+        });
+      }
     });
+  }
+
+  Widget _buildStatusChip(String label, String? status) {
+    final color = ReportStatusUi.colorFor(status);
+    final icon = ReportStatusUi.iconFor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const Gap(4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildChip(String label, Color color) {
@@ -409,19 +542,6 @@ class _MapPageState extends State<MapPage> {
         ),
       ),
     );
-  }
-
-  Color _getStatusColor(String? status) {
-    switch (status) {
-      case 'new':
-        return Colors.red;
-      case 'in_progress':
-        return Colors.orange;
-      case 'fixed':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
   }
 
   Color _getSeverityColor(String? severity) {
@@ -444,19 +564,28 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       body: Stack(
         children: [
-          GoogleMap(
-            initialCameraPosition: _initialCamera,
-            onMapCreated: _onMapCreated,
-            markers: _markers,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            onTap: (pos) {
-              setState(() {
-                _selectedProblem = null;
-              });
-            },
-          ),
+          if (_mapActive)
+            GoogleMap(
+              key: const ValueKey('city_drive_map'),
+              initialCameraPosition: _initialCamera,
+              onMapCreated: _onMapCreated,
+              onCameraMove: _onCameraMove,
+              markers: _markers,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              onTap: (pos) {
+                if (!_canUpdateMap) return;
+                setState(() {
+                  _selectedProblem = null;
+                });
+              },
+            )
+          else
+            const ColoredBox(
+              color: Color(0xFFE8E8E8),
+              child: SizedBox.expand(),
+            ),
           Positioned(
             bottom: 162,
             right: 11,

@@ -4,10 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/local_storage/report_status.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/placemark_address_formatter.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:intl/intl.dart';
@@ -42,6 +42,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 
   Future<void> _getAddressFromCoordinates() async {
     if (widget.latitude == null || widget.longitude == null) {
+      if (!mounted) return;
       setState(() {
         _address = context.localized.cityDriveCoordsUnavailable;
         _isLoadingAddress = false;
@@ -49,34 +50,21 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
       return;
     }
 
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        widget.latitude!,
-        widget.longitude!,
-      );
+    final resolved = await resolveAddressFromCoordinates(
+      widget.latitude!,
+      widget.longitude!,
+    );
 
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        setState(() {
-          _address = '${place.street ?? ''}, ${place.subThoroughfare ?? ''}';
-          _isLoadingAddress = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('Ошибка получения адреса: $e');
-      setState(() {
-        _address =
-            '${widget.latitude!.toStringAsFixed(5)}, ${widget.longitude!.toStringAsFixed(5)}';
-        _isLoadingAddress = false;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _address = resolved;
+      _isLoadingAddress = false;
+    });
   }
 
   Future<void> _publishReport() async {
-    final user = context.repository.authRepository.user;
-    final authorId = user?.id;
-    if (authorId == null) {
-      final l10n = context.localized;
+    final l10n = context.localized;
+    if (!context.repository.authRepository.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.cityDriveLoginToPublish),
@@ -85,41 +73,76 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
       );
       return;
     }
-    final l10n = context.localized;
+
+    if (widget.latitude == null || widget.longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.cityDriveCoordsUnavailable),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final user = context.repository.authRepository.user;
     final authorName = user?.fullName ?? l10n.cityDriveResident;
+
+    var address = _address.trim();
+    if (isLikelyInvalidAddress(address)) {
+      address = await resolveAddressFromCoordinates(
+        widget.latitude!,
+        widget.longitude!,
+      );
+    }
 
     final newProblem = RoadProblemDTO(
       id: 0,
-      authorUserId: authorId,
       title: l10n.cityDriveRoadDamage,
       description: _commentController.text.isEmpty
           ? l10n.cityDriveDamageNeedsAttention
           : _commentController.text,
-      address: _address,
+      address: address.isNotEmpty ? address : null,
       latitude: widget.latitude,
       longitude: widget.longitude,
       type: 'damage',
-      severity: 'high',
       status: ReportStatus.newReport,
-      reportedDate: DateTime.now(),
-      images: [widget.imagePath],
       author: authorName,
-      likes: 0,
-      commentsCount: 0,
-      comments: [],
     );
 
-    await context.read<RoadProblemsProvider>().addProblem(newProblem);
+    try {
+      await context.read<RoadProblemsProvider>().submitReport(
+            problem: newProblem,
+            localImagePath: widget.imagePath,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.cityDriveReportPublished),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.cityDriveReportSubmitAlertTitle),
+        content: Text(l10n.cityDriveReportSubmitAlertMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.ok),
+          ),
+        ],
       ),
     );
+
+    if (!mounted) return;
 
     // Возврат на карту, без popUntilRoot — иначе GoogleMap теряет channel.
     context.router.maybePop();

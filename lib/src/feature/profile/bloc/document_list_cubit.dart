@@ -14,10 +14,11 @@ class DocumentListCubit extends Cubit<DocumentListState> {
         super(const DocumentListState.initial());
   final IProfileRepository _repository;
 
-  Future<void> getDocumentsList() async {
+  Future<void> getDocumentsList({required String languageCode}) async {
     try {
       emit(const DocumentListState.loading());
-      final documentDTO = await _repository.getDocuments();
+      final documentDTO =
+          await _repository.getDocuments(languageCode: languageCode);
 
       emit(
         DocumentListState.loaded(

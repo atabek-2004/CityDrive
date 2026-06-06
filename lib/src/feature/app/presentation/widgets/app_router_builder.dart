@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 
 import 'package:flutter/material.dart';
+import 'package:city_drive/src/feature/app/logic/demo_local_notification_service.dart';
 import 'package:city_drive/src/feature/app/router/navigator_observers_factory.dart';
 
 typedef CreateRouter = RootStackRouter Function(BuildContext context);
@@ -26,6 +27,12 @@ class AppRouterBuilder extends StatefulWidget {
 
 class _AppRouterBuilderState extends State<AppRouterBuilder> {
   late final RootStackRouter _router = widget.createRouter(context);
+
+  @override
+  void initState() {
+    super.initState();
+    DemoLocalNotificationService.instance.bindRouter(_router);
+  }
 
   @override
   void dispose() {

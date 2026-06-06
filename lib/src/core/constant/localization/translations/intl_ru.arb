@@ -355,6 +355,7 @@
   "cityDrivePotholeRepair": "Ямочный ремонт",
   "cityDriveAddressNotSpecified": "Адрес не указан",
   "cityDriveUnderReview": "На рассмотрении",
+  "cityDriveOnVerification": "На проверке",
   "cityDriveFromAuthor": "От: {author}",
   "@cityDriveFromAuthor": {"placeholders": {"author": {"type": "String"}}},
   "cityDriveMoreDetails": "Подробнее",
@@ -382,7 +383,7 @@
   "cityDriveSeverityMedium": "Средний",
   "cityDriveSeverityLow": "Низкий",
   "cityDriveStatusOpen": "Открыто",
-  "cityDriveStatusAccepted": "Принято",
+  "cityDriveStatusAccepted": "Принята",
   "cityDriveStatusInWork": "В работе",
   "cityDriveStatusRejected": "Отклонено",
   "cityDriveStatusDone": "Готово",
@@ -409,6 +410,14 @@
   "cityDriveApplicationAcceptedStep": "Заявка принята",
   "cityDriveApplicationSentStep": "Заявка отправлена",
   "cityDriveViewInMyWorks": "Посмотреть в Мои работы",
+  "cityDriveAssignedTo": "Исполнитель: {name}",
+  "@cityDriveAssignedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "cityDriveAnnouncement": "Объявление",
   "cityDriveCommentOptional": "Комментарий (необязательно)",
   "cityDriveCommentHint": "Например: примем в работу на следующей неделе",
@@ -428,6 +437,9 @@
   "cityDriveEmptyList": "Список пуст",
   "cityDriveLoginToPublish": "Войдите в аккаунт, чтобы опубликовать отметку",
   "cityDriveReportPublished": "Отчет успешно опубликован!",
+  "cityDriveReportSubmittedPending": "Заявка отправлена и ожидает проверки",
+  "cityDriveReportSubmitAlertTitle": "Заявка отправлена",
+  "cityDriveReportSubmitAlertMessage": "Ваша отметка принята на рассмотрение в админ-панели. После проверки администратором вы получите push-уведомление, а отметка появится на карте для всех пользователей.",
   "cityDriveConfirm": "Подтвердить",
   "cityDriveAddCommentHint": "Добавить комментарий (необязательно)...",
   "cityDriveRetake": "Переснять",

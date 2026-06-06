@@ -22,6 +22,7 @@ DocumentDTO _$DocumentDTOFromJson(Map<String, dynamic> json) {
 mixin _$DocumentDTO {
   int? get id => throw _privateConstructorUsedError;
   String? get title => throw _privateConstructorUsedError;
+  String? get url => throw _privateConstructorUsedError;
   String? get content => throw _privateConstructorUsedError;
   String? get type => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
@@ -48,6 +49,7 @@ abstract class $DocumentDTOCopyWith<$Res> {
   $Res call(
       {int? id,
       String? title,
+      String? url,
       String? content,
       String? type,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -71,6 +73,7 @@ class _$DocumentDTOCopyWithImpl<$Res, $Val extends DocumentDTO>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? url = freezed,
     Object? content = freezed,
     Object? type = freezed,
     Object? createdAt = freezed,
@@ -84,6 +87,10 @@ class _$DocumentDTOCopyWithImpl<$Res, $Val extends DocumentDTO>
       title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String?,
       content: freezed == content
           ? _value.content
@@ -116,6 +123,7 @@ abstract class _$$DocumentDTOImplCopyWith<$Res>
   $Res call(
       {int? id,
       String? title,
+      String? url,
       String? content,
       String? type,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -137,6 +145,7 @@ class __$$DocumentDTOImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? title = freezed,
+    Object? url = freezed,
     Object? content = freezed,
     Object? type = freezed,
     Object? createdAt = freezed,
@@ -150,6 +159,10 @@ class __$$DocumentDTOImplCopyWithImpl<$Res>
       title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String?,
       content: freezed == content
           ? _value.content
@@ -177,6 +190,7 @@ class _$DocumentDTOImpl implements _DocumentDTO {
   const _$DocumentDTOImpl(
       {this.id,
       this.title,
+      this.url,
       this.content,
       this.type,
       @JsonKey(name: 'created_at') this.createdAt,
@@ -190,6 +204,8 @@ class _$DocumentDTOImpl implements _DocumentDTO {
   @override
   final String? title;
   @override
+  final String? url;
+  @override
   final String? content;
   @override
   final String? type;
@@ -202,7 +218,7 @@ class _$DocumentDTOImpl implements _DocumentDTO {
 
   @override
   String toString() {
-    return 'DocumentDTO(id: $id, title: $title, content: $content, type: $type, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'DocumentDTO(id: $id, title: $title, url: $url, content: $content, type: $type, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -212,6 +228,7 @@ class _$DocumentDTOImpl implements _DocumentDTO {
             other is _$DocumentDTOImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.url, url) || other.url == url) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.createdAt, createdAt) ||
@@ -222,8 +239,8 @@ class _$DocumentDTOImpl implements _DocumentDTO {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, title, content, type, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType, id, title, url, content, type, createdAt, updatedAt);
 
   /// Create a copy of DocumentDTO
   /// with the given fields replaced by the non-null parameter values.
@@ -245,6 +262,7 @@ abstract class _DocumentDTO implements DocumentDTO {
   const factory _DocumentDTO(
           {final int? id,
           final String? title,
+          final String? url,
           final String? content,
           final String? type,
           @JsonKey(name: 'created_at') final String? createdAt,
@@ -258,6 +276,8 @@ abstract class _DocumentDTO implements DocumentDTO {
   int? get id;
   @override
   String? get title;
+  @override
+  String? get url;
   @override
   String? get content;
   @override

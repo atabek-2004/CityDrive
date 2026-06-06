@@ -7,6 +7,7 @@ import 'package:city_drive/src/core/utils/talker_logger_util.dart';
 import 'package:city_drive/src/feature/app/bloc/app_restart_bloc.dart';
 import 'package:city_drive/src/feature/app/initialization/logic/composition_root.dart';
 import 'package:city_drive/src/feature/app/initialization/widget/initialization_failed_app.dart';
+import 'package:city_drive/src/feature/app/logic/demo_local_notification_service.dart';
 import 'package:city_drive/src/feature/app/logic/firebase_bootstrap.dart';
 import 'package:city_drive/src/feature/app/logic/notification_service.dart';
 import 'package:city_drive/src/feature/app/presentation/app.dart';
@@ -86,6 +87,8 @@ final class AppRunner {
         if (!binding.firstFrameRasterized) binding.allowFirstFrame();
       }
     }
+
+    await DemoLocalNotificationService.instance.init();
 
     final firebaseReady = await FirebaseBootstrap.initialize();
     if (firebaseReady) {

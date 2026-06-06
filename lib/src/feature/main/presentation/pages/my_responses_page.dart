@@ -107,29 +107,37 @@ class _MyResponsesPageState extends State<MyResponsesPage> {
                   );
                 }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final problem = items[index];
-                    final ui = ReportStatusUi.fromStatus(l10n, problem.status);
-                    final imageUrl = problem.images?.isNotEmpty == true
-                        ? problem.images!.first
-                        : '';
-                    return ReportCard(
-                      reportId: problem.id.toString(),
-                      status: ui.label,
-                      statusIcon: ui.icon,
-                      statusColor: ui.color,
-                      date: formatReportDate(l10n, problem.reportedDate),
-                      title: problem.title ?? l10n.cityDriveProblemOnRoad,
-                      address: problem.address ?? '',
-                      imageUrl: imageUrl,
-                      showMapButton: problem.status == ReportStatus.confirmed,
-                      problem: problem,
-                    );
-                  },
+                return RefreshIndicator(
+                  onRefresh: provider.load,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final problem = items[index];
+                      final ui =
+                          ReportStatusUi.fromStatus(l10n, problem.status);
+                      final imageUrl = problem.images?.isNotEmpty == true
+                          ? problem.images!.first
+                          : '';
+                      return ReportCard(
+                        key: ValueKey(problem.id),
+                        reportId: problem.id.toString(),
+                        status: ui.label,
+                        statusIcon: ui.icon,
+                        statusColor: ui.color,
+                        date: formatReportDate(l10n, problem.reportedDate),
+                        title: problem.title ?? l10n.cityDriveProblemOnRoad,
+                        address: problem.address ?? '',
+                        imageUrl: imageUrl,
+                        showMapButton: problem.status == ReportStatus.confirmed ||
+                            problem.status == ReportStatus.fixed ||
+                            problem.status == ReportStatus.inProgress,
+                        problem: problem,
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -183,27 +191,33 @@ class ReportCard extends StatelessWidget {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(statusIcon, color: statusColor, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            status,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: statusColor,
+                      ReportStatusIcon(status: problem?.status),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                status,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: statusColor,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        date,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                            const SizedBox(width: 8),
+                            Text(
+                              date,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

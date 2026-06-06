@@ -12,6 +12,7 @@ import 'package:city_drive/src/feature/auth/data/local_auth_data_source.dart';
 import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
 import 'package:city_drive/src/feature/auth/models/common_dto.dart';
 import 'package:city_drive/src/feature/auth/models/common_lists_dto.dart';
+import 'package:city_drive/src/feature/auth/models/company_dto.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 /// Полностью локальная авторизация через Hive.
@@ -46,6 +47,13 @@ class LocalAuthRepository implements IAuthRepository {
 
   @override
   bool get isAuthenticated => _authDao.user.value != null;
+
+  @override
+  bool get isApproved => true;
+
+  @override
+  Future<ApprovalStatusDTO> fetchApprovalStatus() async =>
+      const ApprovalStatusDTO(isApproved: true);
 
   Future<void> restoreSessionRole() async {
     final current = user;
@@ -102,6 +110,7 @@ class LocalAuthRepository implements IAuthRepository {
     required String? phone,
     required String? password,
     required String? passwordConfirmation,
+    String? role,
   }) async {
     if (phone == null || phone.isEmpty) {
       throw Exception('Укажите номер телефона');
@@ -160,6 +169,11 @@ class LocalAuthRepository implements IAuthRepository {
   Future<void> clearUser() async {
     await _authDao.user.remove();
     await _session.clearCurrentRole();
+  }
+
+  @override
+  Future<void> updateStoredUser(UserDTO user) async {
+    await _authDao.user.setValue(jsonEncode(user.toJson()));
   }
 
   @override

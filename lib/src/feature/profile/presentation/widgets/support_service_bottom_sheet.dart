@@ -4,9 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/utils/layout/url_util.dart';
 
-class SupportServiceBottomSheet extends StatelessWidget {
+class SupportServiceBottomSheet extends StatefulWidget {
   const SupportServiceBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) async {
@@ -22,9 +25,56 @@ class SupportServiceBottomSheet extends StatelessWidget {
   }
 
   @override
+  State<SupportServiceBottomSheet> createState() =>
+      _SupportServiceBottomSheetState();
+}
+
+class _SupportServiceBottomSheetState extends State<SupportServiceBottomSheet> {
+  String? _whatsappPhone;
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadSupportPhone());
+  }
+
+  Future<void> _loadSupportPhone() async {
+    if (!mounted) return;
+    try {
+      final phone = await context.repository.appInfoRemoteDS
+          .fetchSupportWhatsappPhone();
+      if (!mounted) return;
+      setState(() {
+        _whatsappPhone = phone;
+        _loading = false;
+        _error = phone == null ? 'Номер поддержки недоступен' : null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<void> _openWhatsapp() async {
+    final phone = _whatsappPhone;
+    if (phone == null || phone.isEmpty) {
+      Toaster.showErrorTopShortToast(
+        context,
+        _error ?? 'Номер поддержки недоступен',
+      );
+      return;
+    }
+    await UrlUtil.launchWhatsappUrl(context, phone: phone);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      
       expand: false,
       initialChildSize: 0.50,
       minChildSize: 0.45,
@@ -73,13 +123,22 @@ class SupportServiceBottomSheet extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      if (_error != null) ...[
+                        const Gap(12),
+                        Text(
+                          _error!,
+                          style: AppTextStyles.body14W500.copyWith(
+                            color: AppColors.red1,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
-             
               CustomButton(
-                onPressed: () {},
+                onPressed: _loading ? null : _openWhatsapp,
                 style: CustomButtonStyles.mainButtonStyle(context).copyWith(
                   backgroundColor:
                       const WidgetStatePropertyAll(AppColors.mainColor),
@@ -89,10 +148,9 @@ class SupportServiceBottomSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                text: 'Перейти',
+                text: _loading ? 'Загрузка...' : 'Перейти',
                 child: null,
               ),
-
               const Gap(10),
             ],
           ),

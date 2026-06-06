@@ -32,6 +32,19 @@ abstract final class LocaleUtil {
     }
   }
 
+  static Locale localeFromLangCode(String? lang) {
+    switch (lang) {
+      case 'kk':
+        return const Locale('kk');
+      case 'en':
+        return const Locale('en');
+      case 'ru':
+        return const Locale('ru');
+      default:
+        return const Locale('ru');
+    }
+  }
+
   static String shortLabelFromLocale(Locale locale) {
     switch (locale.languageCode) {
       case 'kk':

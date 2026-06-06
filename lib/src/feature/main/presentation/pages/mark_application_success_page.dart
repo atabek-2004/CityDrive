@@ -28,6 +28,7 @@ class MarkApplicationSuccessPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.localized;
     final isAccepted = kind == MarkApplicationSuccessKind.accepted;
+    final assignedName = problem.assignedController?.displayName;
     final title = isAccepted
         ? l10n.cityDriveApplicationAcceptedTitle
         : l10n.cityDriveApplicationSentTitle;
@@ -117,6 +118,19 @@ class MarkApplicationSuccessPage extends StatelessWidget {
                               color: Colors.grey,
                             ),
                           ),
+                          if (isAccepted &&
+                              assignedName != null &&
+                              assignedName.isNotEmpty) ...[
+                            const Gap(4),
+                            Text(
+                              l10n.cityDriveAssignedTo(assignedName),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF1A73E8),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

@@ -24,6 +24,7 @@ import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/core/utils/extensions/integer_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/auth/enum/enter_sms_code_type.dart';
+import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
 import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 
 @RoutePage()
@@ -302,20 +303,17 @@ class _EnterSmsCodePageState extends State<EnterSmsCodePage> {
                               context.loaderOverlay.hide();
                               final authUser =
                                   context.repository.authRepository.user;
-                              if (authUser != null) {
-                                BlocProvider.of<AppBloc>(context).add(
-                                  AppEvent.logining(user: authUser),
-                                );
-                              }
+                              if (authUser == null) return;
+
                               if (widget.isSignUpSecond) {
-                                context.router.replaceAll(
-                                  [const CompanyDataRoute()],
+                                navigateAfterControllerRegistration(
+                                  context,
+                                  authUser,
                                 );
-                              } else {
-                                context.router.replaceAll(
-                                  [const LauncherRoute()],
-                                );
+                                return;
                               }
+
+                              navigateAfterAuth(context, authUser);
                             },
                           );
                         },

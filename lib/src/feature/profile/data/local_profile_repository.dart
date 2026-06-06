@@ -1,3 +1,4 @@
+import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
 import 'package:city_drive/src/feature/auth/data/local_auth_data_source.dart';
 import 'package:city_drive/src/feature/auth/models/common_dto.dart';
@@ -55,5 +56,9 @@ class LocalProfileRepository implements IProfileRepository {
   }
 
   @override
-  Future<List<DocumentDTO>> getDocuments() async => const [];
+  Future<List<DocumentDTO>> getDocuments({required String languageCode}) async =>
+      const [];
+
+  @override
+  Future<BasicResponse> logOut() async => const BasicResponse(message: 'ok');
 }

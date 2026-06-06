@@ -40,7 +40,7 @@ class ProblemDetailPage extends StatelessWidget {
             right: 0,
             height: MediaQuery.of(context).size.height * 0.4,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
                     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5-XVY5royR6nrFQINA8nj5yitXUI2nzi7GA&s',
@@ -157,7 +157,7 @@ class ProblemDetailPage extends StatelessWidget {
                   const Gap(16),
 
                   // Информационные карточки
-                  Row(
+                  const Row(
                     children: [
                       Expanded(
                         child: _InfoCard(
@@ -165,7 +165,7 @@ class ProblemDetailPage extends StatelessWidget {
                           value: 'ул. Абая, 150',
                         ),
                       ),
-                      const Gap(12),
+                      Gap(12),
                       Expanded(
                         child: _InfoCard(
                           label: 'Тип',
@@ -175,7 +175,7 @@ class ProblemDetailPage extends StatelessWidget {
                     ],
                   ),
                   const Gap(12),
-                  Row(
+                  const Row(
                     children: [
                       Expanded(
                         child: _InfoCard(
@@ -183,7 +183,7 @@ class ProblemDetailPage extends StatelessWidget {
                           value: '850000тг',
                         ),
                       ),
-                      const Gap(12),
+                      Gap(12),
                       Expanded(
                         child: _InfoCard(
                           label: 'Срок',
@@ -193,7 +193,7 @@ class ProblemDetailPage extends StatelessWidget {
                     ],
                   ),
                   const Gap(12),
-                  Row(
+                  const Row(
                     children: [
                       Expanded(
                         child: _InfoCard(
@@ -201,7 +201,7 @@ class ProblemDetailPage extends StatelessWidget {
                           value: '12 мес',
                         ),
                       ),
-                      const Gap(12),
+                      Gap(12),
                       Expanded(
                         child: _InfoCard(
                           label: 'Объём',
@@ -248,7 +248,7 @@ class ProblemDetailPage extends StatelessWidget {
                             WorkReportRoute(problem: _effectiveProblem),
                           );
                         } else {
-                          context.router.push(SubmitApplicationRoute());
+                          context.router.push(const SubmitApplicationRoute());
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -260,7 +260,7 @@ class ProblemDetailPage extends StatelessWidget {
                       ),
                       child: Text(
                          isSubmit ? 'Отправить отчет' : 'Подать заявку',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

@@ -17,7 +17,7 @@ abstract interface class IProfileRemoteDS {
 
   Future<List<CommonDTO>> cityList();
 
-  Future<List<DocumentDTO>> getDocuments();
+  Future<List<DocumentDTO>> getDocuments({required String languageCode});
 
   // // balance transfers
   // Future<List<BalanceDTO>> getBalanceTransfer({required String type});
@@ -176,19 +176,21 @@ class ProfileRemoteDSImpl implements IProfileRemoteDS {
   }
 
   @override
-  Future<List<DocumentDTO>> getDocuments() async {
+  Future<List<DocumentDTO>> getDocuments({required String languageCode}) async {
     try {
       final Map<String, dynamic> response = await restClient.get(
         'documents',
-        queryParams: {},
+        headers: {'Accept-Language': languageCode},
       );
+      final data = response['data'];
+      if (data == null) return [];
       final list = await compute<List<dynamic>, List<DocumentDTO>>(
         (list) => list
             .map(
               (e) => DocumentDTO.fromJson(e as Map<String, dynamic>),
             )
             .toList(),
-        response['data'] as List,
+        data as List,
       );
       return list;
     } catch (e, st) {

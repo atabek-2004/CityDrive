@@ -1,22 +1,28 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
 import 'package:city_drive/src/core/local_storage/user_role.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/constant/localization/localization.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
+import 'package:city_drive/src/feature/controller/data/controller_remote_ds.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()
-class RoadProblemDetailPage extends StatelessWidget {
+class RoadProblemDetailPage extends StatefulWidget {
   final RoadProblemDTO problem;
 
   const RoadProblemDetailPage({
@@ -24,40 +30,110 @@ class RoadProblemDetailPage extends StatelessWidget {
     required this.problem,
   });
 
+  @override
+  State<RoadProblemDetailPage> createState() => _RoadProblemDetailPageState();
+}
+
+class _RoadProblemDetailPageState extends State<RoadProblemDetailPage> {
+  bool _likeLoading = false;
+
+  RoadProblemDTO get _initialProblem => widget.problem;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<RoadProblemsProvider>().refreshMark(_initialProblem.id);
+      }
+    });
+  }
+
   Future<void> _moderate(
     BuildContext context, {
     required String status,
   }) async {
     final controllerId = context.repository.authRepository.user?.id;
-    await context.read<RoadProblemsProvider>().updateStatus(
-          id: problem.id,
-          status: status,
-          assignedControllerId: controllerId,
-        );
-    if (context.mounted) {
-      final l10n = context.localized;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            status == ReportStatus.confirmed
-                ? l10n.cityDriveMarkAcceptedSnack
-                : l10n.cityDriveMarkRejectedSnack,
+    try {
+      await context.read<RoadProblemsProvider>().updateStatus(
+            id: _initialProblem.id,
+            status: status,
+            assignedControllerId: controllerId,
+          );
+      if (context.mounted) {
+        context.read<ControllerDashboardCubit>().load();
+        final l10n = context.localized;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              status == ReportStatus.confirmed
+                  ? l10n.cityDriveMarkAcceptedSnack
+                  : l10n.cityDriveMarkRejectedSnack,
+            ),
           ),
-        ),
+        );
+        context.router.maybePop();
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = controllerActionErrorMessage(e);
+      Toaster.showErrorTopShortToast(context, message);
+    }
+  }
+
+  Future<void> _toggleLike() async {
+    if (_likeLoading) return;
+    final l10n = context.localized;
+    if (!context.repository.authRepository.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.cityDriveLoginToPublish)),
       );
-      context.router.maybePop();
+      return;
+    }
+    final problem = context.read<RoadProblemsProvider>().getProblemById(
+          _initialProblem.id,
+        ) ??
+        _initialProblem;
+    final blocked = ReportStatus.engageBlockedReasonRu(problem.status);
+    if (blocked != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(blocked)),
+      );
+      return;
+    }
+    setState(() => _likeLoading = true);
+    try {
+      await context.read<RoadProblemsProvider>().toggleLike(_initialProblem.id);
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? e.toString())),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _likeLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final problem = context.watch<RoadProblemsProvider>().getProblemById(
+          _initialProblem.id,
+        ) ??
+        _initialProblem;
     final isController =
         context.repository.sessionRepository.currentRole ==
             UserRole.controller;
     final controllerId = context.repository.authRepository.user?.id;
     final canModerate = isController &&
-        (problem.status == ReportStatus.newReport ||
-            problem.status == ReportStatus.pending);
+        problem.status == ReportStatus.pending &&
+        problem.assignedControllerId == null;
     final canSubmitReport = isController &&
         !canModerate &&
         (problem.status == ReportStatus.confirmed ||
@@ -76,7 +152,7 @@ class RoadProblemDetailPage extends StatelessWidget {
         ),
         onSubmitReport: () =>
             context.router.push(WorkReportRoute(problem: problem)),
-        buildImage: _buildImage,
+        buildImage: () => _buildImage(problem),
       );
     }
 
@@ -98,7 +174,7 @@ class RoadProblemDetailPage extends StatelessWidget {
               width: double.infinity,
               height: 350,
               color: Colors.grey[300],
-              child: _buildImage(),
+              child: _buildImage(problem),
             ),
             Padding(
               padding: const EdgeInsets.all(16),
@@ -184,26 +260,47 @@ class RoadProblemDetailPage extends StatelessWidget {
 // Лайки и комментарии (кликабельные)
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            const Text('👍', style: TextStyle(fontSize: 16)),
-                            const Gap(4),
-                            Text(
-                              '${problem.likes ?? 0}',
-                              style: AppTextStyles.body14w400.copyWith(
-                                fontWeight: FontWeight.w600,
+                      GestureDetector(
+                        onTap: _likeLoading ? null : _toggleLike,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: problem.likedByMe
+                                ? Colors.blue.shade100
+                                : Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(20),
+                            border: problem.likedByMe
+                                ? Border.all(color: AppColors.mainColor)
+                                : null,
+                          ),
+                          child: Row(
+                            children: [
+                              if (_likeLoading)
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              else
+                                Text(
+                                  problem.likedByMe ? '👍' : '👍🏻',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              const Gap(4),
+                              Text(
+                                '${problem.likes ?? 0}',
+                                style: AppTextStyles.body14w400.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: problem.likedByMe
+                                      ? AppColors.mainColor
+                                      : null,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       const Gap(12),
@@ -456,7 +553,7 @@ class RoadProblemDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(RoadProblemDTO problem) {
     if (problem.images == null || problem.images!.isEmpty) {
       return _buildPlaceholderImage();
     }
@@ -595,276 +692,288 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.localized;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final hasBottomActions = canModerate || canSubmitReport;
+    final descriptionText = (problem.description?.trim().isNotEmpty ?? false)
+        ? problem.description!.trim()
+        : l10n.cityDriveResidentReported;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.38,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                buildImage(),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.35),
-                        Colors.transparent,
-                      ],
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 240,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  buildImage(),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.4),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.15),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 16,
-            child: GestureDetector(
-              onTap: () => context.router.maybePop(),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.black),
-              ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.33,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.status,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const Gap(8),
-                            _StatusBadge(
-                              label: controllerStatusLabel(l10n, problem.status),
-                              color: controllerStatusColor(problem.status),
-                            ),
-                          ],
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 8,
+                    left: 16,
+                    child: GestureDetector(
+                      onTap: () => context.router.maybePop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
                         ),
+                        child: const Icon(Icons.arrow_back, color: Colors.black),
                       ),
-                      const Gap(16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.cityDriveLevel,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Transform.translate(
+                offset: const Offset(0, -24),
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x14000000),
+                        blurRadius: 12,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.fromLTRB(
+                        24,
+                        20,
+                        24,
+                        hasBottomActions ? 16 : 24 + bottomInset,
+                      ),
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(2),
                             ),
-                            const Gap(8),
-                            _StatusBadge(
+                          ),
+                        ),
+                        const Gap(16),
+                        Text(
+                          problem.title ?? l10n.cityDriveRoadDamage,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                          ),
+                        ),
+                        const Gap(12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ReportStatusBadge(
+                              status: problem.status,
+                              label: controllerStatusLabel(
+                                l10n,
+                                problem.status,
+                              ),
+                              compact: true,
+                            ),
+                            _SeverityChip(
                               label: severityLabel(l10n, problem.severity),
                               color: severityColor(problem.severity),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const Gap(28),
-                  Text(
-                    l10n.cityDriveInformation,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const Gap(16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _InfoTile(
+                        const Gap(24),
+                        Text(
+                          l10n.cityDriveInformation,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Gap(12),
+                        _InfoTile(
                           label: l10n.cityDriveAddress,
-                          value: problem.address ?? '—',
+                          value: problem.address ?? l10n.cityDriveAddressNotSpecified,
+                          fullWidth: true,
                         ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: _InfoTile(
-                          label: l10n.cityDriveType,
-                          value: problemTypeShortLabel(l10n, problem.type),
+                        const Gap(12),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _InfoTile(
+                                label: l10n.cityDriveType,
+                                value: problemTypeShortLabel(l10n, problem.type),
+                              ),
+                            ),
+                            const Gap(12),
+                            Expanded(
+                              child: _InfoTile(
+                                label: l10n.cityDriveAuthor,
+                                value: problem.author ?? l10n.cityDriveResident,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const Gap(12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _InfoTile(
-                          label: l10n.cityDriveAuthor,
-                          value: problem.author ?? l10n.cityDriveResident,
+                        const Gap(12),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _InfoTile(
+                                label: l10n.cityDriveDateLabel,
+                                value: problem.reportedDate != null
+                                    ? DateFormat('dd.MM.yyyy')
+                                        .format(problem.reportedDate!)
+                                    : '—',
+                              ),
+                            ),
+                            const Gap(12),
+                            Expanded(
+                              child: _InfoTile(
+                                label: 'ID',
+                                value: '#${problem.id}',
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: _InfoTile(
-                          label: l10n.cityDriveDateLabel,
-                          value: problem.reportedDate != null
-                              ? DateFormat('dd.MM.yyyy')
-                                  .format(problem.reportedDate!)
-                              : '—',
+                        const Gap(24),
+                        Text(
+                          l10n.description,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const Gap(12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _InfoTile(
-                          label: l10n.cityDriveUrgency,
-                          value: severityLabel(l10n, problem.severity),
+                        const Gap(12),
+                        Container(
+                          width: double.infinity,
+                          constraints: const BoxConstraints(minHeight: 88),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            descriptionText,
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: (problem.description?.trim().isNotEmpty ??
+                                      false)
+                                  ? Colors.black87
+                                  : Colors.grey.shade600,
+                            ),
+                          ),
                         ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: _InfoTile(
-                          label: 'ID',
-                          value: '#${problem.id}',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(28),
-                  Text(
-                    l10n.description,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const Gap(12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      problem.description ?? l10n.cityDriveResidentReported,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.5,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (canModerate)
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: onAccept,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.mainColor,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        l10n.cityDriveAcceptApplicationBtn,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Gap(8),
-                  TextButton(
-                    onPressed: onReject,
-                    child: Text(
-                      l10n.cityDriveReject,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          if (canSubmitReport)
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onSubmitReport,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.mainColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Text(
-                    l10n.cityDriveSubmitReport,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
+      bottomNavigationBar: hasBottomActions
+          ? SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+                child: canModerate
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: onAccept,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.mainColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: Text(
+                                l10n.cityDriveAcceptApplicationBtn,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: onReject,
+                            child: Text(
+                              l10n.cityDriveReject,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      )
+                    : SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: onSubmitReport,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.mainColor,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            l10n.cityDriveSubmitReport,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+            )
+          : null,
     );
   }
 }
 
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.label, required this.color});
+class _SeverityChip extends StatelessWidget {
+  const _SeverityChip({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -872,18 +981,17 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color,
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Text(
         label,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 15,
+        style: TextStyle(
+          color: color,
+          fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -892,14 +1000,20 @@ class _StatusBadge extends StatelessWidget {
 }
 
 class _InfoTile extends StatelessWidget {
-  const _InfoTile({required this.label, required this.value});
+  const _InfoTile({
+    required this.label,
+    required this.value,
+    this.fullWidth = false,
+  });
 
   final String label;
   final String value;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: fullWidth ? double.infinity : null,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
@@ -918,9 +1032,8 @@ class _InfoTile extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
+              height: 1.3,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

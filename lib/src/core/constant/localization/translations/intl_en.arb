@@ -354,6 +354,7 @@
   "cityDrivePotholeRepair": "Pothole repair",
   "cityDriveAddressNotSpecified": "Address not specified",
   "cityDriveUnderReview": "Under review",
+  "cityDriveOnVerification": "Under verification",
   "cityDriveFromAuthor": "From: {author}",
   "cityDriveMoreDetails": "Details",
   "cityDriveMarkAcceptedSnack": "Mark accepted for work",
@@ -406,6 +407,14 @@
   "cityDriveApplicationAcceptedStep": "Application accepted",
   "cityDriveApplicationSentStep": "Application sent",
   "cityDriveViewInMyWorks": "View in My works",
+  "cityDriveAssignedTo": "Assigned to: {name}",
+  "@cityDriveAssignedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "cityDriveAnnouncement": "Announcement",
   "cityDriveCommentOptional": "Comment (optional)",
   "cityDriveCommentHint": "For example: we will start work next week",
@@ -425,6 +434,9 @@
   "cityDriveEmptyList": "List is empty",
   "cityDriveLoginToPublish": "Sign in to publish a mark",
   "cityDriveReportPublished": "Report published successfully!",
+  "cityDriveReportSubmittedPending": "Report submitted and awaiting review",
+  "cityDriveReportSubmitAlertTitle": "Report submitted",
+  "cityDriveReportSubmitAlertMessage": "Your report has been sent and is being reviewed by responsible specialists. If approved, your request will be accepted.",
   "cityDriveConfirm": "Confirm",
   "cityDriveAddCommentHint": "Add a comment (optional)...",
   "cityDriveRetake": "Retake",

@@ -13,6 +13,8 @@ import 'package:city_drive/src/core/utils/image_util.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
 import 'package:city_drive/src/core/constant/localization/locale_util.dart';
+import 'package:city_drive/src/core/constant/localization/localization.dart';
+import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
 import 'package:city_drive/src/feature/profile/presentation/widgets/choose_language_bottom_sheet.dart';
 import 'package:city_drive/src/feature/settings/widget/settings_scope.dart';
 import 'package:city_drive/src/feature/profile/presentation/widgets/log_out_bottom_sheet.dart';
@@ -125,6 +127,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 filter: {"#": RegExp('[0-9]')},
                 initialText: user.phone,
               );
+              if (user.lang != null) {
+                final locale = LocaleUtil.localeFromLangCode(user.lang);
+                final settings =
+                    SettingsScope.settingsOf(context, listen: false);
+                if (settings.locale?.languageCode != locale.languageCode) {
+                  SettingsScope.of(context).add(
+                    AppSettingsEvent.updateAppSettings(
+                      appSettings: settings.copyWith(locale: locale),
+                    ),
+                  );
+                  Localization.load(locale);
+                }
+              }
             },
             loading: () {
               _setOverlayVisible(context, true);

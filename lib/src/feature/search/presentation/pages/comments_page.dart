@@ -1,8 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:provider/provider.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/core/local_storage/report_status.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +27,17 @@ class _CommentsPageState extends State<CommentsPage> {
   final TextEditingController _commentController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
+  List<Comment> _comments = [];
+  bool _loading = true;
+  bool _sending = false;
+  String? _loadError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadComments();
+  }
+
   @override
   void dispose() {
     _commentController.dispose();
@@ -31,71 +45,101 @@ class _CommentsPageState extends State<CommentsPage> {
     super.dispose();
   }
 
+  Future<void> _loadComments() async {
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
+    try {
+      final items = await context
+          .read<RoadProblemsProvider>()
+          .fetchComments(widget.problem.id);
+      if (!mounted) return;
+      setState(() {
+        _comments = items;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
   Future<void> _addComment() async {
-    if (_commentController.text.trim().isEmpty) return;
+    final text = _commentController.text.trim();
+    if (text.isEmpty || _sending) return;
 
-    final newComment = Comment(
-      author: 'Вы',
-      text: _commentController.text.trim(),
-      time: DateTime.now(),
-    );
+    final l10n = context.localized;
+    if (!context.repository.authRepository.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.cityDriveLoginToPublish)),
+      );
+      return;
+    }
 
-    final updatedComments = [...?widget.problem.comments, newComment];
+    final problem = context.read<RoadProblemsProvider>().getProblemById(
+          widget.problem.id,
+        ) ??
+        widget.problem;
+    final blocked = ReportStatus.engageBlockedReasonRu(problem.status);
+    if (blocked != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(blocked)),
+      );
+      return;
+    }
 
-    final updatedProblem = RoadProblemDTO(
-      id: widget.problem.id,
-      authorUserId: widget.problem.authorUserId,
-      assignedControllerId: widget.problem.assignedControllerId,
-      title: widget.problem.title,
-      description: widget.problem.description,
-      address: widget.problem.address,
-      latitude: widget.problem.latitude,
-      longitude: widget.problem.longitude,
-      type: widget.problem.type,
-      severity: widget.problem.severity,
-      status: widget.problem.status,
-      reportedDate: widget.problem.reportedDate,
-      images: widget.problem.images,
-      author: widget.problem.author,
-      likes: widget.problem.likes,
-      commentsCount: updatedComments.length,
-      comments: updatedComments,
-    );
-
-   
-    await context.read<RoadProblemsProvider>().updateProblem(updatedProblem);
-
-   
-    _commentController.clear();
-    _focusNode.unfocus();
-
-   
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Комментарий добавлен'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 1),
-      ),
-    );
-
-    setState(() {});
+    setState(() => _sending = true);
+    try {
+      final created = await context
+          .read<RoadProblemsProvider>()
+          .addComment(widget.problem.id, text);
+      if (!mounted) return;
+      setState(() {
+        _comments = [..._comments, created];
+      });
+      _commentController.clear();
+      _focusNode.unfocus();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Комментарий добавлен'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? e.toString())),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-   
-    final currentProblem = context
+    final l10n = context.localized;
+    final currentUserId = context.repository.authRepository.user?.id;
+    final totalCount = context
             .watch<RoadProblemsProvider>()
-            .getProblemById(widget.problem.id) ??
-        widget.problem;
-
-    final comments = currentProblem.comments ?? [];
+            .getProblemById(widget.problem.id)
+            ?.commentsCount ??
+        _comments.length;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: Text('Комментарии (${comments.length})'),
+        title: Text('${l10n.cityDriveComments} ($totalCount)'),
         backgroundColor: AppColors.white,
         foregroundColor: AppColors.blac151619,
         elevation: 0,
@@ -103,57 +147,84 @@ class _CommentsPageState extends State<CommentsPage> {
       ),
       body: Column(
         children: [
-          
           Expanded(
-            child: comments.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const Gap(16),
-                        Text(
-                          'Пока нет комментариев',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _loadError != null
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _loadError!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                              const Gap(16),
+                              ElevatedButton(
+                                onPressed: _loadComments,
+                                child: const Text('Повторить'),
+                              ),
+                            ],
                           ),
                         ),
-                        const Gap(8),
-                        Text(
-                          'Будьте первым, кто оставит комментарий!',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
+                      )
+                    : _comments.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.chat_bubble_outline,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const Gap(16),
+                                Text(
+                                  'Пока нет комментариев',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const Gap(8),
+                                Text(
+                                  l10n.cityDriveLeaveFirstComment,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _loadComments,
+                            child: ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(16),
+                              itemCount: _comments.length,
+                              itemBuilder: (context, index) {
+                                final comment = _comments[index];
+                                final isCurrentUser =
+                                    comment.authorUserId != null &&
+                                        comment.authorUserId == currentUserId;
+                                return _CommentItem(
+                                  comment: comment,
+                                  isCurrentUser: isCurrentUser,
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      final comment = comments[index];
-                      return _CommentItem(
-                        comment: comment,
-                        isCurrentUser: comment.author == 'Вы',
-                      );
-                    },
-                  ),
           ),
-
-         
           Container(
             decoration: BoxDecoration(
               color: AppColors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -168,7 +239,6 @@ class _CommentsPageState extends State<CommentsPage> {
             child: SafeArea(
               child: Row(
                 children: [
-                 
                   Expanded(
                     child: TextField(
                       controller: _commentController,
@@ -176,7 +246,7 @@ class _CommentsPageState extends State<CommentsPage> {
                       maxLines: null,
                       textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
-                        hintText: 'Добавить комментарий...',
+                        hintText: l10n.cityDriveAddCommentHint,
                         hintStyle: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 14,
@@ -195,20 +265,27 @@ class _CommentsPageState extends State<CommentsPage> {
                     ),
                   ),
                   const Gap(8),
-
-                 
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.mainColor,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      onPressed: _addComment,
-                      icon: const Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      onPressed: _sending ? null : _addComment,
+                      icon: _sending
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.send_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                     ),
                   ),
                 ],
@@ -222,29 +299,29 @@ class _CommentsPageState extends State<CommentsPage> {
 }
 
 class _CommentItem extends StatelessWidget {
-  final Comment comment;
-  final bool isCurrentUser;
-
   const _CommentItem({
     required this.comment,
     required this.isCurrentUser,
   });
 
+  final Comment comment;
+  final bool isCurrentUser;
+
   @override
   Widget build(BuildContext context) {
+    final authorLabel = comment.author.isNotEmpty ? comment.author : 'User';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Аватар
           CircleAvatar(
             radius: 20,
             backgroundColor: isCurrentUser
-                ? AppColors.mainColor.withOpacity(0.2)
+                ? AppColors.mainColor.withValues(alpha: 0.2)
                 : Colors.grey[300],
             child: Text(
-              comment.author[0].toUpperCase(),
+              authorLabel[0].toUpperCase(),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
@@ -253,26 +330,23 @@ class _CommentItem extends StatelessWidget {
             ),
           ),
           const Gap(12),
-
-          // Контент комментария
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isCurrentUser
-                    ? AppColors.mainColor.withOpacity(0.1)
+                    ? AppColors.mainColor.withValues(alpha: 0.1)
                     : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Имя и время
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        comment.author,
+                        authorLabel,
                         style: AppTextStyles.body14w400.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -286,8 +360,6 @@ class _CommentItem extends StatelessWidget {
                     ],
                   ),
                   const Gap(6),
-
-                  // Текст комментария
                   Text(
                     comment.text,
                     style: AppTextStyles.body14w400.copyWith(

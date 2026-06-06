@@ -20,6 +20,7 @@ class UserPayload with _$UserPayload {
 
     @JsonKey(includeIfNull: false, name: 'device_type') String? deviceType,
     @JsonKey(includeIfNull: false, name: 'device_token') String? deviceToken,
+    @JsonKey(includeIfNull: false) String? lang,
   }) = _UserPayload;
 
   factory UserPayload.fromJson(Map<String, dynamic> json) => _$UserPayloadFromJson(json);

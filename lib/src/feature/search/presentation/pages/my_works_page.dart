@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
@@ -8,6 +9,8 @@ import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
+import 'package:city_drive/src/feature/controller/models/controller_dashboard_dto.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
@@ -30,40 +33,35 @@ class _MyWorksPageState extends State<MyWorksPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<RoadProblemsProvider>().load();
-      }
-    });
   }
 
-  List<RoadProblemDTO> _filteredItems(
-    RoadProblemsProvider provider,
-    int controllerId,
-  ) {
+  List<RoadProblemDTO> _filteredItems({
+    ControllerDashboardDTO? dashboard,
+    required RoadProblemsProvider provider,
+    required int controllerId,
+  }) {
+    final myMarks = dashboard?.myMarks ?? provider.mineForController();
+    final pending =
+        dashboard?.pendingMarks ?? provider.pendingForController();
+
     switch (_selectedMainFilter) {
       case _WorksMainFilter.applications:
-        return provider.pendingForController();
+        return pending;
       case _WorksMainFilter.canceled:
-        return provider.problems
+        return myMarks
             .where((p) => p.status == ReportStatus.rejected)
             .toList();
       case _WorksMainFilter.inWork:
         if (_selectedSubFilter == _WorksSubFilter.completed) {
-          return provider.problems
-              .where(
-                (p) =>
-                    p.assignedControllerId == controllerId &&
-                    p.status == ReportStatus.fixed,
-              )
+          return myMarks
+              .where((p) => p.status == ReportStatus.fixed)
               .toList();
         }
-        return provider.problems
+        return myMarks
             .where(
               (p) =>
-                  p.assignedControllerId == controllerId &&
-                  (p.status == ReportStatus.inProgress ||
-                      p.status == ReportStatus.confirmed),
+                  p.status == ReportStatus.inProgress ||
+                  p.status == ReportStatus.confirmed,
             )
             .toList();
     }
@@ -144,33 +142,50 @@ class _MyWorksPageState extends State<MyWorksPage> {
               ),
             ),
             Expanded(
-              child: Consumer<RoadProblemsProvider>(
-                builder: (context, provider, _) {
-                  final items = _filteredItems(provider, controllerId);
+              child: BlocBuilder<ControllerDashboardCubit, ControllerDashboardState>(
+                builder: (context, dashState) {
+                  final dashboard = dashState.maybeWhen(
+                    loaded: (d) => d,
+                    orElse: () => null,
+                  );
 
-                  if (items.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          _emptyMessage(l10n),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.grey, height: 1.4),
+                  return Consumer<RoadProblemsProvider>(
+                    builder: (context, provider, _) {
+                      final items = _filteredItems(
+                        dashboard: dashboard,
+                        provider: provider,
+                        controllerId: controllerId,
+                      );
+
+                      if (items.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Text(
+                              _emptyMessage(l10n),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return RefreshIndicator(
+                        onRefresh: () =>
+                            context.read<ControllerDashboardCubit>().load(),
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: items.length,
+                          separatorBuilder: (_, __) => const Gap(16),
+                          itemBuilder: (context, index) {
+                            return _WorkCard(problem: items[index]);
+                          },
                         ),
-                      ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async => provider.load(),
-                    child: ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const Gap(16),
-                      itemBuilder: (context, index) {
-                        return _WorkCard(problem: items[index]);
-                      },
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -297,15 +312,10 @@ class _WorkCard extends StatelessWidget {
             ],
           ),
           const Gap(8),
-          Row(
-            children: [
-              Icon(statusUi.icon, size: 18, color: statusUi.color),
-              const Gap(4),
-              Text(
-                statusUi.label,
-                style: TextStyle(color: statusUi.color),
-              ),
-            ],
+          ReportStatusBadge(
+            status: problem.status,
+            label: statusUi.label,
+            compact: true,
           ),
           if (problem.reportedDate != null) ...[
             const Gap(8),

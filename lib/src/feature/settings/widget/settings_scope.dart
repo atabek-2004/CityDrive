@@ -8,7 +8,9 @@ import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
 
 import 'package:city_drive/src/feature/app/initialization/widget/dependencies_scope.dart';
+import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
+import 'package:city_drive/src/feature/main/bloc/news_provider.dart';
 
 import 'package:city_drive/src/core/constant/localization/localization.dart';
 import 'package:city_drive/src/feature/settings/bloc/app_settings_bloc.dart';
@@ -85,9 +87,22 @@ class _SettingsScopeState extends State<SettingsScope> {
             BlocProvider(
               create: (context) => AppBloc(context.repository.authRepository),
             ),
+            BlocProvider(
+              create: (context) => ControllerDashboardCubit(
+                repository: context.repository.controllerRepository,
+              ),
+              lazy: true,
+            ),
             ChangeNotifierProvider(
               create: (context) => RoadProblemsProvider(
-                context.repository.roadProblemRepository,
+                repository: context.repository.roadProblemRepository,
+                authRepository: context.repository.authRepository,
+                sessionRepository: context.repository.sessionRepository,
+              ),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => NewsProvider(
+                context.repository.newsRemoteDS,
               ),
             ),
             // BlocProvider(

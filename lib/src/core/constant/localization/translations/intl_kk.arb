@@ -377,6 +377,7 @@
   "cityDrivePotholeRepair": "Шұңқыр жөндеу",
   "cityDriveAddressNotSpecified": "Мекенжай көрсетілмеген",
   "cityDriveUnderReview": "Қаралуда",
+  "cityDriveOnVerification": "Тексеруде",
   "cityDriveFromAuthor": "Кімнен: {author}",
   "cityDriveMoreDetails": "Толығырақ",
   "cityDriveMarkAcceptedSnack": "Белгі жұмысқа қабылданды",
@@ -429,6 +430,14 @@
   "cityDriveApplicationAcceptedStep": "Өтінім қабылданды",
   "cityDriveApplicationSentStep": "Өтінім жіберілді",
   "cityDriveViewInMyWorks": "Менің жұмыстарымда көру",
+  "cityDriveAssignedTo": "Орындаушы: {name}",
+  "@cityDriveAssignedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "cityDriveAnnouncement": "Хабарландыру",
   "cityDriveCommentOptional": "Пікір (міндетті емес)",
   "cityDriveCommentHint": "Мысалы: келесі аптада жұмысты бастаймыз",
@@ -448,6 +457,9 @@
   "cityDriveEmptyList": "Тізім бос",
   "cityDriveLoginToPublish": "Белгі жариялау үшін аккаунтқа кіріңіз",
   "cityDriveReportPublished": "Есеп сәтті жарияланды!",
+  "cityDriveReportSubmittedPending": "Өтінім жіберілді, тексеруді күтуде",
+  "cityDriveReportSubmitAlertTitle": "Өтінім жіберілді",
+  "cityDriveReportSubmitAlertMessage": "Сіздің хабарламаңыз жіберілді және жауапты мамандар тексеруде. Оң шешім қабылданса, сұрауыңыз қабылданады.",
   "cityDriveConfirm": "Растау",
   "cityDriveAddCommentHint": "Пікір қосу (міндетті емес)...",
   "cityDriveRetake": "Қайта түсіру",

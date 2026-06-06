@@ -1,3 +1,4 @@
+import 'package:city_drive/src/core/data/app_info_remote_ds.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:city_drive/src/core/data/session_repository.dart';
@@ -6,16 +7,21 @@ import 'package:city_drive/src/core/rest_client/rest_client.dart';
 import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/dio_client.dart';
 import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/interceptor/dio_interceptor.dart';
 import 'package:city_drive/src/core/rest_client/src/dio_rest_client/src/rest_client_dio.dart';
+import 'package:city_drive/src/core/config/api_config.dart';
+import 'package:city_drive/src/feature/controller/data/controller_remote_ds.dart';
+import 'package:city_drive/src/feature/controller/data/controller_repository.dart';
+import 'package:city_drive/src/feature/auth/data/company_remote_ds.dart';
+import 'package:city_drive/src/feature/auth/data/company_repository.dart';
 import 'package:city_drive/src/feature/auth/data/auth_remote_ds.dart';
 import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
-import 'package:city_drive/src/feature/auth/data/local_auth_data_source.dart';
-import 'package:city_drive/src/feature/auth/data/local_auth_repository.dart';
+import 'package:city_drive/src/feature/auth/data/backend_auth_repository.dart';
 import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
-import 'package:city_drive/src/feature/profile/data/local_profile_repository.dart';
 import 'package:city_drive/src/feature/profile/data/profile_remote_ds.dart';
 import 'package:city_drive/src/feature/profile/data/profile_repository.dart';
-import 'package:city_drive/src/feature/search/data/road_problem_local_ds.dart';
+import 'package:city_drive/src/feature/search/data/road_problem_api_repository.dart';
+import 'package:city_drive/src/feature/search/data/road_problem_remote_ds.dart';
 import 'package:city_drive/src/feature/search/data/road_problem_repository.dart';
+import 'package:city_drive/src/feature/main/data/news_remote_ds.dart';
 import 'package:city_drive/src/feature/settings/data/app_settings_datasource.dart';
 
 abstract class IRepositoryStorage {
@@ -26,8 +32,12 @@ abstract class IRepositoryStorage {
   IAuthRepository get authRepository;
   IProfileRepository get profileRepository;
   IRoadProblemRepository get roadProblemRepository;
+  NewsRemoteDS get newsRemoteDS;
   IAuthRemoteDS get authRemoteDS;
   IProfileRemoteDS get profileRemoteDS;
+  IAppInfoRemoteDS get appInfoRemoteDS;
+  ICompanyRepository get companyRepository;
+  IControllerRepository get controllerRepository;
 
   void close();
 }
@@ -48,10 +58,13 @@ class RepositoryStorage implements IRepositoryStorage {
   final HiveService _hiveService;
   IRestClient? _restClient;
   ISessionRepository? _sessionRepository;
-  LocalAuthDataSource? _localAuthDS;
   IAuthRepository? _authRepository;
   IProfileRepository? _profileRepository;
   IRoadProblemRepository? _roadProblemRepository;
+  NewsRemoteDS? _newsRemoteDS;
+  IAppInfoRemoteDS? _appInfoRemoteDS;
+  ICompanyRepository? _companyRepository;
+  IControllerRepository? _controllerRepository;
 
   @override
   HiveService get hiveService => _hiveService;
@@ -66,11 +79,12 @@ class RepositoryStorage implements IRepositoryStorage {
     await _hiveService.close();
   }
 
+  /// [ApiConfig.baseUrl] — из `GET /api/info` → `flutter_base_url` (не localhost с телефона).
   @override
   IRestClient get restClient => _restClient ??= RestClientDio(
-        baseUrl: 'http://91.243.71.181:8080/api/',
+        baseUrl: '${ApiConfig.baseUrl}/',
         dioClient: DioClient(
-          baseUrl: 'http://91.243.71.181:8080/api',
+          baseUrl: '${ApiConfig.baseUrl}/',
           interceptor: const DioInterceptor(),
           authDao: authDao,
           packageInfo: _packageInfo,
@@ -78,28 +92,49 @@ class RepositoryStorage implements IRepositoryStorage {
         ),
       );
 
-  LocalAuthDataSource get _localAuth =>
-      _localAuthDS ??= LocalAuthDataSource(_hiveService);
+  @override
+  IAuthRepository get authRepository => _authRepository ??= BackendAuthRepository(
+        remoteDS: authRemoteDS,
+        authDao: authDao,
+        sessionRepository: sessionRepository,
+        companyRepository: companyRepository,
+      );
 
   @override
-  IAuthRepository get authRepository => _authRepository ??= LocalAuthRepository(
-        authDao: authDao,
-        localDS: _localAuth,
-        sessionRepository: sessionRepository,
-        hiveService: _hiveService,
+  IControllerRepository get controllerRepository =>
+      _controllerRepository ??= ControllerRepositoryImpl(
+        remoteDS: ControllerRemoteDS(
+          (restClient as RestClientDio).dioClient.dio,
+        ),
+        roadProblemRepository: roadProblemRepository,
+        authRepository: authRepository,
+      );
+
+  @override
+  ICompanyRepository get companyRepository => _companyRepository ??=
+      CompanyRepositoryImpl(
+        remoteDS: CompanyRemoteDSImpl(restClient: restClient),
       );
 
   @override
   IProfileRepository get profileRepository => _profileRepository ??=
-      LocalProfileRepository(
-        authRepository: authRepository,
-        localAuthDS: _localAuth,
+      ProfileRepositoryImpl(remoteDS: profileRemoteDS);
+
+  @override
+  IAppInfoRemoteDS get appInfoRemoteDS => _appInfoRemoteDS ??=
+      AppInfoRemoteDSImpl(restClient: restClient);
+
+  @override
+  NewsRemoteDS get newsRemoteDS => _newsRemoteDS ??= NewsRemoteDS(
+        (restClient as RestClientDio).dioClient.dio,
       );
 
   @override
   IRoadProblemRepository get roadProblemRepository =>
-      _roadProblemRepository ??= RoadProblemRepository(
-        RoadProblemLocalDataSource(_hiveService),
+      _roadProblemRepository ??= RoadProblemApiRepository(
+        RoadProblemRemoteDS(
+          (restClient as RestClientDio).dioClient.dio,
+        ),
       );
 
   @override

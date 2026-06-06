@@ -518,10 +518,8 @@ class _SignUpSecondPageState extends State<SignUpSecondPage> {
                                         passwordRepeatController.text.trim(),
 
                                     birthDate: _selectedDate.toString(),
-                                    // deviceType:
-                                    //     Platform.isAndroid ? 'android' : 'ios',
-                                    // deviceToken: '',
                                   ),
+                                  role: 'CONTROLLER',
                                 );
                               },
                               style: CustomButtonStyles.mainButtonStyle(context)

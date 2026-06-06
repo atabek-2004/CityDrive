@@ -2107,6 +2107,12 @@ abstract class AppLocalizations {
   /// **'На рассмотрении'**
   String get cityDriveUnderReview;
 
+  /// No description provided for @cityDriveOnVerification.
+  ///
+  /// In ru, this message translates to:
+  /// **'На проверке'**
+  String get cityDriveOnVerification;
+
   /// No description provided for @cityDriveFromAuthor.
   ///
   /// In ru, this message translates to:
@@ -2419,6 +2425,12 @@ abstract class AppLocalizations {
   /// **'Посмотреть в Мои работы'**
   String get cityDriveViewInMyWorks;
 
+  /// No description provided for @cityDriveAssignedTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исполнитель: {name}'**
+  String cityDriveAssignedTo(String name);
+
   /// No description provided for @cityDriveAnnouncement.
   ///
   /// In ru, this message translates to:
@@ -2532,6 +2544,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Отчет успешно опубликован!'**
   String get cityDriveReportPublished;
+
+  /// No description provided for @cityDriveReportSubmittedPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заявка отправлена и ожидает проверки'**
+  String get cityDriveReportSubmittedPending;
+
+  /// No description provided for @cityDriveReportSubmitAlertTitle.
+  String get cityDriveReportSubmitAlertTitle;
+
+  /// No description provided for @cityDriveReportSubmitAlertMessage.
+  String get cityDriveReportSubmitAlertMessage;
 
   /// No description provided for @cityDriveConfirm.
   ///

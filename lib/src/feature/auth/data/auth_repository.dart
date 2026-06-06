@@ -3,15 +3,19 @@ import 'dart:io';
 
 import 'package:city_drive/src/core/rest_client/models/basic_response.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:city_drive/src/feature/auth/data/api_login_result.dart';
 import 'package:city_drive/src/feature/auth/data/auth_remote_ds.dart';
 import 'package:city_drive/src/feature/auth/database/auth_dao.dart';
 import 'package:city_drive/src/feature/auth/models/common_dto.dart';
 import 'package:city_drive/src/feature/auth/models/common_lists_dto.dart';
 import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
+import 'package:city_drive/src/feature/auth/models/company_dto.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 
 abstract interface class IAuthRepository {
   bool get isAuthenticated;
+
+  bool get isApproved;
 
   UserDTO? get user;
 
@@ -25,6 +29,9 @@ abstract interface class IAuthRepository {
   });
 
   Future<void> clearUser();
+
+  /// Persists profile fields from API while keeping session extras (token, role).
+  Future<void> updateStoredUser(UserDTO user);
 
   // Forgot password API's
   Future forgotPasswordSmsSend({
@@ -69,7 +76,10 @@ abstract interface class IAuthRepository {
     required String? phone,
     required String? password,
     required String? passwordConfirmation,
+    String? role,
   });
+
+  Future<ApprovalStatusDTO> fetchApprovalStatus();
 
   Future<CommonListsDTO> getRegisterFormOptions();
 
@@ -113,6 +123,13 @@ class AuthRepositoryImpl implements IAuthRepository {
   @override
   bool get isAuthenticated => _authDao.user.value != null;
 
+  @override
+  bool get isApproved => true;
+
+  @override
+  Future<ApprovalStatusDTO> fetchApprovalStatus() async =>
+      const ApprovalStatusDTO(isApproved: true);
+
   // @override
   // Future registration1({
   //   required String name,
@@ -150,6 +167,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String? phone,
     required String? password,
     required String? passwordConfirmation,
+    String? role,
   }) async {
     try {
       final user = await _remoteDS.registration(
@@ -174,6 +192,17 @@ class AuthRepositoryImpl implements IAuthRepository {
     } catch (e) {
       rethrow;
     }
+  }
+
+  @override
+  Future<void> updateStoredUser(UserDTO user) async {
+    final userStr = _authDao.user.value;
+    final merged = Map<String, dynamic>.from(user.toJson());
+    if (userStr != null) {
+      final stored = jsonDecode(userStr) as Map<String, dynamic>;
+      merged['token'] ??= stored['token'];
+    }
+    await _authDao.user.setValue(jsonEncode(merged));
   }
 
   @override
@@ -211,16 +240,16 @@ class AuthRepositoryImpl implements IAuthRepository {
   }) async {
     final String? dv = _authDao.deviceToken.value;
     try {
-      final user = await _remoteDS.login(
+      final result = await _remoteDS.login(
         phone: phone,
         password: password,
         deviceToken: dv,
         deviceType: deviceType,
       );
 
-      await _authDao.user.setValue(jsonEncode(user.toJson()));
+      await _authDao.user.setValue(jsonEncode(result.user.toJson()));
 
-      return user;
+      return result.user;
     } catch (e) {
       rethrow;
     }

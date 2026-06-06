@@ -65,7 +65,8 @@ class ProfileBLoC extends Bloc<ProfileEvent, ProfileState> {
     try {
       emit(const ProfileState.loading());
 
-      final result = await _authRepository.logout();
+      final result = await _profileRepository.logOut();
+      await _authRepository.clearUser();
 
       emit(ProfileState.exited(message: result.message ?? ''));
     } on RestClientException catch (e) {
@@ -82,6 +83,7 @@ class ProfileBLoC extends Bloc<ProfileEvent, ProfileState> {
       emit(const ProfileState.loading());
 
       final result = await _profileRepository.deleteProfile();
+      await _authRepository.clearUser();
 
       emit(ProfileState.exited(message: result.message ?? ''));
     } on RestClientException catch (e) {

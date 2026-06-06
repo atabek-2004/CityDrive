@@ -203,34 +203,102 @@ class CommentsRouteArgs {
 
 /// generated route for
 /// [CompanyDataPage]
-class CompanyDataRoute extends PageRouteInfo<void> {
-  const CompanyDataRoute({List<PageRouteInfo>? children})
-    : super(CompanyDataRoute.name, initialChildren: children);
+class CompanyDataRoute extends PageRouteInfo<CompanyDataRouteArgs> {
+  CompanyDataRoute({
+    Key? key,
+    VoidCallback? onCompanySaved,
+    List<PageRouteInfo>? children,
+  }) : super(
+         CompanyDataRoute.name,
+         args: CompanyDataRouteArgs(key: key, onCompanySaved: onCompanySaved),
+         initialChildren: children,
+       );
 
   static const String name = 'CompanyDataRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const CompanyDataPage();
+      final args = data.argsAs<CompanyDataRouteArgs>(
+        orElse: () => const CompanyDataRouteArgs(),
+      );
+      return WrappedRoute(
+        child: CompanyDataPage(
+          key: args.key,
+          onCompanySaved: args.onCompanySaved,
+        ),
+      );
     },
   );
 }
 
+class CompanyDataRouteArgs {
+  const CompanyDataRouteArgs({this.key, this.onCompanySaved});
+
+  final Key? key;
+
+  final VoidCallback? onCompanySaved;
+
+  @override
+  String toString() {
+    return 'CompanyDataRouteArgs{key: $key, onCompanySaved: $onCompanySaved}';
+  }
+}
+
 /// generated route for
 /// [CompanyDocumentsPage]
-class CompanyDocumentsRoute extends PageRouteInfo<void> {
-  const CompanyDocumentsRoute({List<PageRouteInfo>? children})
-    : super(CompanyDocumentsRoute.name, initialChildren: children);
+class CompanyDocumentsRoute extends PageRouteInfo<CompanyDocumentsRouteArgs> {
+  CompanyDocumentsRoute({
+    Key? key,
+    String? rejectionReason,
+    VoidCallback? onDocumentsSubmitted,
+    List<PageRouteInfo>? children,
+  }) : super(
+         CompanyDocumentsRoute.name,
+         args: CompanyDocumentsRouteArgs(
+           key: key,
+           rejectionReason: rejectionReason,
+           onDocumentsSubmitted: onDocumentsSubmitted,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'CompanyDocumentsRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const CompanyDocumentsPage();
+      final args = data.argsAs<CompanyDocumentsRouteArgs>(
+        orElse: () => const CompanyDocumentsRouteArgs(),
+      );
+      return WrappedRoute(
+        child: CompanyDocumentsPage(
+          key: args.key,
+          rejectionReason: args.rejectionReason,
+          onDocumentsSubmitted: args.onDocumentsSubmitted,
+        ),
+      );
     },
   );
+}
+
+class CompanyDocumentsRouteArgs {
+  const CompanyDocumentsRouteArgs({
+    this.key,
+    this.rejectionReason,
+    this.onDocumentsSubmitted,
+  });
+
+  final Key? key;
+
+  final String? rejectionReason;
+
+  final VoidCallback? onDocumentsSubmitted;
+
+  @override
+  String toString() {
+    return 'CompanyDocumentsRouteArgs{key: $key, rejectionReason: $rejectionReason, onDocumentsSubmitted: $onDocumentsSubmitted}';
+  }
 }
 
 /// generated route for
@@ -654,6 +722,22 @@ class PasswordRecoveryRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return WrappedRoute(child: const PasswordRecoveryPage());
+    },
+  );
+}
+
+/// generated route for
+/// [PendingApprovalPage]
+class PendingApprovalRoute extends PageRouteInfo<void> {
+  const PendingApprovalRoute({List<PageRouteInfo>? children})
+    : super(PendingApprovalRoute.name, initialChildren: children);
+
+  static const String name = 'PendingApprovalRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PendingApprovalPage();
     },
   );
 }

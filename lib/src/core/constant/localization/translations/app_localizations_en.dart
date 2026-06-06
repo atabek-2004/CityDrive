@@ -1016,6 +1016,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cityDriveUnderReview => 'Under review';
 
   @override
+  String get cityDriveOnVerification => 'Under verification';
+
+  @override
   String cityDriveFromAuthor(String author) {
     return 'From: $author';
   }
@@ -1176,6 +1179,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cityDriveViewInMyWorks => 'View in My works';
 
   @override
+  String cityDriveAssignedTo(String name) {
+    return 'Assigned to: $name';
+  }
+
+  @override
   String get cityDriveAnnouncement => 'Announcement';
 
   @override
@@ -1231,6 +1239,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cityDriveReportPublished => 'Report published successfully!';
+
+  @override
+  String get cityDriveReportSubmittedPending =>
+      'Report submitted and awaiting review';
+
+  @override
+  String get cityDriveReportSubmitAlertTitle => 'Report submitted';
+
+  @override
+  String get cityDriveReportSubmitAlertMessage =>
+      'Your report has been sent and is being reviewed by responsible specialists. If approved, your request will be accepted.';
 
   @override
   String get cityDriveConfirm => 'Confirm';

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:city_drive/src/feature/auth/data/auth_repository.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:city_drive/src/core/rest_client/rest_client.dart';
@@ -13,9 +14,12 @@ part 'profile_cubit.freezed.dart';
 class ProfileCubit extends Cubit<ProfileCubitState> {
   ProfileCubit({
     required IProfileRepository repository,
+    required IAuthRepository authRepository,
   })  : _repository = repository,
+        _authRepository = authRepository,
         super(const ProfileCubitState.initial());
   final IProfileRepository _repository;
+  final IAuthRepository _authRepository;
 
   Future<void> updateProfile({
     required UserPayload userPayload,
@@ -28,7 +32,7 @@ class ProfileCubit extends Cubit<ProfileCubitState> {
         payload: userPayload,
         imageFile: avatar,
       );
-      // log('$user', name: 'edit cubit response');
+      await _authRepository.updateStoredUser(result);
       emit(ProfileCubitState.loaded(dto: result));
     } on RestClientException catch (e) {
       emit(

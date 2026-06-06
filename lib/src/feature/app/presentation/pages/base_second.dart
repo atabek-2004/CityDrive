@@ -1,17 +1,13 @@
-import 'package:animations/animations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
 import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
 import 'package:city_drive/src/feature/profile/presentation/pages/profile_page.dart';
-import 'package:provider/provider.dart';
-import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/presentation/pages/my_works_page.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 import 'package:city_drive/src/feature/search/presentation/utils/road_problem_labels.dart';
@@ -29,6 +25,7 @@ class BaseSecondPage extends StatefulWidget {
 class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
+  ControllerDashboardCubit? _dashboardCubit;
 
   @override
   void initState() {
@@ -38,12 +35,18 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
       vsync: this,
     );
     _tabController.addListener(_onTabChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _dashboardCubit = context.read<ControllerDashboardCubit>();
+      _dashboardCubit?.startPolling();
+      _dashboardCubit?.load();
+    });
   }
 
   void _onTabChanged() {
     if (!mounted) return;
     if (!_tabController.indexIsChanging && _tabController.index == 0) {
-      context.read<RoadProblemsProvider>().load();
+      context.read<ControllerDashboardCubit>().load();
     }
     setState(() {
       _currentIndex = _tabController.index;
@@ -52,6 +55,7 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
 
   @override
   void dispose() {
+    _dashboardCubit?.stopPolling();
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
@@ -59,7 +63,6 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    // Оборачиваем в BlocProvider для ProfilePage
     return LoaderOverlay(
       overlayColor: AppColors.barrierColor,
       overlayWidgetBuilder: (progress) => const CustomLoadingOverlayWidget(),
@@ -70,14 +73,14 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
         )..add(const ProfileEvent.getProfile()),
         child: Scaffold(
           body: TabBarView(
-          controller: _tabController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: const [
-            MainPage(),
-            MyWorksPage(),
-            ProfilePage(),
-          ],
-        ),
+            controller: _tabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: const [
+              ControllerMainPage(),
+              MyWorksPage(),
+              ProfilePage(),
+            ],
+          ),
           bottomNavigationBar: BaseBottomNavbar(
             tabController: _tabController,
             currentIndex: _currentIndex,
@@ -197,43 +200,46 @@ class _NavBarItem extends StatelessWidget {
 }
 
 // ============== ГЛАВНАЯ СТРАНИЦА КОНТРОЛЛЕРА ==============
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RoadProblemsProvider>().load();
-    });
-  }
+class ControllerMainPage extends StatelessWidget {
+  const ControllerMainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<RoadProblemsProvider>(
-      builder: (context, provider, _) {
-        final pending = provider.pendingForController();
-        final inWork = provider.problems
-            .where((p) => p.status == 'in_progress' || p.status == 'confirmed')
-            .length;
-        final done =
-            provider.problems.where((p) => p.status == 'fixed').length;
-
-        return RefreshIndicator(
-          onRefresh: () async {
-            provider.load();
-          },
-          child: _MainPageBody(
-            pendingCount: pending.length,
-            applicationsCount: pending.length,
-            inWorkCount: inWork,
-            doneCount: done,
-            pendingProblems: pending,
+    return BlocBuilder<ControllerDashboardCubit, ControllerDashboardState>(
+      builder: (context, state) {
+        return state.when(
+          initial: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (message) => RefreshIndicator(
+            onRefresh: () => context.read<ControllerDashboardCubit>().load(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.3,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          loaded: (dashboard) => RefreshIndicator(
+            onRefresh: () => context.read<ControllerDashboardCubit>().load(),
+            child: _MainPageBody(
+              pendingCount: dashboard.stats.newCount,
+              applicationsCount: dashboard.stats.applicationsCount,
+              inWorkCount: dashboard.displayStats.inWorkCount,
+              doneCount: dashboard.displayStats.doneCount,
+              pendingProblems: dashboard.pendingMarks,
+            ),
           ),
         );
       },

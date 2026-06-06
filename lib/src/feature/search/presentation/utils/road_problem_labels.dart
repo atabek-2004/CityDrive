@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
 import 'package:city_drive/src/core/local_storage/report_status.dart';
 import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
-
 String severityLabel(AppLocalizations l10n, String? severity) {
-  switch (severity) {
-    case 'critical':
-      return l10n.cityDriveSeverityCritical;
+  final level = severity == 'critical' ? 'high' : severity;
+  switch (level) {
     case 'high':
       return l10n.cityDriveSeverityHigh;
     case 'medium':
@@ -19,9 +17,8 @@ String severityLabel(AppLocalizations l10n, String? severity) {
 }
 
 Color severityColor(String? severity) {
-  switch (severity) {
-    case 'critical':
-      return const Color(0xFFFF6B6B);
+  final level = severity == 'critical' ? 'high' : severity;
+  switch (level) {
     case 'high':
       return const Color(0xFFFFA726);
     case 'medium':
@@ -31,11 +28,18 @@ Color severityColor(String? severity) {
   }
 }
 
+String mapStatusLabel(AppLocalizations l10n, String? status) {
+  if (ReportStatus.isUnderReview(status)) {
+    return l10n.cityDriveOnVerification;
+  }
+  return controllerStatusLabel(l10n, status);
+}
+
 String controllerStatusLabel(AppLocalizations l10n, String? status) {
   switch (status) {
     case ReportStatus.newReport:
     case ReportStatus.pending:
-      return l10n.cityDriveStatusOpen;
+      return l10n.cityDriveUnderReview;
     case ReportStatus.confirmed:
       return l10n.cityDriveStatusAccepted;
     case ReportStatus.inProgress:
@@ -43,25 +47,14 @@ String controllerStatusLabel(AppLocalizations l10n, String? status) {
     case ReportStatus.rejected:
       return l10n.cityDriveStatusRejected;
     case ReportStatus.fixed:
-      return l10n.cityDriveStatusDone;
+      return l10n.cityDriveStatusFixed;
     default:
-      return l10n.cityDriveStatusOpen;
+      return l10n.cityDriveUnderReview;
   }
 }
 
-Color controllerStatusColor(String? status) {
-  switch (status) {
-    case ReportStatus.confirmed:
-    case ReportStatus.fixed:
-      return const Color(0xFF4CD964);
-    case ReportStatus.rejected:
-      return Colors.red;
-    case ReportStatus.inProgress:
-      return const Color(0xFF4A9EFF);
-    default:
-      return const Color(0xFF91D5FF);
-  }
-}
+Color controllerStatusColor(String? status) =>
+    ReportStatusUi.colorFor(status);
 
 String publishedLabel(AppLocalizations l10n, DateTime? date) {
   final formatted = formatReportDate(l10n, date);
