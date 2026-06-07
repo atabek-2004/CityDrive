@@ -1,3 +1,5 @@
+import 'package:city_drive/src/feature/search/model/work_report_dto.dart';
+
 class AssignedControllerDTO {
   const AssignedControllerDTO({
     this.id,
@@ -45,6 +47,8 @@ class RoadProblemDTO {
   final int? commentsCount;
   final List<Comment>? comments;
   final bool likedByMe;
+  final String? controllerComment;
+  final WorkReportDTO? workReport;
 
   RoadProblemDTO({
     required this.id,
@@ -66,6 +70,8 @@ class RoadProblemDTO {
     this.commentsCount,
     this.comments,
     this.likedByMe = false,
+    this.controllerComment,
+    this.workReport,
   });
 
   RoadProblemDTO copyWith({
@@ -94,6 +100,33 @@ class RoadProblemDTO {
         commentsCount: commentsCount ?? this.commentsCount,
         comments: comments ?? this.comments,
         likedByMe: likedByMe ?? this.likedByMe,
+        controllerComment: controllerComment,
+        workReport: workReport,
+      );
+
+  RoadProblemDTO mergeFrom(RoadProblemDTO other) => RoadProblemDTO(
+        id: other.id,
+        authorUserId: other.authorUserId ?? authorUserId,
+        assignedControllerId:
+            other.assignedControllerId ?? assignedControllerId,
+        assignedController: other.assignedController ?? assignedController,
+        title: other.title ?? title,
+        description: other.description ?? description,
+        address: other.address ?? address,
+        latitude: other.latitude ?? latitude,
+        longitude: other.longitude ?? longitude,
+        type: other.type ?? type,
+        severity: other.severity ?? severity,
+        status: other.status ?? status,
+        reportedDate: other.reportedDate ?? reportedDate,
+        images: other.images ?? images,
+        author: other.author ?? author,
+        likes: other.likes ?? likes,
+        commentsCount: other.commentsCount ?? commentsCount,
+        comments: other.comments ?? comments,
+        likedByMe: other.likedByMe,
+        controllerComment: other.controllerComment ?? controllerComment,
+        workReport: other.workReport ?? workReport,
       );
 
   factory RoadProblemDTO.fromJson(Map<String, dynamic> json) {
@@ -117,6 +150,8 @@ class RoadProblemDTO {
       commentsCount: _intOrNull(json['comments_count']),
       comments: _commentsOrNull(json),
       likedByMe: json['liked_by_me'] as bool? ?? false,
+      controllerComment: json['controller_comment'] as String?,
+      workReport: WorkReportDTO.fromMarkJson(json),
     );
   }
 

@@ -8,5 +8,5 @@
 /// | Android emulator    | http://10.0.2.2:8080/api         |
 /// | iOS simulator       | http://localhost:8080/api        |
 abstract final class ApiConfig {
-  static const baseUrl = 'http://192.168.3.212:8080/api';
+  static const baseUrl = 'http://93.115.23.239:8080/api';
 }

@@ -6,6 +6,7 @@ import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
+import 'package:city_drive/src/feature/controller/presentation/utils/controller_home_navigation.dart';
 import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
 import 'package:city_drive/src/feature/profile/presentation/pages/profile_page.dart';
 import 'package:city_drive/src/feature/search/presentation/pages/my_works_page.dart';
@@ -35,12 +36,27 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
       vsync: this,
     );
     _tabController.addListener(_onTabChanged);
+    ControllerHomeNavigation.pendingTabIndex.addListener(_onPendingHomeTab);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _dashboardCubit = context.read<ControllerDashboardCubit>();
       _dashboardCubit?.startPolling();
       _dashboardCubit?.load();
+      _applyPendingHomeTab();
     });
+  }
+
+  void _onPendingHomeTab() => _applyPendingHomeTab();
+
+  void _applyPendingHomeTab() {
+    if (!mounted) return;
+    final tab = ControllerHomeNavigation.takePendingTab();
+    if (tab == null || tab == _tabController.index) return;
+    _tabController.animateTo(tab);
+    setState(() => _currentIndex = tab);
+    if (tab == ControllerHomeNavigation.myWorksTabIndex) {
+      context.read<ControllerDashboardCubit>().load();
+    }
   }
 
   void _onTabChanged() {
@@ -55,6 +71,7 @@ class _BaseSecondPageState extends State<BaseSecondPage> with TickerProviderStat
 
   @override
   void dispose() {
+    ControllerHomeNavigation.pendingTabIndex.removeListener(_onPendingHomeTab);
     _dashboardCubit?.stopPolling();
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
@@ -234,11 +251,11 @@ class ControllerMainPage extends StatelessWidget {
           loaded: (dashboard) => RefreshIndicator(
             onRefresh: () => context.read<ControllerDashboardCubit>().load(),
             child: _MainPageBody(
-              pendingCount: dashboard.stats.newCount,
-              applicationsCount: dashboard.stats.applicationsCount,
+              pendingCount: dashboard.displayStats.newCount,
+              applicationsCount: dashboard.displayStats.applicationsCount,
               inWorkCount: dashboard.displayStats.inWorkCount,
               doneCount: dashboard.displayStats.doneCount,
-              pendingProblems: dashboard.pendingMarks,
+              pendingProblems: dashboard.newMarks,
             ),
           ),
         );
@@ -408,7 +425,7 @@ class _MainPageBody extends StatelessWidget {
                             title: p.title ?? l10n.cityDrivePotholeRepair,
                             address: p.address ?? l10n.cityDriveAddressNotSpecified,
                             severityLabel: severityLabel(l10n, p.severity),
-                            statusLine: l10n.cityDriveUnderReview,
+                            statusLine: controllerAnnouncementStatusLabel(l10n, p),
                             publishedTime: publishedLabel(l10n, p.reportedDate),
                             authorLine: p.author != null
                                 ? l10n.cityDriveFromAuthor(p.author!)

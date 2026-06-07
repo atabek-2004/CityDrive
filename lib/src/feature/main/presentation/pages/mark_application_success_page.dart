@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
-import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
+import 'package:city_drive/src/feature/controller/presentation/utils/controller_home_navigation.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 
 enum MarkApplicationSuccessKind {
@@ -50,8 +50,9 @@ class MarkApplicationSuccessPage extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () =>
-                      context.router.popUntilRouteWithName(BaseSecondRoute.name),
+                  onPressed: () => ControllerHomeNavigation.popToHomeAndOpenMyWorks(
+                    context.router,
+                  ),
                 ),
               ),
               const Gap(24),
@@ -178,8 +179,9 @@ class MarkApplicationSuccessPage extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      context.router.popUntilRouteWithName(BaseSecondRoute.name),
+                  onPressed: () => ControllerHomeNavigation.popToHomeAndOpenMyWorks(
+                    context.router,
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     padding: const EdgeInsets.symmetric(vertical: 18),

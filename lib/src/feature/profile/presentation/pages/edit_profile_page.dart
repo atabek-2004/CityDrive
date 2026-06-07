@@ -19,8 +19,7 @@ import 'package:city_drive/src/core/presentation/widgets/textfields/custom_valid
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/core/utils/input/validator_util.dart';
-import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
-import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
 import 'package:city_drive/src/feature/auth/models/request/user_payload.dart';
 import 'package:city_drive/src/feature/auth/models/user_dto.dart';
 import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
@@ -447,11 +446,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             },
                             exited: (user) {
                               context.loaderOverlay.hide();
-                              // Toaster.showTopShortToast(context, message: 'Успешно');
-                              BlocProvider.of<AppBloc>(context)
-                                  .add(const AppEvent.exiting());
-                              context.router.popUntil((route) =>
-                                  route.settings.name == LauncherRoute.name);
+                              resetAfterLogout(context);
                             },
                             loaded: (userDTO) {
                               // selectedLanguageId = userDTO.language?.id;

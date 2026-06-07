@@ -65,7 +65,10 @@ class _ControllerAcceptApplicationPageState
   bool get _canAccept {
     final p = _problem;
     if (p == null) return false;
-    return p.status == ReportStatus.pending && p.assignedControllerId == null;
+    return ReportStatus.canControllerAccept(
+      status: p.status,
+      assignedControllerId: p.assignedControllerId,
+    );
   }
 
   @override
@@ -84,8 +87,10 @@ class _ControllerAcceptApplicationPageState
     try {
       final fresh = await context.repository.controllerRepository.getMark(markId);
       if (!mounted) return;
-      if (fresh.status != ReportStatus.pending ||
-          fresh.assignedControllerId != null) {
+      if (!ReportStatus.canControllerAccept(
+            status: fresh.status,
+            assignedControllerId: fresh.assignedControllerId,
+          )) {
         setState(() {
           _isSubmitting = false;
           _problem = fresh;
@@ -100,7 +105,7 @@ class _ControllerAcceptApplicationPageState
       final updated =
           await context.repository.controllerRepository.updateMarkStatus(
         id: markId,
-        status: ReportStatus.confirmed,
+        status: ReportStatus.controllerAssigned,
         assignedControllerId: controllerId,
         comment: comment.isEmpty ? null : comment,
       );

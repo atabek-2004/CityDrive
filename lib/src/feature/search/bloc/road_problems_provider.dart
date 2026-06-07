@@ -140,12 +140,14 @@ class RoadProblemsProvider extends ChangeNotifier {
     required int id,
     required String status,
     int? assignedControllerId,
+    bool clearAssignedController = false,
     String? comment,
   }) async {
     final updated = await _repository.updateStatus(
       id: id,
       status: status,
       assignedControllerId: assignedControllerId,
+      clearAssignedController: clearAssignedController,
       comment: comment,
     );
     if (!_isController) {

@@ -29,6 +29,8 @@ mixin _$ControllerDashboardStatsDTO {
   int get inWorkCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'done_count')
   int get doneCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'pending_review_count')
+  int get pendingReviewCount => throw _privateConstructorUsedError;
 
   /// Serializes this ControllerDashboardStatsDTO to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,7 +54,8 @@ abstract class $ControllerDashboardStatsDTOCopyWith<$Res> {
       {@JsonKey(name: 'new_count') int newCount,
       @JsonKey(name: 'applications_count') int applicationsCount,
       @JsonKey(name: 'in_work_count') int inWorkCount,
-      @JsonKey(name: 'done_count') int doneCount});
+      @JsonKey(name: 'done_count') int doneCount,
+      @JsonKey(name: 'pending_review_count') int pendingReviewCount});
 }
 
 /// @nodoc
@@ -75,6 +78,7 @@ class _$ControllerDashboardStatsDTOCopyWithImpl<$Res,
     Object? applicationsCount = null,
     Object? inWorkCount = null,
     Object? doneCount = null,
+    Object? pendingReviewCount = null,
   }) {
     return _then(_value.copyWith(
       newCount: null == newCount
@@ -93,6 +97,10 @@ class _$ControllerDashboardStatsDTOCopyWithImpl<$Res,
           ? _value.doneCount
           : doneCount // ignore: cast_nullable_to_non_nullable
               as int,
+      pendingReviewCount: null == pendingReviewCount
+          ? _value.pendingReviewCount
+          : pendingReviewCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -110,7 +118,8 @@ abstract class _$$ControllerDashboardStatsDTOImplCopyWith<$Res>
       {@JsonKey(name: 'new_count') int newCount,
       @JsonKey(name: 'applications_count') int applicationsCount,
       @JsonKey(name: 'in_work_count') int inWorkCount,
-      @JsonKey(name: 'done_count') int doneCount});
+      @JsonKey(name: 'done_count') int doneCount,
+      @JsonKey(name: 'pending_review_count') int pendingReviewCount});
 }
 
 /// @nodoc
@@ -132,6 +141,7 @@ class __$$ControllerDashboardStatsDTOImplCopyWithImpl<$Res>
     Object? applicationsCount = null,
     Object? inWorkCount = null,
     Object? doneCount = null,
+    Object? pendingReviewCount = null,
   }) {
     return _then(_$ControllerDashboardStatsDTOImpl(
       newCount: null == newCount
@@ -150,6 +160,10 @@ class __$$ControllerDashboardStatsDTOImplCopyWithImpl<$Res>
           ? _value.doneCount
           : doneCount // ignore: cast_nullable_to_non_nullable
               as int,
+      pendingReviewCount: null == pendingReviewCount
+          ? _value.pendingReviewCount
+          : pendingReviewCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -162,7 +176,8 @@ class _$ControllerDashboardStatsDTOImpl
       {@JsonKey(name: 'new_count') this.newCount = 0,
       @JsonKey(name: 'applications_count') this.applicationsCount = 0,
       @JsonKey(name: 'in_work_count') this.inWorkCount = 0,
-      @JsonKey(name: 'done_count') this.doneCount = 0});
+      @JsonKey(name: 'done_count') this.doneCount = 0,
+      @JsonKey(name: 'pending_review_count') this.pendingReviewCount = 0});
 
   factory _$ControllerDashboardStatsDTOImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -180,10 +195,13 @@ class _$ControllerDashboardStatsDTOImpl
   @override
   @JsonKey(name: 'done_count')
   final int doneCount;
+  @override
+  @JsonKey(name: 'pending_review_count')
+  final int pendingReviewCount;
 
   @override
   String toString() {
-    return 'ControllerDashboardStatsDTO(newCount: $newCount, applicationsCount: $applicationsCount, inWorkCount: $inWorkCount, doneCount: $doneCount)';
+    return 'ControllerDashboardStatsDTO(newCount: $newCount, applicationsCount: $applicationsCount, inWorkCount: $inWorkCount, doneCount: $doneCount, pendingReviewCount: $pendingReviewCount)';
   }
 
   @override
@@ -198,13 +216,15 @@ class _$ControllerDashboardStatsDTOImpl
             (identical(other.inWorkCount, inWorkCount) ||
                 other.inWorkCount == inWorkCount) &&
             (identical(other.doneCount, doneCount) ||
-                other.doneCount == doneCount));
+                other.doneCount == doneCount) &&
+            (identical(other.pendingReviewCount, pendingReviewCount) ||
+                other.pendingReviewCount == pendingReviewCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, newCount, applicationsCount, inWorkCount, doneCount);
+  int get hashCode => Object.hash(runtimeType, newCount, applicationsCount,
+      inWorkCount, doneCount, pendingReviewCount);
 
   /// Create a copy of ControllerDashboardStatsDTO
   /// with the given fields replaced by the non-null parameter values.
@@ -226,11 +246,12 @@ class _$ControllerDashboardStatsDTOImpl
 abstract class _ControllerDashboardStatsDTO
     implements ControllerDashboardStatsDTO {
   const factory _ControllerDashboardStatsDTO(
-          {@JsonKey(name: 'new_count') final int newCount,
-          @JsonKey(name: 'applications_count') final int applicationsCount,
-          @JsonKey(name: 'in_work_count') final int inWorkCount,
-          @JsonKey(name: 'done_count') final int doneCount}) =
-      _$ControllerDashboardStatsDTOImpl;
+      {@JsonKey(name: 'new_count') final int newCount,
+      @JsonKey(name: 'applications_count') final int applicationsCount,
+      @JsonKey(name: 'in_work_count') final int inWorkCount,
+      @JsonKey(name: 'done_count') final int doneCount,
+      @JsonKey(name: 'pending_review_count')
+      final int pendingReviewCount}) = _$ControllerDashboardStatsDTOImpl;
 
   factory _ControllerDashboardStatsDTO.fromJson(Map<String, dynamic> json) =
       _$ControllerDashboardStatsDTOImpl.fromJson;
@@ -247,6 +268,9 @@ abstract class _ControllerDashboardStatsDTO
   @override
   @JsonKey(name: 'done_count')
   int get doneCount;
+  @override
+  @JsonKey(name: 'pending_review_count')
+  int get pendingReviewCount;
 
   /// Create a copy of ControllerDashboardStatsDTO
   /// with the given fields replaced by the non-null parameter values.

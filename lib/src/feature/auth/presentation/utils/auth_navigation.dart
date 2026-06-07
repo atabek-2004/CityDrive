@@ -75,3 +75,9 @@ Future<void> navigateByRegistrationState(BuildContext context) async {
 void navigateAfterControllerRegistration(BuildContext context, UserDTO user) {
   navigateByRegistrationState(context);
 }
+
+/// После logout — сброс стека и экран выбора роли (Launcher → notAuthorized).
+void resetAfterLogout(BuildContext context) {
+  BlocProvider.of<AppBloc>(context).add(const AppEvent.exiting());
+  context.router.replaceAll([const LauncherRoute()]);
+}

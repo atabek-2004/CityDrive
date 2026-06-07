@@ -81,6 +81,29 @@ class _RoadProblemDetailPageState extends State<RoadProblemDetailPage> {
     }
   }
 
+  Future<void> _releaseAssignment(BuildContext context) async {
+    try {
+      await context.read<RoadProblemsProvider>().updateStatus(
+            id: _initialProblem.id,
+            status: ReportStatus.confirmed,
+            clearAssignedController: true,
+          );
+      if (context.mounted) {
+        context.read<ControllerDashboardCubit>().load();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заявка отменена')),
+        );
+        context.router.maybePop();
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      Toaster.showErrorTopShortToast(
+        context,
+        controllerActionErrorMessage(e),
+      );
+    }
+  }
+
   Future<void> _toggleLike() async {
     if (_likeLoading) return;
     final l10n = context.localized;
@@ -132,21 +155,33 @@ class _RoadProblemDetailPageState extends State<RoadProblemDetailPage> {
             UserRole.controller;
     final controllerId = context.repository.authRepository.user?.id;
     final canModerate = isController &&
-        problem.status == ReportStatus.pending &&
-        problem.assignedControllerId == null;
+        ReportStatus.canControllerAccept(
+          status: problem.status,
+          assignedControllerId: problem.assignedControllerId,
+        );
+    final canAwaitAdmin = isController &&
+        controllerId != null &&
+        ReportStatus.isControllerAwaitingAdmin(
+          status: problem.status,
+          assignedControllerId: problem.assignedControllerId,
+          controllerId: controllerId,
+        );
     final canSubmitReport = isController &&
-        !canModerate &&
-        (problem.status == ReportStatus.confirmed ||
-            problem.status == ReportStatus.inProgress) &&
-        (problem.assignedControllerId == null ||
-            problem.assignedControllerId == controllerId);
+        controllerId != null &&
+        ReportStatus.canControllerSubmitWorkReport(
+          status: problem.status,
+          assignedControllerId: problem.assignedControllerId,
+          controllerId: controllerId,
+        );
 
     if (isController) {
       return _ControllerAnnouncementDetail(
         problem: problem,
+        currentControllerId: controllerId,
         canModerate: canModerate,
+        canAwaitAdmin: canAwaitAdmin,
         canSubmitReport: canSubmitReport,
-        onReject: () => _moderate(context, status: ReportStatus.rejected),
+        onRelease: () => _releaseAssignment(context),
         onAccept: () => context.router.push(
           ControllerAcceptApplicationRoute(problem: problem),
         ),
@@ -255,9 +290,6 @@ class _RoadProblemDetailPageState extends State<RoadProblemDetailPage> {
                     const Gap(24),
                   ],
 
-                  // Замените секцию комментариев на это:
-
-// Лайки и комментарии (кликабельные)
                   Row(
                     children: [
                       GestureDetector(
@@ -673,18 +705,22 @@ class _RoadProblemDetailPageState extends State<RoadProblemDetailPage> {
 class _ControllerAnnouncementDetail extends StatelessWidget {
   const _ControllerAnnouncementDetail({
     required this.problem,
+    required this.currentControllerId,
     required this.canModerate,
+    required this.canAwaitAdmin,
     required this.canSubmitReport,
-    required this.onReject,
+    required this.onRelease,
     required this.onAccept,
     required this.onSubmitReport,
     required this.buildImage,
   });
 
   final RoadProblemDTO problem;
+  final int? currentControllerId;
   final bool canModerate;
+  final bool canAwaitAdmin;
   final bool canSubmitReport;
-  final VoidCallback onReject;
+  final VoidCallback onRelease;
   final VoidCallback onAccept;
   final VoidCallback onSubmitReport;
   final Widget Function() buildImage;
@@ -693,7 +729,7 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.localized;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final hasBottomActions = canModerate || canSubmitReport;
+    final hasBottomActions = canModerate || canAwaitAdmin || canSubmitReport;
     final descriptionText = (problem.description?.trim().isNotEmpty ?? false)
         ? problem.description!.trim()
         : l10n.cityDriveResidentReported;
@@ -798,10 +834,15 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
                           runSpacing: 8,
                           children: [
                             ReportStatusBadge(
-                              status: problem.status,
-                              label: controllerStatusLabel(
+                              status: controllerAnnouncementBadgeStatus(problem),
+                              label: controllerAnnouncementStatusLabel(
                                 l10n,
-                                problem.status,
+                                problem,
+                                currentControllerId: currentControllerId,
+                              ),
+                              color: controllerAnnouncementStatusColor(
+                                problem,
+                                currentControllerId: currentControllerId,
                               ),
                               compact: true,
                             ),
@@ -910,13 +951,65 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
                 child: canModerate
-                    ? Column(
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: onAccept,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.mainColor,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            l10n.cityDriveAcceptApplicationBtn,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                    : canAwaitAdmin
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFF3E0),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  l10n.cityDriveAdminReviewSubtitle,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFFE65100),
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                              const Gap(12),
+                              TextButton(
+                                onPressed: onRelease,
+                                child: Text(
+                                  l10n.cancel,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: onAccept,
+                              onPressed: onSubmitReport,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.mainColor,
                                 padding:
@@ -926,7 +1019,7 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
                                 ),
                               ),
                               child: Text(
-                                l10n.cityDriveAcceptApplicationBtn,
+                                l10n.cityDriveSubmitReport,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -935,35 +1028,7 @@ class _ControllerAnnouncementDetail extends StatelessWidget {
                               ),
                             ),
                           ),
-                          TextButton(
-                            onPressed: onReject,
-                            child: Text(
-                              l10n.cityDriveReject,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
                         ],
-                      )
-                    : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: onSubmitReport,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.mainColor,
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Text(
-                            l10n.cityDriveSubmitReport,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                       ),
               ),
             )

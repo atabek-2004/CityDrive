@@ -32,7 +32,7 @@ dependencies:
   drift_flutter: ^0.2.0
   dropdown_button2: ^2.3.9
   equatable: ^2.0.5
-  file_picker: ^8.1.4
+  file_picker: ^10.3.9
   firebase_core: ^3.8.1
   firebase_messaging: ^15.1.6
   flutter:
@@ -57,7 +57,6 @@ dependencies:
   image_picker: ^1.2.1
   intercepted_client: ^0.0.1
   intl: ^0.20.2
-  ispect: ^2.0.5
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
   loader_overlay: ^4.0.2+1
@@ -150,3 +149,8 @@ flutter_gen:
     flutter_svg: true
     rive: true
     lottie: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/png/logoo.png"

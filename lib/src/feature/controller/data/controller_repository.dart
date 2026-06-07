@@ -24,6 +24,12 @@ abstract interface class IControllerRepository {
     String? comment,
   });
 
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
+  });
+
   /// Only when a separate my-marks fetch is needed (tab refresh without full dashboard).
   Future<List<RoadProblemDTO>> refreshMyMarks();
 }
@@ -102,13 +108,16 @@ class ControllerRepositoryImpl implements IControllerRepository {
     final dashboard = ControllerDashboardDTO(
       stats: ControllerDashboardStatsDTO(
         newCount: pending.length,
-        applicationsCount: pending.length,
-        inWorkCount: mine
+        applicationsCount: mine
             .where(
-              (m) =>
-                  m.status == ReportStatus.confirmed ||
-                  m.status == ReportStatus.inProgress,
+              (m) => m.status == ReportStatus.controllerAssigned,
             )
+            .length,
+        inWorkCount: mine
+            .where((m) => m.status == ReportStatus.inProgress)
+            .length,
+        pendingReviewCount: mine
+            .where((m) => m.status == ReportStatus.reportSubmitted)
             .length,
         doneCount:
             mine.where((m) => m.status == ReportStatus.fixed).length,
@@ -155,5 +164,17 @@ class ControllerRepositoryImpl implements IControllerRepository {
         status: status,
         assignedControllerId: assignedControllerId,
         comment: comment,
+      );
+
+  @override
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
+  }) =>
+      _roadProblemRepository.submitWorkReport(
+        id: id,
+        description: description,
+        localImagePaths: localImagePaths,
       );
 }

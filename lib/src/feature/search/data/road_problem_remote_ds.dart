@@ -99,16 +99,48 @@ class RoadProblemRemoteDS {
     required int id,
     required String status,
     int? assignedControllerId,
+    bool clearAssignedController = false,
     String? comment,
   }) async {
     final response = await _dio.patch<Map<String, dynamic>>(
       'marks/$id/status',
       data: {
         'status': status,
-        if (assignedControllerId != null)
+        if (clearAssignedController)
+          'assigned_controller_id': null
+        else if (assignedControllerId != null)
           'assigned_controller_id': assignedControllerId,
         if (comment != null && comment.isNotEmpty) 'comment': comment,
       },
+    );
+    return RoadProblemDTO.fromJson(response.data!);
+  }
+
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
+  }) async {
+    final files = <MultipartFile>[];
+    for (var i = 0; i < localImagePaths.length; i++) {
+      final path = localImagePaths[i];
+      files.add(
+        await MultipartFile.fromFile(
+          path,
+          filename: 'photo${i + 1}.jpg',
+        ),
+      );
+    }
+
+    final formData = FormData.fromMap({
+      if (description != null && description.trim().isNotEmpty)
+        'description': description.trim(),
+      if (files.isNotEmpty) 'images': files,
+    });
+
+    final response = await _dio.post<Map<String, dynamic>>(
+      'marks/$id/work-report',
+      data: formData,
     );
     return RoadProblemDTO.fromJson(response.data!);
   }

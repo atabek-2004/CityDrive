@@ -4,11 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:city_drive/src/core/presentation/widgets/bottomsheet/custom_drag_handle.dart';
 import 'package:city_drive/src/core/presentation/widgets/buttons/custom_button.dart';
-import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
-import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
-import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
 import 'package:city_drive/src/feature/profile/bloc/profile_bloc.dart';
 
 class LogoutBottomSheet extends StatefulWidget {
@@ -51,9 +49,10 @@ class _LogoutBottomSheetState extends State<LogoutBottomSheet> {
       listener: (context, state) {
         state.maybeWhen(
           exited: (message) {
-            // context.read<CargoFormCubit>().clearForm();
-            BlocProvider.of<AppBloc>(context).add(const AppEvent.exiting());
-            context.router.maybePop();
+            if (context.mounted) {
+              context.router.maybePop();
+              resetAfterLogout(context);
+            }
           },
           error: (message) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -146,15 +145,14 @@ class _LogoutBottomSheetState extends State<LogoutBottomSheet> {
                             Expanded(
                               child: CustomButton(
                                 onPressed: () {
-                                  widget.isDeleteAccount == true
-                                      ? BlocProvider.of<ProfileBLoC>(context)
-                                          .add(
-                                          const ProfileEvent.deleteAccount(),
-                                        )
-                                      : BlocProvider.of<ProfileBLoC>(context)
-                                          .add(const ProfileEvent.logOut());
-
-                                  context.router.replaceAll([LoginRoute()]);
+                                  if (widget.isDeleteAccount == true) {
+                                    BlocProvider.of<ProfileBLoC>(context).add(
+                                      const ProfileEvent.deleteAccount(),
+                                    );
+                                  } else {
+                                    BlocProvider.of<ProfileBLoC>(context)
+                                        .add(const ProfileEvent.logOut());
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,

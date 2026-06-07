@@ -128,7 +128,9 @@ class RoadProblemApiRepository implements IRoadProblemRepository {
         (p) =>
             p.assignedControllerId == controllerId &&
             (p.status == ReportStatus.confirmed ||
+                p.status == ReportStatus.controllerAssigned ||
                 p.status == ReportStatus.inProgress ||
+                p.status == ReportStatus.reportSubmitted ||
                 p.status == ReportStatus.fixed),
       )
       .toList();
@@ -189,16 +191,34 @@ class RoadProblemApiRepository implements IRoadProblemRepository {
     required int id,
     required String status,
     int? assignedControllerId,
+    bool clearAssignedController = false,
     String? comment,
   }) async {
     final updated = await _remote.updateStatus(
       id: id,
       status: status,
       assignedControllerId: assignedControllerId,
+      clearAssignedController: clearAssignedController,
       comment: comment,
     );
     await refresh();
     await refreshMine();
+    await refreshPending();
+    return updated;
+  }
+
+  @override
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
+  }) async {
+    final updated = await _remote.submitWorkReport(
+      id: id,
+      description: description,
+      localImagePaths: localImagePaths,
+    );
+    _upsertMark(updated);
     await refreshPending();
     return updated;
   }

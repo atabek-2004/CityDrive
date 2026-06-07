@@ -41,12 +41,18 @@ class _MyWorksPageState extends State<MyWorksPage> {
     required int controllerId,
   }) {
     final myMarks = dashboard?.myMarks ?? provider.mineForController();
-    final pending =
-        dashboard?.pendingMarks ?? provider.pendingForController();
 
     switch (_selectedMainFilter) {
       case _WorksMainFilter.applications:
-        return pending;
+        return myMarks
+            .where(
+              (p) => ReportStatus.isControllerAwaitingAdmin(
+                status: p.status,
+                assignedControllerId: p.assignedControllerId,
+                controllerId: controllerId,
+              ),
+            )
+            .toList();
       case _WorksMainFilter.canceled:
         return myMarks
             .where((p) => p.status == ReportStatus.rejected)
@@ -60,8 +66,16 @@ class _MyWorksPageState extends State<MyWorksPage> {
         return myMarks
             .where(
               (p) =>
-                  p.status == ReportStatus.inProgress ||
-                  p.status == ReportStatus.confirmed,
+                  ReportStatus.isControllerInWork(
+                    status: p.status,
+                    assignedControllerId: p.assignedControllerId,
+                    controllerId: controllerId,
+                  ) ||
+                  ReportStatus.isControllerReportAwaitingReview(
+                    status: p.status,
+                    assignedControllerId: p.assignedControllerId,
+                    controllerId: controllerId,
+                  ),
             )
             .toList();
     }
@@ -255,7 +269,12 @@ class _WorkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.localized;
-    final statusUi = ReportStatusUi.fromStatus(l10n, problem.status);
+    final controllerId = context.repository.authRepository.user?.id;
+    final statusLabel = controllerAnnouncementStatusLabel(
+      l10n,
+      problem,
+      currentControllerId: controllerId,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -314,7 +333,11 @@ class _WorkCard extends StatelessWidget {
           const Gap(8),
           ReportStatusBadge(
             status: problem.status,
-            label: statusUi.label,
+            label: statusLabel,
+            color: controllerAnnouncementStatusColor(
+              problem,
+              currentControllerId: controllerId,
+            ),
             compact: true,
           ),
           if (problem.reportedDate != null) ...[

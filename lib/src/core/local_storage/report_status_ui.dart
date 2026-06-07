@@ -33,10 +33,14 @@ class ReportStatusUi {
         return Icons.hourglass_top_rounded;
       case ReportStatus.confirmed:
         return Icons.check_circle_outline;
+      case ReportStatus.controllerAssigned:
+        return Icons.schedule_outlined;
       case ReportStatus.rejected:
         return Icons.block_outlined;
       case ReportStatus.inProgress:
         return Icons.construction_outlined;
+      case ReportStatus.reportSubmitted:
+        return Icons.fact_check_outlined;
       case ReportStatus.fixed:
         return Icons.done_all_rounded;
       default:
@@ -60,10 +64,14 @@ class ReportStatusUi {
         return const Color(0xFFFFB020);
       case ReportStatus.confirmed:
         return const Color(0xFF34C759);
+      case ReportStatus.controllerAssigned:
+        return const Color(0xFFFF9500);
       case ReportStatus.rejected:
         return const Color(0xFFFF3B30);
       case ReportStatus.inProgress:
         return const Color(0xFF4A9EFF);
+      case ReportStatus.reportSubmitted:
+        return const Color(0xFFFF9500);
       case ReportStatus.fixed:
         return const Color(0xFF00897B);
       default:
@@ -100,10 +108,14 @@ class ReportStatusUi {
         return l10n.cityDriveOnVerification;
       case ReportStatus.confirmed:
         return l10n.cityDriveStatusAccepted;
+      case ReportStatus.controllerAssigned:
+        return l10n.cityDriveAdminReview;
       case ReportStatus.rejected:
         return l10n.cityDriveFilterRejected;
       case ReportStatus.inProgress:
         return l10n.cityDriveStatusInWork;
+      case ReportStatus.reportSubmitted:
+        return l10n.cityDriveReportSubmittedPending;
       case ReportStatus.fixed:
         return l10n.cityDriveStatusFixed;
       default:
@@ -118,16 +130,18 @@ class ReportStatusBadge extends StatelessWidget {
     required this.status,
     required this.label,
     this.compact = false,
+    this.color,
     super.key,
   });
 
   final String? status;
   final String label;
   final bool compact;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final color = ReportStatusUi.colorFor(status);
+    final badgeColor = color ?? ReportStatusUi.colorFor(status);
     final bg = ReportStatusUi.backgroundColorFor(status);
 
     if (compact) {
@@ -139,7 +153,7 @@ class ReportStatusBadge extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: color,
+              color: badgeColor,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -154,7 +168,7 @@ class ReportStatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -166,7 +180,7 @@ class ReportStatusBadge extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: color,
+                color: badgeColor,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),

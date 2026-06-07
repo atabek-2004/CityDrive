@@ -4,11 +4,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:city_drive/src/core/local_storage/report_status.dart';
+import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/core/theme/resources.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/controller/bloc/controller_dashboard_cubit.dart';
+import 'package:city_drive/src/feature/controller/data/controller_remote_ds.dart';
 import 'package:city_drive/src/feature/search/bloc/road_problems_provider.dart';
 import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 
@@ -28,6 +31,29 @@ class _WorkReportPageState extends State<WorkReportPage> {
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _guardAccess());
+  }
+
+  void _guardAccess() {
+    if (!mounted) return;
+    final controllerId = context.repository.authRepository.user?.id;
+    final canSubmit = controllerId != null &&
+        ReportStatus.canControllerSubmitWorkReport(
+          status: widget.problem.status,
+          assignedControllerId: widget.problem.assignedControllerId,
+          controllerId: controllerId,
+        );
+    if (canSubmit) return;
+    Toaster.showErrorTopShortToast(
+      context,
+      'Отчёт можно отправить только для заявки в работе',
+    );
+    context.router.maybePop();
+  }
+
   Future<void> _pickImage(int index) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -37,40 +63,40 @@ class _WorkReportPageState extends State<WorkReportPage> {
 
   Future<void> _submit() async {
     if (_isSubmitting) return;
+
+    final description = _descriptionController.text.trim();
+    final photos = _images.whereType<File>().toList();
+    if (photos.isEmpty && description.isEmpty) {
+      Toaster.showErrorTopShortToast(
+        context,
+        'Добавьте фото или описание',
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
-
-    final imagePaths = _images
-        .whereType<File>()
-        .map((f) => f.path)
-        .toList();
-
-    final updated = RoadProblemDTO(
-      id: widget.problem.id,
-      authorUserId: widget.problem.authorUserId,
-      assignedControllerId: widget.problem.assignedControllerId,
-      title: widget.problem.title,
-      description: _descriptionController.text.isEmpty
-          ? widget.problem.description
-          : _descriptionController.text,
-      address: widget.problem.address,
-      latitude: widget.problem.latitude,
-      longitude: widget.problem.longitude,
-      type: widget.problem.type,
-      severity: widget.problem.severity,
-      status: ReportStatus.fixed,
-      reportedDate: widget.problem.reportedDate,
-      images: imagePaths.isNotEmpty ? imagePaths : widget.problem.images,
-      author: widget.problem.author,
-      likes: widget.problem.likes,
-      commentsCount: widget.problem.commentsCount,
-      comments: widget.problem.comments,
-    );
-
-    await context.read<RoadProblemsProvider>().updateProblem(updated);
-
-    if (!mounted) return;
-    setState(() => _isSubmitting = false);
-    context.router.push(ReportSuccessRoute(problem: widget.problem));
+    try {
+      final updated =
+          await context.repository.controllerRepository.submitWorkReport(
+        id: widget.problem.id,
+        description: description.isEmpty ? null : description,
+        localImagePaths: photos.map((f) => f.path).toList(),
+      );
+      if (!mounted) return;
+      await context.read<RoadProblemsProvider>().refreshMark(updated.id);
+      if (!mounted) return;
+      await context.read<ControllerDashboardCubit>().load();
+      if (!mounted) return;
+      context.router.push(ReportSuccessRoute(problem: updated));
+    } catch (e) {
+      if (!mounted) return;
+      Toaster.showErrorTopShortToast(
+        context,
+        controllerApiErrorMessage(e),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override

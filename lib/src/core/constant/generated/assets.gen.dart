@@ -290,6 +290,9 @@ class $AssetsImagesPngGen {
   /// File path: assets/images/png/logo.png
   AssetGenImage get logo => const AssetGenImage('assets/images/png/logo.png');
 
+  /// File path: assets/images/png/logoo.png
+  AssetGenImage get logoo => const AssetGenImage('assets/images/png/logoo.png');
+
   /// File path: assets/images/png/main_feed_left_app_bar.png
   AssetGenImage get mainFeedLeftAppBar => const AssetGenImage('assets/images/png/main_feed_left_app_bar.png');
 
@@ -379,6 +382,7 @@ class $AssetsImagesPngGen {
         kaspi,
         locationInMap,
         logo,
+        logoo,
         mainFeedLeftAppBar,
         mainFeedRightAppBar,
         map1,

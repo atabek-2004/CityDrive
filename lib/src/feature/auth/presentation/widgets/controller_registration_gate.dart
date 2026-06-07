@@ -6,6 +6,7 @@ import 'package:city_drive/src/feature/auth/presentation/pages/company_data_page
 import 'package:city_drive/src/feature/auth/presentation/pages/company_documents_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/pages/pending_approval_page.dart';
 import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
+import 'package:city_drive/src/feature/auth/presentation/widgets/company_cubit_scope.dart';
 
 /// Выбирает экран регистрации контроллера по `GET company/registration-state`.
 class ControllerRegistrationGate extends StatefulWidget {
@@ -70,13 +71,17 @@ class _ControllerRegistrationGateState extends State<ControllerRegistrationGate>
   Widget build(BuildContext context) {
     return switch (_step) {
       _GateStep.loading => const CustomLoadingOverlayWidget(),
-      _GateStep.companyData => CompanyDataPage(
-          onCompanySaved: () => setState(() => _step = _GateStep.documents),
+      _GateStep.companyData => CompanyCubitScope(
+          child: CompanyDataPage(
+            onCompanySaved: () => setState(() => _step = _GateStep.documents),
+          ),
         ),
-      _GateStep.documents => CompanyDocumentsPage(
-          rejectionReason: _rejectionReason,
-          onDocumentsSubmitted: () =>
-              setState(() => _step = _GateStep.pendingApproval),
+      _GateStep.documents => CompanyCubitScope(
+          child: CompanyDocumentsPage(
+            rejectionReason: _rejectionReason,
+            onDocumentsSubmitted: () =>
+                setState(() => _step = _GateStep.pendingApproval),
+          ),
         ),
       _GateStep.pendingApproval => const PendingApprovalPage(),
       _GateStep.approved => const CustomLoadingOverlayWidget(),

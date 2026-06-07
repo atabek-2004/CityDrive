@@ -14,6 +14,7 @@ class ControllerDashboardStatsDTO with _$ControllerDashboardStatsDTO {
     @JsonKey(name: 'applications_count') @Default(0) int applicationsCount,
     @JsonKey(name: 'in_work_count') @Default(0) int inWorkCount,
     @JsonKey(name: 'done_count') @Default(0) int doneCount,
+    @JsonKey(name: 'pending_review_count') @Default(0) int pendingReviewCount,
   }) = _ControllerDashboardStatsDTO;
 
   factory ControllerDashboardStatsDTO.fromJson(Map<String, dynamic> json) =>
@@ -52,29 +53,56 @@ class ControllerDashboardDTO {
     );
   }
 
-  /// Prefer backend [stats]; fill in_work/done from [myMarks] when stats are zero.
+  /// «Новые» — всё из [pendingMarks] без исполнителя (бэкенд уже отфильтровал).
+  List<RoadProblemDTO> get newMarks => pendingMarks
+      .where(
+        (m) => ReportStatus.canControllerAccept(
+          status: m.status,
+          assignedControllerId: m.assignedControllerId,
+        ),
+      )
+      .toList();
+
+  /// Prefer backend [stats]; синхронизируем счётчики с [myMarks] при необходимости.
   ControllerDashboardStatsDTO get displayStats {
     final fromMy = _statsFromMyMarks(myMarks);
     return stats.copyWith(
+      newCount: stats.newCount > 0 ? stats.newCount : newMarks.length,
+      applicationsCount: stats.applicationsCount > 0
+          ? stats.applicationsCount
+          : fromMy.applicationsCount,
       inWorkCount:
           stats.inWorkCount > 0 ? stats.inWorkCount : fromMy.inWorkCount,
       doneCount: stats.doneCount > 0 ? stats.doneCount : fromMy.doneCount,
+      pendingReviewCount: stats.pendingReviewCount > 0
+          ? stats.pendingReviewCount
+          : fromMy.pendingReviewCount,
     );
   }
 
   static ControllerDashboardStatsDTO _statsFromMyMarks(
     List<RoadProblemDTO> marks,
   ) {
+    var applications = 0;
     var inWork = 0;
+    var pendingReview = 0;
     var done = 0;
     for (final m in marks) {
-      if (m.status == ReportStatus.confirmed ||
-          m.status == ReportStatus.inProgress) {
+      if (m.status == ReportStatus.controllerAssigned) {
+        applications++;
+      } else if (m.status == ReportStatus.inProgress) {
         inWork++;
+      } else if (m.status == ReportStatus.reportSubmitted) {
+        pendingReview++;
       } else if (m.status == ReportStatus.fixed) {
         done++;
       }
     }
-    return ControllerDashboardStatsDTO(inWorkCount: inWork, doneCount: done);
+    return ControllerDashboardStatsDTO(
+      applicationsCount: applications,
+      inWorkCount: inWork,
+      pendingReviewCount: pendingReview,
+      doneCount: done,
+    );
   }
 }

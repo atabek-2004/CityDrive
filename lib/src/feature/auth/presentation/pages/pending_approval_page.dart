@@ -8,6 +8,7 @@ import 'package:city_drive/src/core/local_storage/user_role.dart';
 import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/bloc/app_bloc.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
+import 'package:city_drive/src/feature/auth/presentation/utils/auth_navigation.dart';
 import 'package:city_drive/src/feature/app/logic/demo_local_notification_service.dart';
 
 @RoutePage()
@@ -90,7 +91,7 @@ class _PendingApprovalPageState extends State<PendingApprovalPage>
   }
 
   Future<void> _logout() async {
-    BlocProvider.of<AppBloc>(context).add(const AppEvent.exiting());
+    resetAfterLogout(context);
   }
 
   @override

@@ -280,7 +280,7 @@ final class DemoLocalNotificationService {
     );
   }
 
-  /// Push при публикации объявления в админ-панели.
+  /// Push при публикации объявления в админ-pанели.
   Future<void> showNewsPublishedNotification({
     required String title,
     int? newsId,
@@ -359,9 +359,11 @@ int _statusOrdinal(String status) => switch (status) {
       'new' => 1,
       'pending' => 2,
       'confirmed' => 3,
-      'rejected' => 4,
-      'in_progress' => 5,
-      'fixed' => 6,
+      'controller_assigned' => 4,
+      'rejected' => 5,
+      'in_progress' => 6,
+      'report_submitted' => 7,
+      'fixed' => 8,
       _ => 9,
     };
 
@@ -371,9 +373,12 @@ String _markStatusMessage({String? title, required String status}) {
 
   return switch (status) {
     'confirmed' => '$name принята администратором и опубликована на карте.',
+    'controller_assigned' =>
+      '$name принята вами. Ожидает подтверждения администратором.',
     'rejected' => '$name отклонена администратором.',
-    'in_progress' => '$name принята в работу.',
-    'fixed' => '$name отмечена как исправленная.',
+    'in_progress' => '$name принята в работу. Можно отправить отчёт.',
+    'report_submitted' => '$name: отчёт отправлен, ожидает проверки администратором.',
+    'fixed' => '$name: работа принята администратором.',
     'pending' || 'new' => '$name: на проверке администратором.',
     _ => '$name: новый статус — ${_statusLabelRu(status)}.',
   };
@@ -382,8 +387,10 @@ String _markStatusMessage({String? title, required String status}) {
 String _statusLabelRu(String status) => switch (status) {
       'new' || 'pending' => 'На проверке',
       'confirmed' => 'Принята',
+      'controller_assigned' => 'Проверка админом',
       'rejected' => 'Отклонена',
       'in_progress' => 'В работе',
+      'report_submitted' => 'На проверке',
       'fixed' => 'Исправлено',
       _ => status,
     };

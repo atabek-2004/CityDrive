@@ -8,9 +8,9 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:city_drive/src/core/constant/generated/assets.gen.dart';
 import 'package:city_drive/src/core/presentation/widgets/dialog/toaster.dart';
 import 'package:city_drive/src/core/presentation/widgets/other/custom_loading_overlay_widget.dart';
-import 'package:city_drive/src/core/utils/extensions/context_extension.dart';
 import 'package:city_drive/src/feature/app/router/app_router.dart';
 import 'package:city_drive/src/feature/auth/bloc/company_cubit.dart';
+import 'package:city_drive/src/feature/auth/presentation/widgets/company_cubit_scope.dart';
 
 @RoutePage()
 class CompanyDocumentsPage extends StatefulWidget implements AutoRouteWrapper {
@@ -31,12 +31,7 @@ class CompanyDocumentsPage extends StatefulWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CompanyCubit(
-        repository: context.repository.companyRepository,
-      ),
-      child: this,
-    );
+    return CompanyCubitScope(child: this);
   }
 }
 

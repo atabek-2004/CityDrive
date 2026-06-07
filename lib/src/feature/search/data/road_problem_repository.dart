@@ -50,7 +50,14 @@ abstract interface class IRoadProblemRepository {
     required int id,
     required String status,
     int? assignedControllerId,
+    bool clearAssignedController = false,
     String? comment,
+  });
+
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
   });
 
   Future<RoadProblemDTO> fetchMarkById(int id);
@@ -181,6 +188,7 @@ class RoadProblemRepository implements IRoadProblemRepository {
     required int id,
     required String status,
     int? assignedControllerId,
+    bool clearAssignedController = false,
     String? comment,
   }) async {
     final current = _localDS.getById(id);
@@ -189,11 +197,21 @@ class RoadProblemRepository implements IRoadProblemRepository {
     }
     final updated = current.copyWith(
       status: status,
-      assignedControllerId: assignedControllerId ?? current.assignedControllerId,
+      assignedControllerId: clearAssignedController
+          ? null
+          : (assignedControllerId ?? current.assignedControllerId),
     );
     await _localDS.save(updated);
     return RoadProblemMapper.toDto(updated);
   }
+
+  @override
+  Future<RoadProblemDTO> submitWorkReport({
+    required int id,
+    String? description,
+    required List<String> localImagePaths,
+  }) =>
+      throw UnimplementedError('Work report requires API backend');
 
   @override
   Future<RoadProblemDTO> fetchMarkById(int id) async {

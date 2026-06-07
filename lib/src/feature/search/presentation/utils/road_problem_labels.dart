@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:city_drive/src/core/constant/localization/translations/app_localizations.dart';
 import 'package:city_drive/src/core/local_storage/report_status.dart';
 import 'package:city_drive/src/core/local_storage/report_status_ui.dart';
+import 'package:city_drive/src/core/theme/resources.dart';
+import 'package:city_drive/src/feature/search/model/road_problem_dto.dart';
 String severityLabel(AppLocalizations l10n, String? severity) {
   final level = severity == 'critical' ? 'high' : severity;
   switch (level) {
@@ -42,8 +44,12 @@ String controllerStatusLabel(AppLocalizations l10n, String? status) {
       return l10n.cityDriveUnderReview;
     case ReportStatus.confirmed:
       return l10n.cityDriveStatusAccepted;
+    case ReportStatus.controllerAssigned:
+      return l10n.cityDriveAdminReview;
     case ReportStatus.inProgress:
       return l10n.cityDriveStatusInWork;
+    case ReportStatus.reportSubmitted:
+      return l10n.cityDriveAdminReview;
     case ReportStatus.rejected:
       return l10n.cityDriveStatusRejected;
     case ReportStatus.fixed:
@@ -55,6 +61,69 @@ String controllerStatusLabel(AppLocalizations l10n, String? status) {
 
 Color controllerStatusColor(String? status) =>
     ReportStatusUi.colorFor(status);
+
+/// Статус на экране контроллера с учётом назначения.
+///
+/// `confirmed` без исполнителя — «Доступна» (ещё не принята контроллером).
+/// После accept — «Принята» / «В работе».
+String controllerAnnouncementStatusLabel(
+  AppLocalizations l10n,
+  RoadProblemDTO problem, {
+  int? currentControllerId,
+}) {
+  final assigned = problem.assignedControllerId;
+  final assignedToMe =
+      assigned != null && currentControllerId != null && assigned == currentControllerId;
+
+  if (ReportStatus.canControllerAccept(
+    status: problem.status,
+    assignedControllerId: assigned,
+  )) {
+    if (problem.status == ReportStatus.confirmed) {
+      return l10n.cityDriveAvailable;
+    }
+    return l10n.cityDriveNewStatus;
+  }
+
+  if (assignedToMe && problem.status == ReportStatus.controllerAssigned) {
+    return l10n.cityDriveAdminReview;
+  }
+
+  if (assignedToMe && problem.status == ReportStatus.reportSubmitted) {
+    return l10n.cityDriveReportSubmittedPending;
+  }
+
+  if (assignedToMe && problem.status == ReportStatus.confirmed) {
+    return l10n.cityDriveStatusAccepted;
+  }
+
+  return controllerStatusLabel(l10n, problem.status);
+}
+
+/// Цвет бейджа для [controllerAnnouncementStatusLabel].
+Color controllerAnnouncementStatusColor(
+  RoadProblemDTO problem, {
+  int? currentControllerId,
+}) {
+  if (ReportStatus.canControllerAccept(
+    status: problem.status,
+    assignedControllerId: problem.assignedControllerId,
+  )) {
+    return AppColors.mainColor;
+  }
+  return controllerStatusColor(problem.status);
+}
+
+/// Статус для иконки бейджа (доступные заявки — как «новая»).
+String? controllerAnnouncementBadgeStatus(RoadProblemDTO problem) {
+  if (ReportStatus.canControllerAccept(
+    status: problem.status,
+    assignedControllerId: problem.assignedControllerId,
+  )) {
+    return ReportStatus.newReport;
+  }
+  return problem.status;
+}
 
 String publishedLabel(AppLocalizations l10n, DateTime? date) {
   final formatted = formatReportDate(l10n, date);
